@@ -1,0 +1,15 @@
+<launch>
+    <group ns="jv">
+        <node 
+            pkg = "lab_palopoli"
+            name = "custom_joint_publisher"
+            output = "log"
+            type = "custom_joint_publisher"
+        />
+        <node
+            pkg = "lab_palopoli"
+            name = "custom_joint_subscriber"
+            output = "screen"
+            type = "custom_joint_subscriber"
+    </group>
+</launch>
