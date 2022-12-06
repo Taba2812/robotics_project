@@ -77,13 +77,18 @@ int main()
         inRange(HSVCamera, Scalar(hue - step, saturation - step, brightness - step), Scalar(hue + step, saturation + step, brightness + step), HSVRange);
 
         //Mask Correction
-        Mat erosion;
         Mat erosion_kernel = getStructuringElement( MORPH_CROSS, Size( 2*erosion_size + 1, 2*erosion_size+1 ), Point( erosion_size, erosion_size ) );
+        Mat dilation_kernel = getStructuringElement( MORPH_CROSS, Size( 2*dilation_size + 1, 2*dilation_size+1 ), Point( dilation_size, dilation_size ) );
+
+        Mat erosion;
         erode(HSVRange, erosion, erosion_kernel);
+        Mat opening;
+        dilate(erosion, opening, dilation_kernel);
 
         Mat dilation;
-        Mat dilation_kernel = getStructuringElement( MORPH_CROSS, Size( 2*dilation_size + 1, 2*dilation_size+1 ), Point( dilation_size, dilation_size ) );
         dilate(HSVRange, dilation, dilation_kernel);
+        Mat closing;
+        erode(dilation, closing, erosion_kernel);
 
         //Masking Operation
         Mat Masked;
@@ -92,8 +97,8 @@ int main()
 
         imshow("Webcam Source", Masked);
         imshow("Webcam HSV Range", HSVRange);
-        imshow("Erosion", erosion);
-        imshow("Dilation", dilation);
+        imshow("Open", opening);
+        imshow("Close", closing);
 
 
         int c = waitKey(10);
