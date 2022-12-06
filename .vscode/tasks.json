@@ -4,18 +4,54 @@
 	"tasks": [
 		{
 			"label": "CMake: build OpenCV",
-			"command": "cmake '/Computer Vision/src/build/CMakeLists.txt'",
-			"detail": "Setup environment for compilation of OpenCV application"
+			"command": "cmake",
+			"args": [ "${workspaceFolder}/computer_vision/src/build/CMakeLists.txt" ],
+			"detail": "Setup environment for compilation of OpenCV application",
+			"problemMatcher": [],
+			"presentation": {
+				"reveal": "silent",
+				"revealProblems": "onProblem",
+				"close": true
+			}
 		},
 		{
 			"label": "CMake: compile OpenCV",
-			"command": "make '/Computer Vision/src/build/MakeFile'",
-			"detail": "Compile OpenCV Application"
+			"command": "make",
+			"options": {
+				"cwd": "${workspaceFolder}/computer_vision/src/build"
+			},
+			"detail": "Compile OpenCV Application",
+			"problemMatcher": [],
+			"presentation": {
+				"reveal": "silent",
+				"revealProblems": "onProblem",
+				"close": true
+			}
+		},
+		{
+			"label": "CMake: clean OpenCV",
+			"linux": {
+				"command": "${workspaceFolder}/.vscode/OpenCV_cleanup.bash",
+				"args": [ "${workspaceFolder}/computer_vision/src/build" ]
+			},
+			"detail": "Setup environment for compilation of OpenCV application",
+			"problemMatcher": [],
+			"presentation": {
+				"reveal": "silent",
+				"revealProblems": "onProblem",
+				"close": true
+			}
 		},
 		{
 			"label": "Run OpenCV",
-			"command": "'/Computer Vision/src/build/RobImgProPipe'",
-			"detail": "Run Robot Image Processing Pipeline Application"
+			"command": "${workspaceFolder}/computer_vision/src/build/RobImgProPipe",
+			"detail": "Run Robot Image Processing Pipeline Application",
+			"problemMatcher": [],
+			"presentation": {
+				"reveal": "silent",
+				"revealProblems": "onProblem",
+				"close": true
+			}
 		}
 	]
 }
