@@ -1,0 +1,21 @@
+{
+	"version": "2.0.0",
+
+	"tasks": [
+		{
+			"label": "CMake: build OpenCV",
+			"command": "cmake '/Computer Vision/src/build/CMakeLists.txt'",
+			"detail": "Setup environment for compilation of OpenCV application"
+		},
+		{
+			"label": "CMake: compile OpenCV",
+			"command": "make '/Computer Vision/src/build/MakeFile'",
+			"detail": "Compile OpenCV Application"
+		},
+		{
+			"label": "Run OpenCV",
+			"command": "'/Computer Vision/src/build/RobImgProPipe'",
+			"detail": "Run Robot Image Processing Pipeline Application"
+		}
+	]
+}
