@@ -7,6 +7,8 @@
 
 using namespace cv;
 
+
+
 int main()
 {
     VideoCapture webcam_stream = VideoCapture(0);
@@ -19,38 +21,24 @@ int main()
     int edge_treshold = 0;
     int mask_treshold = 0;
 
+    int hue = 0;
+    int saturation = 0;
+    int brightness = 0;
+    int step = 0;
+
+    int erosion_size = 0;
+    int dilation_size = 0;
+
     Size refS = Size((int) webcam_stream.get(CAP_PROP_FRAME_WIDTH),
                      (int) webcam_stream.get(CAP_PROP_FRAME_HEIGHT));
 
     namedWindow("Webcam Source", WINDOW_KEEPRATIO);
-    createTrackbar("Treshold", "Webcam Source", &edge_treshold, 100);
-    createTrackbar("Mask Treshold", "Webcam Source", &mask_treshold, 255);
-
-    namedWindow("Webcam Red", WINDOW_KEEPRATIO);
-    namedWindow("Webcam Green", WINDOW_KEEPRATIO);
-    namedWindow("Webcam Blue", WINDOW_KEEPRATIO);
-    namedWindow("Red Mask", WINDOW_KEEPRATIO);
-    namedWindow("Green Mask", WINDOW_KEEPRATIO);
-    namedWindow("Blue Mask", WINDOW_KEEPRATIO);
-    resizeWindow("Webcam Source", refS);
-    resizeWindow("Webcam Red", refS/3);
-    resizeWindow("Webcam Green", refS/3);
-    resizeWindow("Webcam Blue", refS/3);
-    resizeWindow("Red Mask", refS/3);
-    resizeWindow("Green Mask", refS/3);
-    resizeWindow("Blue Mask", refS/3);
-
-    int bordo = 100;
-    int barra = 75;
-
-    moveWindow("Webcam Source", 0, 0);
-    moveWindow("Webcam Red", refS.width + bordo, 0);
-    moveWindow("Webcam Green", refS.width + bordo, refS.height/3 + bordo);
-    moveWindow("Webcam Blue", refS.width + bordo, 2 * refS.height/3 + bordo + barra);
-
-    moveWindow("Red Mask", 0, refS.height + bordo + barra);
-    moveWindow("Green Mask", refS.width/3, refS.height + bordo + barra);
-    moveWindow("Blue Mask", 2*refS.width/3, refS.height + bordo + barra);
+    createTrackbar("Hue", "Webcam Source", &hue, 360);
+    createTrackbar("Saturation", "Webcam Source", &saturation, 255);
+    createTrackbar("Brightness", "Webcam Source", &brightness, 255);
+    createTrackbar("Step", "Webcam Source", &step, 50);
+    createTrackbar("Erosion", "Webcam Source", &erosion_size, 50);
+    createTrackbar("Dilation", "Webcam Source", &dilation_size, 50);
 
 
     Mat frameReference, edgeDetected;
@@ -83,15 +71,30 @@ int main()
         Mat tmp;
         Canny(edgeDetected, tmp, edge_treshold, edge_treshold*3, 3);
 
+        //Range Operation
+        Mat HSVCamera, HSVRange;
+        cvtColor(frameReference, HSVCamera, COLOR_BGR2HSV);
+        inRange(HSVCamera, Scalar(hue - step, saturation - step, brightness - step), Scalar(hue + step, saturation + step, brightness + step), HSVRange);
+
+        //Mask Correction
+        Mat erosion;
+        Mat erosion_kernel = getStructuringElement( MORPH_CROSS, Size( 2*erosion_size + 1, 2*erosion_size+1 ), Point( erosion_size, erosion_size ) );
+        erode(HSVRange, erosion, erosion_kernel);
+
+        Mat dilation;
+        Mat dilation_kernel = getStructuringElement( MORPH_CROSS, Size( 2*dilation_size + 1, 2*dilation_size+1 ), Point( dilation_size, dilation_size ) );
+        dilate(HSVRange, dilation, dilation_kernel);
+
+        //Masking Operation
+        Mat Masked;
+        bitwise_and(frameReference, frameReference, Masked, HSVRange);
 
 
-        imshow("Webcam Source", frameReference);
-        imshow("Webcam Red", webcam_channels[2]);
-        imshow("Webcam Green", webcam_channels[1]);
-        imshow("Webcam Blue", webcam_channels[0]);
-        imshow("Red Mask", webcam_channels_masks[2]);
-        imshow("Green Mask", webcam_channels_masks[1]);
-        imshow("Blue Mask", webcam_channels_masks[0]);
+        imshow("Webcam Source", Masked);
+        imshow("Webcam HSV Range", HSVRange);
+        imshow("Erosion", erosion);
+        imshow("Dilation", dilation);
+
 
         int c = waitKey(10);
         if (c == 'k')
