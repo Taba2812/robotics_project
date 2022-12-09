@@ -1,5 +1,7 @@
 # robotics_project
 Project on a robotic manipulator.
 
-Clone from the trento_lab_home/ros_ws/src
-In the same directory, clone locosim
+git clone git@github.com:Taba2812/robotics_project.git
+git submodule update --recursive
+
+When in the final steps of the project, more detailed instruction on how to build and run will be given.

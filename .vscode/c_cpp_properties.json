@@ -4,9 +4,8 @@
             "name": "Linux",
             "includePath": [
                 "${workspaceFolder}/**",
-                "/home/dawwo/OpenCV/opencv-4.x/include",
-                "/home/dawwo/OpenCV/opencv-4.x/include/**",
-                "/usr/include/opencv4"
+                "/opt/ros/noetic/include",
+                "/usr/include/eigen3"
             ],
             "defines": [],
             "compilerPath": "/usr/bin/gcc",
