@@ -27,13 +27,13 @@ int main()
     int edge_treshold = 0;
     int mask_treshold = 0;
 
-    int hue = 0;
-    int saturation = 0;
-    int brightness = 0;
-    int step = 0;
+    int hue = 144;
+    int saturation = 185;
+    int brightness = 96;
+    int step = 50;
 
-    int erosion_size = 0;
-    int dilation_size = 0;
+    int erosion_size = 3;
+    int dilation_size = 5;
 
 
     //Read from Images
@@ -45,11 +45,11 @@ int main()
     createTrackbar("Hue", "Webcam Source", &hue, 360);
     createTrackbar("Saturation", "Webcam Source", &saturation, 255);
     createTrackbar("Brightness", "Webcam Source", &brightness, 255);
-    createTrackbar("Step", "Webcam Source", &step, 50);
+    createTrackbar("Step", "Webcam Source", &step, 100);
     createTrackbar("Erosion", "Webcam Source", &erosion_size, 50);
     createTrackbar("Dilation", "Webcam Source", &dilation_size, 50);
 
-    std::string url = location + "Phone_Table_#1.jpg";
+    std::string url = location + "Phone_Table_#2.jpg";
 
     Mat src_image = imread(url, IMREAD_COLOR);
 
@@ -59,6 +59,18 @@ int main()
         return EXIT_FAILURE;
     }
 
+    Size img_size = Size((int)src_image.cols, (int)src_image.rows);
+
+    namedWindow("Webcam HSV Range", WINDOW_KEEPRATIO);
+    resizeWindow("Webcam HSV Range", img_size/4);
+
+    namedWindow("Image HSV", WINDOW_KEEPRATIO);
+    resizeWindow("Image HSV", img_size/4);
+
+    namedWindow("Open", WINDOW_KEEPRATIO);
+    resizeWindow("Open", img_size/4);
+
+    resizeWindow("Webcam Source", img_size/3);
 
     Mat frameReference, edgeDetected;
     std::vector<Mat> webcam_channels;
@@ -91,34 +103,39 @@ int main()
         Mat tmp;
         Canny(edgeDetected, tmp, edge_treshold, edge_treshold*3, 3);
 
+        //Bilateral Blur on HSV Image
+        Mat blurred;
+        bilateralFilter(frameReference, blurred, 9, 75, 75);
+
         //Range Operation
         Mat HSVCamera, HSVRange;
-        cvtColor(frameReference, HSVCamera, COLOR_BGR2HSV);
+        cvtColor(blurred, HSVCamera, COLOR_BGR2HSV);
+
         inRange(HSVCamera, Scalar(hue - step, saturation - step, brightness - step), Scalar(hue + step, saturation + step, brightness + step), HSVRange);
 
         //Mask Correction
-        Mat erosion_kernel = getStructuringElement( MORPH_CROSS, Size( 2*erosion_size + 1, 2*erosion_size+1 ), Point( erosion_size, erosion_size ) );
-        Mat dilation_kernel = getStructuringElement( MORPH_CROSS, Size( 2*dilation_size + 1, 2*dilation_size+1 ), Point( dilation_size, dilation_size ) );
-
-        Mat erosion;
-        erode(HSVRange, erosion, erosion_kernel);
-        Mat opening;
-        dilate(erosion, opening, dilation_kernel);
+        Mat erosion_kernel = getStructuringElement( MORPH_ELLIPSE, Size( 2*erosion_size + 1, 2*erosion_size+1 ), Point( erosion_size, erosion_size ) );
+        Mat dilation_kernel = getStructuringElement( MORPH_ELLIPSE, Size( 2*dilation_size + 1, 2*dilation_size+1 ), Point( dilation_size, dilation_size ) );
 
         Mat dilation;
         dilate(HSVRange, dilation, dilation_kernel);
         Mat closing;
         erode(dilation, closing, erosion_kernel);
 
+        Mat erosion;
+        erode(closing, erosion, erosion_kernel);
+        Mat opening;
+        dilate(erosion, opening, dilation_kernel);
+
         //Masking Operation
         Mat Masked;
-        bitwise_and(frameReference, frameReference, Masked, HSVRange);
+        bitwise_and(frameReference, frameReference, Masked, opening);
 
 
         imshow("Webcam Source", Masked);
         imshow("Webcam HSV Range", HSVRange);
+        imshow("Image HSV", HSVCamera);
         imshow("Open", opening);
-        imshow("Close", closing);
 
 
         int c = waitKey(10);
@@ -157,5 +174,24 @@ PIPELINE ----------------------------
  - Apply Mask to Camera Input
 
  - Run Object Recognition
+
+*/
+
+/*
+VALUES ------------------------------
+
+ - Erosion 2
+ - Dilation 7
+
+ 1 Kind of blocks
+ - Hue 0
+ - Saturation 209
+ - Brightness 146ù
+ - Step 50
+
+ Other kind of block
+ - Hue 144
+ - Saturation 185
+ - Brightness 96
 
 */
