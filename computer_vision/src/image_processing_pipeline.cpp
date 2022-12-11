@@ -7,15 +7,21 @@
 
 using namespace cv;
 
-
+const std::string location = "/home/dawwo/Documents/Repositories/robotics_project/computer_vision/images_database/testing_placeholders/";
 
 int main()
 {
+    // Read from Webcam
+    /*
     VideoCapture webcam_stream = VideoCapture(0);
     if (!webcam_stream.isOpened()) {
         std::cout << "Could not open webcam" << "0" << std::endl;
         return -1;
     }
+    */
+
+    int picture_index = 1;
+
 
     int frameNum = -1;
     int edge_treshold = 0;
@@ -29,16 +35,29 @@ int main()
     int erosion_size = 0;
     int dilation_size = 0;
 
-    Size refS = Size((int) webcam_stream.get(CAP_PROP_FRAME_WIDTH),
-                     (int) webcam_stream.get(CAP_PROP_FRAME_HEIGHT));
+
+    //Read from Images
+    //Size refS = Size((int) webcam_stream.get(CAP_PROP_FRAME_WIDTH),
+    //                 (int) webcam_stream.get(CAP_PROP_FRAME_HEIGHT));
 
     namedWindow("Webcam Source", WINDOW_KEEPRATIO);
+    createTrackbar("Image", "Webcam Source", &picture_index, 9);
     createTrackbar("Hue", "Webcam Source", &hue, 360);
     createTrackbar("Saturation", "Webcam Source", &saturation, 255);
     createTrackbar("Brightness", "Webcam Source", &brightness, 255);
     createTrackbar("Step", "Webcam Source", &step, 50);
     createTrackbar("Erosion", "Webcam Source", &erosion_size, 50);
     createTrackbar("Dilation", "Webcam Source", &dilation_size, 50);
+
+    std::string url = location + "Phone_Table_#1.jpg";
+
+    Mat src_image = imread(url, IMREAD_COLOR);
+
+    if(src_image.empty()){
+        printf(url.c_str());
+        printf(" Error opening image\n");
+        return EXIT_FAILURE;
+    }
 
 
     Mat frameReference, edgeDetected;
@@ -48,7 +67,8 @@ int main()
     double psnrV;
 
     for (;;) {
-        webcam_stream >> frameReference;
+        //webcam_stream >> frameReference;
+        frameReference = src_image;
         split(frameReference, webcam_channels);
         split(frameReference, webcam_channels_masks);
 
