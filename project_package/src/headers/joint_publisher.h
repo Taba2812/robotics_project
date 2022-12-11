@@ -1,14 +1,15 @@
 #ifndef CUSTOM_JOINT_PUB_H
 #define CUSTOM_JOINT_PUB_H
 
-
 #include "ros/ros.h"
 #include <sensor_msgs/JointState.h>
 #include <std_msgs/Float64MultiArray.h>
 #include <Eigen/Dense>
 #include <realtime_tools/realtime_publisher.h>
 
-typedef  Eigen::Matrix<double, 6, 1> JointStateVector;
+#define JOINTS 6
+
+typedef  Eigen::Matrix<double, JOINTS, 1> JointStateVector;
 
 
 // Methods
