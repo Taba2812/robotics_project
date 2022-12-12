@@ -1,6 +1,8 @@
 #include "headers/joint_publisher.h"
 #include <math.h>
 
+char* joint_names[JOINTS] = {"shoulder_pan_joint", "shoulder_lift_joint", "elbow_joint", "wrist_1_joint", "wrist_2_joint", "wrist_3_joint"};
+
 void send_des_jstate(const JointStateVector & joint_pos)
 {
     std::cout << "q_des " << joint_pos.transpose() << std::endl;
@@ -51,20 +53,22 @@ JointStateVector secondOrderFilter(const JointStateVector & input, const double 
 
 int main(int argc, char **argv)
 {
-  ros::init(argc, argv, "custom_joint_publisher");
+  ros::init(argc, argv, "joint_publisher");
   ros::NodeHandle node;
 
   //pub_des_jstate_sim_rt.reset(new realtime_tools::RealtimePublisher<sensor_msgs::JointState>(node, "/command", 1));
 
   node.getParam("/real_robot", real_robot);
 
-  if (real_robot)
+  pub_des_jstate = node.advertise<std_msgs::Float64MultiArray>("/ur5/joint_group_pos_controller/command", 1);
+
+  /*if (real_robot)
   {
       pub_des_jstate = node.advertise<std_msgs::Float64MultiArray>("/ur5/joint_group_pos_controller/command", 1);
 
   } else {
       pub_des_jstate = node.advertise<sensor_msgs::JointState>("/command", 1);
-  }
+  }*/
 
   ros::Rate loop_rate(loop_frequency);
 

@@ -16,5 +16,20 @@
         "/home/taba/trento_lab_home/ros_ws/src/locosim/robot_control",
         "/opt/openrobots/lib/pythonPYTHON_VERSION/site-packages",
         "/home/taba/trento_lab_home/ros_ws/src/locosim/robot_control"
+    ],
+    "python.analysis.extraPaths": [
+        "/home/taba/trento_lab_home/ros_ws/devel/lib/python3/dist-packages",
+        "/home/taba/trento_lab_home/ros_ws/install/lib/python3/dist-packages",
+        "/opt/ros/noetic/lib/python3/dist-packages",
+        "/opt/openrobots/lib/pythonPYTHON_VERSION/site-packages",
+        "/home/taba/trento_lab_home/ros_ws/src/locosim/robot_control",
+        "/opt/openrobots/lib/pythonPYTHON_VERSION/site-packages",
+        "/home/taba/trento_lab_home/ros_ws/src/locosim/robot_control",
+        "/opt/openrobots/lib/pythonPYTHON_VERSION/site-packages",
+        "/home/taba/trento_lab_home/ros_ws/src/locosim/robot_control",
+        "/opt/openrobots/lib/python3.8/site-packages",
+        "/home/taba/trento_lab_home/ros_ws/src/locosim/robot_control",
+        "/opt/openrobots/lib/pythonPYTHON_VERSION/site-packages",
+        "/home/taba/trento_lab_home/ros_ws/src/locosim/robot_control"
     ]
 }
