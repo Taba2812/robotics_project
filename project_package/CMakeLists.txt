@@ -20,9 +20,9 @@ install(TARGETS joint_publisher
   RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
 )
 
-add_executable(position_control src/position_control.cpp)
-target_link_libraries(position_control ${catkin_LIBRARIES})
-install(TARGETS joint_publisher
+add_executable(joint_subscriber src/joint_subscriber.cpp)
+target_link_libraries(joint_subscriber ${catkin_LIBRARIES})
+install(TARGETS joint_subscriber
   ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
   LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
   RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}

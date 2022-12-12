@@ -7,8 +7,8 @@
 
 #define JOINTS 6
 #define QUEUE_SIZE 1000
-#define LOOP_RATE 1000
+#define LOOP_RATE 1000.
 
-void get_position(const std_msgs::Float64MultiArray::ConstPtr& msg);
+void get_position(const sensor_msgs::JointState::ConstPtr & msg);
 
 #endif
