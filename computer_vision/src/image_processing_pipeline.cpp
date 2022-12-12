@@ -7,7 +7,7 @@
 #include <opencv2/imgproc.hpp>
 
 std::list<std::string> views = {"Original", "HSV", "Mask", "Masked"};
-const std::string location = "/home/dawwo/Documents/Repositories/robotics_project/computer_vision/images_database/testing_placeholders/";
+const std::string location = "/home/dawwo/Documents/Repositories/robotics_project/computer_vision/images_database/official_placeholders/MultipleBlocks/";
 
 //VARIABLES -----------------
 
@@ -17,9 +17,9 @@ int frameNum = -1;
 int edge_treshold = 0;
 int mask_treshold = 0;
 
-int hue = 144;
-int saturation = 185;
-int brightness = 96;
+int hue = 107;
+int saturation = 194;
+int brightness = 139;
 int step = 50;
 
 int erosion_size = 3;
@@ -65,7 +65,7 @@ void showWindows(std::list<cv::Mat> mats) {
 int main () {
 
     //Get Test Image
-    std::string url = location + "Phone_Table_#2.jpg";
+    std::string url = location + "blocks_group2_14.jpg";
 
     cv::Mat src_image = cv::imread(url, cv::IMREAD_COLOR);
 
@@ -78,7 +78,7 @@ int main () {
     cv::Size src_size = cv::Size((int)src_image.cols, (int)src_image.rows);
 
     //Setup views
-    createWindows(src_size, 3);
+    createWindows(src_size, 2);
     addTrackbars();
 
     //Main Loop
