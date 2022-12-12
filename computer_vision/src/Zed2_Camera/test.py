@@ -13,19 +13,12 @@ def main():
     # Create a InitParameters object and set configuration parameters
     init_params = sl.InitParameters()
     init_params.sdk_verbose = False
-    init_params.camera_resolution = sl.RESOLUTION.HD1080  # Use HD1080 video mode
+    init_params.camera_resolution = sl.RESOLUTION.HD720  # Use HD1080 video mode
     init_params.camera_fps = 30  # Set fps at 30
     init_params.depth_mode = sl.DEPTH_MODE.ULTRA  # Use PERFORMANCE depth mode
     init_params.coordinate_units = sl.UNIT.METER  # Use meter units (for depth measurements)
-    init_params.depth_minimum_distance = 0.10
-    init_params.depth_maximum_distance = 2
-    
-    # Create and set RuntimeParameters after opening the camera
-    runtime_parameters = sl.RuntimeParameters()
-    runtime_parameters.sensing_mode = sl.SENSING_MODE.STANDARD  # Use STANDARD sensing mode
-    # Setting the depth confidence parameters
-    runtime_parameters.confidence_threshold = 100
-    runtime_parameters.textureness_confidence_threshold = 100
+    init_params.depth_minimum_distance = 0.5
+    init_params.depth_maximum_distance = 30
 
     # Open the camera
     err = zed.open(init_params)
@@ -33,6 +26,19 @@ def main():
         print('Camera not Found');
         exit(1)
     
+    zed.set_camera_settings(sl.VIDEO_SETTINGS.BRIGHTNESS, 6)
+
+    # Create and set RuntimeParameters after opening the camera
+    runtime_parameters = sl.RuntimeParameters()
+    runtime_parameters.sensing_mode = sl.SENSING_MODE.FILL # Use STANDARD sensing mode
+    # Setting the depth confidence parameters
+    runtime_parameters.confidence_threshold = 30
+    runtime_parameters.textureness_confidence_threshold = 100
+    
+    # A new image is available if grab() returns SUCCESS
+    tracking_parameters = sl.PositionalTrackingParameters()
+    tracking_parameters.set_as_static=True
+    err = zed.enable_positional_tracking(tracking_parameters)
 
     # Get camera information (ZED serial number)
     zed_serial = zed.get_camera_information().serial_number
@@ -49,7 +55,6 @@ def main():
     tr_np = mirror_ref.m
 
     while i < 1:
-        # A new image is available if grab() returns SUCCESS
         if zed.grab(runtime_parameters) == sl.ERROR_CODE.SUCCESS:
             # Retrieve left image
             zed.retrieve_image(image, sl.VIEW.LEFT)
@@ -82,13 +87,16 @@ def main():
             sys.stdout.flush()
 
 
-    path = "./Image.png"
-    path2 = "./Depth.png"       
+    path = "./Image3.png"
+    path2 = "./Depth3.jpg"    
     img = image.get_data()
     dp = depth.get_data()
     cv2.imwrite(path, img)
     cv2.imwrite(path2, dp)
-
+    np.save("point_cloud_array3", point_cloud.get_data())
+    print(dp)
+    cv2.imshow("img",dp)
+    cv2.waitKey(0)
     # Close the camera
     zed.close()
 

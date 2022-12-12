@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <iostream>
 #include <list>
+#include <vector>
 #include <opencv2/core.hpp>
 #include <opencv2/imgcodecs.hpp>
 #include <opencv2/highgui.hpp>
@@ -8,6 +9,14 @@
 
 std::list<std::string> views = {"Original", "HSV", "Mask", "Masked"};
 const std::string location = "/home/dawwo/Documents/Repositories/robotics_project/computer_vision/images_database/official_placeholders/MultipleBlocks/";
+
+struct HSV_Colorspace{
+    int hue;
+    int saturation;
+    int brightness;
+};
+
+std::vector<HSV_Colorspace> lookup_colors = {{107,194,139}};
 
 //VARIABLES -----------------
 
@@ -89,7 +98,7 @@ int main () {
         std::cout << "Frame: #" << frameNum << std::endl;
 
         //PIPELINE--------------------
-        //Bilateral Blur on HSV Image
+        //Bilateral Blur on HSV Image   
         cv::Mat blurred;
         cv::bilateralFilter(src_image, blurred, 9, 75, 75);
 
@@ -97,25 +106,27 @@ int main () {
         cv::Mat HSVCamera, HSVRange;
         cv::cvtColor(blurred, HSVCamera, cv::COLOR_BGR2HSV);
 
-        cv::inRange(HSVCamera, cv::Scalar(hue - step, saturation - step, brightness - step), cv::Scalar(hue + step, saturation + step, brightness + step), HSVRange);
+        cv::Mat dilation, closing, erosion, opening, mask;
+        //Mask for all colors that we are looking for then mix them
+        //for (HSV_Colorspace pick : lookup_colors) {
+            cv::inRange(HSVCamera, cv::Scalar(hue - step, saturation - step, brightness - step), cv::Scalar(hue + step, saturation + step, brightness + step), HSVRange);
 
-        //Mask Correction
-        cv::Mat erosion_kernel = cv::getStructuringElement( cv::MORPH_ELLIPSE, cv::Size( 2*erosion_size + 1, 2*erosion_size+1 ), cv::Point( erosion_size, erosion_size ) );
-        cv::Mat dilation_kernel = cv::getStructuringElement( cv::MORPH_ELLIPSE, cv::Size( 2*dilation_size + 1, 2*dilation_size+1 ), cv::Point( dilation_size, dilation_size ) );
+            //Mask Correction
+            cv::Mat erosion_kernel = cv::getStructuringElement( cv::MORPH_ELLIPSE, cv::Size( 2*erosion_size + 1, 2*erosion_size+1 ), cv::Point( erosion_size, erosion_size ) );
+            cv::Mat dilation_kernel = cv::getStructuringElement( cv::MORPH_ELLIPSE, cv::Size( 2*dilation_size + 1, 2*dilation_size+1 ), cv::Point( dilation_size, dilation_size ) );
 
-        cv::Mat dilation;
-        cv::dilate(HSVRange, dilation, dilation_kernel);
-        cv::Mat closing;
-        cv::erode(dilation, closing, erosion_kernel);
+            cv::dilate(HSVRange, dilation, dilation_kernel);
+            cv::erode(dilation, closing, erosion_kernel);
 
-        cv::Mat erosion;
-        cv::erode(closing, erosion, erosion_kernel);
-        cv::Mat opening;
-        cv::dilate(erosion, opening, dilation_kernel);
+            cv::erode(closing, erosion, erosion_kernel);
+            cv::dilate(erosion, opening, dilation_kernel);
+
+            //cv::bitwise_or(mask, opening, mask);
+        //}
 
         //Masking Operation
         cv::Mat Masked;
-        bitwise_and(src_image, src_image, Masked, opening);
+        cv::bitwise_and(src_image, src_image, Masked, opening);
         //--------------------
 
         std::list<cv::Mat> mats = {src_image, HSVCamera, opening, Masked};
