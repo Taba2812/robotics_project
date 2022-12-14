@@ -9,6 +9,7 @@
 
 #include "settings.h"
 #include "display_utility.h"
+#include "pipeline.h"
 
 //VARIABLES -----------------
 
@@ -47,41 +48,19 @@ int main () {
         std::cout << "Frame: #" << frameNum << std::endl;
 
         //PIPELINE--------------------
-        //Bilateral Blur on HSV Image   
         cv::Mat blurred;
-        cv::bilateralFilter(src_image, blurred, 9, 75, 75);
+        pipeline::removeNoise(src_image, blurred);
 
         //Range Operation
-        cv::Mat HSVCamera, HSVRange;
-        cv::cvtColor(blurred, HSVCamera, cv::COLOR_BGR2HSV);
-
-        cv::Mat dilation, closing, erosion, opening;
-        cv::Mat mask((int)src_image.rows, (int)src_image.cols, CV_8UC1, cv::Scalar(0));
-
-        //Mask for all colors that we are looking for then mix them
-        for (setting::Boundry bound : setting::lookup_colors) {
-            cv::inRange(HSVCamera, cv::Scalar(bound.lower.hue, bound.lower.saturation, bound.lower.brightness), 
-                                   cv::Scalar(bound.upper.hue, bound.upper.saturation, bound.upper.brightness), HSVRange);
-
-            //Mask Correction
-            cv::Mat erosion_kernel = cv::getStructuringElement( cv::MORPH_ELLIPSE, cv::Size( 2*erosion_size + 1, 2*erosion_size+1 ), cv::Point( erosion_size, erosion_size ) );
-            cv::Mat dilation_kernel = cv::getStructuringElement( cv::MORPH_ELLIPSE, cv::Size( 2*dilation_size + 1, 2*dilation_size+1 ), cv::Point( dilation_size, dilation_size ) );
-
-            cv::dilate(HSVRange, dilation, dilation_kernel);
-            cv::erode(dilation, closing, erosion_kernel);
-
-            cv::erode(closing, erosion, erosion_kernel);
-            cv::dilate(erosion, opening, dilation_kernel);
-
-            cv::bitwise_or(mask, opening, mask);
-        }
+        cv::Mat mask;
+        pipeline::generateMask(blurred, mask);
 
         //Masking Operation
-        cv::Mat Masked;
-        cv::bitwise_and(src_image, src_image, Masked, mask);
+        cv::Mat result;
+        pipeline::maskMat(blurred, result, mask);
         //--------------------
 
-        std::list<cv::Mat> mats = {src_image, HSVCamera, HSVRange, opening, Masked};
+        std::list<cv::Mat> mats = {src_image, blurred, mask, result};
         utility::showWindows(mats);
 
         int c = cv::waitKey(10);
