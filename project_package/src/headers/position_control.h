@@ -4,6 +4,7 @@
 #include "ros/ros.h"
 #include "sensor_msgs/JointState.h"
 #include "std_msgs/Float64MultiArray.h"
+#include "geometry_msgs/PoseWithCovarianceStamped.h"
 #include <Eigen/Dense>
 
 #define JOINTS 6
@@ -16,5 +17,6 @@ std::string joint_names[JOINTS] = {"elbow_joint", "shoulder_lift_joint", "should
 double q[JOINTS] = {0,0,0,0,0,0};
 
 void get_position(const sensor_msgs::JointState::ConstPtr& js);
+void new_pose(double x, double y, double z, double roll, double pitch, double yaw);
 
 #endif

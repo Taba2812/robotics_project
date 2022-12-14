@@ -1,8 +1,0 @@
-<launch>
-
-    <group js="joint_state">
-        <node pkg="project_package" name="joint_publisher" type="joint_publisher"/>
-        <node pkg="project_package" name="position_control" type="position_control"/>
-    </group>
-
-</launch>
