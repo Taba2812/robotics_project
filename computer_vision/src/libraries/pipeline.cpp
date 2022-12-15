@@ -1,4 +1,5 @@
 #include "pipeline.h"
+#include "settings.h"
 
 void pipeline::removeNoise(cv::Mat src, cv::Mat dst) {
     //Bilateral Blur on Image   

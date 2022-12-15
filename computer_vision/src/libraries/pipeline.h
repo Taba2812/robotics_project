@@ -6,8 +6,6 @@
 #include <opencv2/highgui.hpp>
 #include <opencv2/imgproc.hpp>
 
-#include "settings.h"
-
 namespace pipeline {
 
     void removeNoise(cv::Mat src, cv::Mat dst);

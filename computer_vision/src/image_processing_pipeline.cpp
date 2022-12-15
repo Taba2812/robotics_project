@@ -7,9 +7,9 @@
 #include <opencv2/highgui.hpp>
 #include <opencv2/imgproc.hpp>
 
-#include "settings.h"
-#include "display_utility.h"
-#include "pipeline.h"
+#include "libraries/settings.h"
+#include "libraries/display_utility.h"
+#include "libraries/pipeline.h"
 
 //VARIABLES -----------------
 

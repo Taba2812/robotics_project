@@ -32,12 +32,7 @@ namespace setting {
                                           {{218,147,111},{140,51 ,50 }},  //Blocchetti Viola
                                           {{40 ,255,255},{0  ,130,115}}}; //Blocchetti Rossi
 
-    cv::Rect getCropRect(cv::Mat mat) {
-        return cv::Rect (mat.cols * (LEFT_CROP  / 100.0), 
-                         mat.rows * (TOP_CROP   / 100.0), 
-                         mat.cols * (RIGHT_CROP / 100.0), 
-                         mat.rows * (BOT_CROP   / 100.0)); 
-    }
+    cv::Rect getCropRect(cv::Mat mat);
     
 }
 
