@@ -27,8 +27,10 @@ int main(int argc, char **argv){
     ros::NodeHandle nh;
     ros::Rate loop_rate(LOOP_RATE);
 
+    //array of joint variables
     q.resize(JOINTS,1);
 
+    //publishers and subscribers
     ros::Subscriber joint_sub = nh.subscribe("/ur5/joint_states", QUEUE_SIZE, get_joint);
     ros::Subscriber link_sub = nh.subscribe("/gazebo/link_states", QUEUE_SIZE, get_link);
     ros::Publisher joint_pub = nh.advertise<std_msgs::Float64MultiArray>("/ur5/joint_group_pos_controller/command", QUEUE_SIZE);

@@ -7,9 +7,11 @@
 
 #define JOINTS 6
 #define DIM 4
-#define ALPHA 1.57
-#define CN 0
-#define D 1
+
+//these are stand-in values, I have to figure them out from a kinematic diagram of the ur5
+#define ALPHA 1.57  //90 degrees in radians
+#define CN 0        //common normal
+#define D 1         //distance between axes for DH parameters
 
 typedef Eigen::Matrix<double, DIM, DIM> Matrix4d;
 

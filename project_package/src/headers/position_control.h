@@ -4,6 +4,7 @@
 #include <iostream>
 #include "ros/ros.h"
 #include "direct_kinematics.h"
+#include "inverse_kinematics.h"
 #include "sensor_msgs/JointState.h"
 #include "std_msgs/Float64MultiArray.h"
 #include "gazebo_msgs/LinkStates.h"
