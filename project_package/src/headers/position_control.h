@@ -17,7 +17,7 @@
 std::string joint_names[JOINTS] = {"elbow_joint", "shoulder_lift_joint", "shoulder_pan_joint", "wrist_1_joint", "wrist_2_joint", "wrist_3_joint"};
 std::string link_names[LINKS] = {"base_link", "shoulder_link", "upper_arm_link", "forearm_link", "wrist_1_link", "wrist_2_link", "wrist_3_link"};
 Eigen::VectorXd q;
-geometry_msgs::Point p[LINKS];
+double p[LINKS][3];
 
 void get_joint(const sensor_msgs::JointState::ConstPtr& js);
 void get_link(const gazebo_msgs::LinkStates::ConstPtr& ls);

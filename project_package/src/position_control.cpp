@@ -7,7 +7,15 @@ void get_joint(const sensor_msgs::JointState::ConstPtr& js){
 }
 
 void get_link(const gazebo_msgs::LinkStates::ConstPtr& ls){
-    
+    int counter = 0;
+    for(auto a : ls->pose){
+        if(counter < LINKS){
+            p[counter][0] = a.position.x;
+            p[counter][1] = a.position.y;
+            p[counter][2] = a.position.z;
+            counter++;
+        }
+    }
 }
 
 void new_pose(double x, double y, double z, double roll, double pitch, double yaw){
@@ -19,7 +27,7 @@ int main(int argc, char **argv){
     ros::NodeHandle nh;
     ros::Rate loop_rate(LOOP_RATE);
 
-    q.resize(6,1);
+    q.resize(JOINTS,1);
 
     ros::Subscriber joint_sub = nh.subscribe("/ur5/joint_states", QUEUE_SIZE, get_joint);
     ros::Subscriber link_sub = nh.subscribe("/gazebo/link_states", QUEUE_SIZE, get_link);
