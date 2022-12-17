@@ -1,9 +1,13 @@
 #include "headers/position_control.h"
 
-void get_position(const sensor_msgs::JointState::ConstPtr& js){
+void get_joint(const sensor_msgs::JointState::ConstPtr& js){
     for(int i=0; i<JOINTS; i++){
         q[i] = js->position[i];
     }
+}
+
+void get_link(const gazebo_msgs::LinkStates::ConstPtr& ls){
+    
 }
 
 void new_pose(double x, double y, double z, double roll, double pitch, double yaw){
@@ -17,7 +21,8 @@ int main(int argc, char **argv){
 
     q.resize(6,1);
 
-    ros::Subscriber joint_sub = nh.subscribe("/ur5/joint_states", QUEUE_SIZE, get_position);
+    ros::Subscriber joint_sub = nh.subscribe("/ur5/joint_states", QUEUE_SIZE, get_joint);
+    ros::Subscriber link_sub = nh.subscribe("/gazebo/link_states", QUEUE_SIZE, get_link);
     ros::Publisher joint_pub = nh.advertise<std_msgs::Float64MultiArray>("/ur5/joint_group_pos_controller/command", QUEUE_SIZE);
 
     for(int i=0; i<2; i++){
@@ -26,7 +31,7 @@ int main(int argc, char **argv){
     }
 
     while(ros::ok()){
-        //various processes of nodes and topics
+        //implementation
     }
 
     return 0;
