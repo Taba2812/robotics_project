@@ -35,6 +35,7 @@ int main(int argc, char **argv){
     ros::Subscriber link_sub = nh.subscribe("/gazebo/link_states", QUEUE_SIZE, get_link);
     ros::Publisher joint_pub = nh.advertise<std_msgs::Float64MultiArray>("/ur5/joint_group_pos_controller/command", QUEUE_SIZE);
 
+    //Make sure we have received proper joint angles already
     for(int i=0; i<2; i++){
         ros::spinOnce();
         loop_rate.sleep();
