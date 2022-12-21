@@ -9,11 +9,13 @@
 #define DIM 4
 
 //these are stand-in values, I have to figure them out from a kinematic diagram of the ur5, may vary joint to joint
-#define ALPHA 1.57  //90 degrees in radians
-#define CN 0        //common normal
-#define D 1         //distance between axes for DH parameters
+#define R90 1.57  //90 degrees in radians
 
 typedef Eigen::Matrix<double, DIM, DIM> Matrix4d;
+
+double alpha[JOINTS] = {R90,R90,R90,R90,R90,R90};   //angles (?)
+double cn[JOINTS] = {0,0,0,0,0,0};                  //common normal
+double d[JOINTS] = {1,1,1,1,1,1};                   //distance between axes
 
 class EndEffector{
 public:
@@ -29,15 +31,15 @@ std::ostream& operator<<(std::ostream& os, const EndEffector& ef){
 }
 
 void T(Matrix4d& m, const Eigen::VectorXd& q, int index){
-    m << cos(q[index]), -sin(q[index])*cos(ALPHA), sin(q[index])*sin(ALPHA) , CN*cos(q[index]),
-         sin(q[index]), cos(q[index])*cos(ALPHA) , -cos(q[index]*sin(ALPHA)), CN*sin(q[index]),
-         0            , sin(ALPHA)               , cos(ALPHA)               , D,
-         0            , 0                        , 0                        , 1;
+    m << cos(q[index]), -sin(q[index])*cos(alpha[index]), sin(q[index])*sin(alpha[index]) , cn[index]*cos(q[index]),
+         sin(q[index]), cos(q[index])*cos(alpha[index]) , -cos(q[index]*sin(alpha[index])), cn[index]*sin(q[index]),
+         0            , sin(alpha[index])               , cos(alpha[index])               , d[index],
+         0            , 0                               , 0                               , 1;
 }
 
 EndEffector::EndEffector(){
-    position << 0,0,0;
-    orientation << 0,0,0,0,0,0,0,0,0;
+    position << Eigen::Vector3d::Zero();
+    orientation << Eigen::Matrix3d::Zero();
 }
 
 void EndEffector::compute_direct(const Eigen::VectorXd& q){

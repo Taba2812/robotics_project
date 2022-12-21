@@ -2,7 +2,7 @@
 
 void get_joint(const sensor_msgs::JointState::ConstPtr& js){
     for(int i=0; i<JOINTS; i++){
-        q[i] = js->position[i];
+        q(i) = js->position[i];
     }
 }
 
@@ -26,9 +26,6 @@ int main(int argc, char **argv){
     ros::init(argc, argv, "position_control");
     ros::NodeHandle nh;
     ros::Rate loop_rate(LOOP_RATE);
-
-    //array of joint variables
-    q.resize(JOINTS,1);
 
     //publishers and subscribers
     ros::Subscriber joint_sub = nh.subscribe("/ur5/joint_states", QUEUE_SIZE, get_joint);
