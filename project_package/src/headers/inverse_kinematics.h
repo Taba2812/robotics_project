@@ -40,7 +40,7 @@ void Destination::compute_inverse(const EndEffector& ee){
     Eigen::MatrixXd T60, T06, T61, T41;
     Eigen::Matrix4d T43;
     Eigen::Vector3d pos, X06, Y06;
-    Eigen::Vector4d cmp, tmp, P50, P31;
+    Eigen::Vector4d cmp, tmp, P50, P31[4];
     double phi, psi, R, n;
     double th1[2], th2[8], th3[8], th4[8], th5[4], th6[4];
 
@@ -80,17 +80,17 @@ void Destination::compute_inverse(const EndEffector& ee){
     th6[3] = atan2( ( (-X06(1)*sin(th1[1]) + Y06[1]*cos(th1[1])) / sin(th5[3]) ) , ( (X06(0)*sin(th1[1]) - Y06(0)*cos(th1[1])) / sin(th5[3]) ) );
 
     //theta3
-    P31 = P(th1[0], th5[0], th6[0], T60);
-    n = P31.norm();
+    P31[0] = P(th1[0], th5[0], th6[0], T60);
+    P31[1] = P(th1[0], th5[1], th6[1], T60);
+    P31[2] = P(th1[1], th5[2], th6[2], T60);
+    P31[3] = P(th1[1], th5[3], th6[3], T60);
+    n = P31[0].norm();
     th3[0] = acos((pow(n,2)-pow(cn[1],2)-pow(cn[2],2)) / 2*cn[1]*cn[2]);
-    P31 = P(th1[0], th5[1], th6[1], T60);
-    n = P31.norm();
+    n = P31[1].norm();
     th3[1] = acos((pow(n,2)-pow(cn[1],2)-pow(cn[2],2)) / 2*cn[1]*cn[2]);
-    P31 = P(th1[1], th5[2], th6[2], T60);
-    n = P31.norm();
+    n = P31[2].norm();
     th3[2] = acos((pow(n,2)-pow(cn[1],2)-pow(cn[2],2)) / 2*cn[1]*cn[2]);
-    P31 = P(th1[1], th5[3], th6[3], T60);
-    n = P31.norm();
+    n = P31[3].norm();
     th3[3] = acos((pow(n,2)-pow(cn[1],2)-pow(cn[2],2)) / 2*cn[1]*cn[2]);
     th3[4] = -th3[0];
     th3[5] = -th3[1];
