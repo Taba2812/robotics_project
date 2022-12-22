@@ -28,9 +28,7 @@ namespace setting {
 
     const std::string location = "/home/dawwo/Documents/Repositories/robotics_project/computer_vision/images_database/official_placeholders/MultipleBlocks/";
 
-    std::vector<Boundry> lookup_colors = {{{170,230,185},{108,125,66 }},  //Blocchetti Blu
-                                          {{218,147,111},{140,51 ,50 }},  //Blocchetti Viola
-                                          {{40 ,255,255},{0  ,130,115}}}; //Blocchetti Rossi
+    std::vector<Boundry> lookup_colors();
 
     cv::Rect getCropRect(cv::Mat mat);
     

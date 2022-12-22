@@ -14,7 +14,7 @@ void pipeline::generateMask(cv::Mat src, cv::Mat mask) {
     mask = cv::Mat((int)src.rows, (int)src.cols, CV_8UC1, cv::Scalar(0));
 
     //Mask for all colors that we are looking for then mix them
-    for (setting::Boundry bound : setting::lookup_colors) {
+    for (setting::Boundry bound : setting::lookup_colors()) {
         cv::inRange(HSVCamera, cv::Scalar(bound.lower.hue, bound.lower.saturation, bound.lower.brightness), 
                                cv::Scalar(bound.upper.hue, bound.upper.saturation, bound.upper.brightness), HSVRange);
 

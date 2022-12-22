@@ -7,7 +7,7 @@
 
 namespace utility {
 
-    std::list<std::string> views = {"Original", "Blurred", "Mask", "Result"};
+    std::list<std::string> views();
 
     std::string type2str(int type);
     void showWindows(std::list<cv::Mat> mats);

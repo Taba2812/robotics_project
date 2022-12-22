@@ -1,5 +1,9 @@
 #include "display_utility.h"
 
+std::list<std::string> utility::views() { 
+    return {"Original", "Blurred", "Mask", "Result"};
+}
+
 std::string utility::type2str(int type) {
     std::string r;
 
@@ -24,11 +28,11 @@ std::string utility::type2str(int type) {
 };
 
 void utility::createWindows(cv::Size src_size, int size_multiplier) {
-    int ratio = views.size() / 3;
+    int ratio = views().size() / 3;
 
     cv::Size view_size = src_size / (ratio*size_multiplier);
     
-    for (std::string s : views) {
+    for (std::string s : views()) {
         cv::namedWindow(s, cv::WINDOW_KEEPRATIO);
         cv::resizeWindow(s, view_size);
     }
@@ -40,10 +44,10 @@ void utility::addTrackbars() {
 }
 
 void utility::showWindows(std::list<cv::Mat> mats) {
-    std::list<std::string>::iterator it_views = views.begin();
+    std::list<std::string>::iterator it_views = views().begin();
     std::list<cv::Mat>::iterator     it_mats  = mats.begin();
 
-    for (;it_views != views.end();) {
+    for (;it_views != views().end();) {
         cv::imshow(*it_views, *it_mats);
 
         it_views++;
