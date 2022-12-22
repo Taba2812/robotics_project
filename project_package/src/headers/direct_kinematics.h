@@ -8,14 +8,20 @@
 #define JOINTS 6
 #define DIM 4
 
-//these are stand-in values, I have to figure them out from a kinematic diagram of the ur5, may vary joint to joint
-#define R90 1.57  //90 degrees in radians
+//probable values, have to try it out
+#define D1 0.089159
+#define D4 0.10915
+#define D5 0.09465
+#define D6 0.0823
+#define A2 0.425
+#define A3 0.39225
+#define R90 1.5708  //90 degrees in radians
 
 typedef Eigen::Matrix<double, DIM, DIM> Matrix4d;
 
-double alpha[JOINTS] = {R90,R90,R90,R90,R90,R90};   //angles (?)
-double cn[JOINTS] = {0,0,0,0,0,0};                  //common normal
-double d[JOINTS] = {1,1,1,1,1,1};                   //distance between axes
+double d[JOINTS] = {D1,0,0,D4,D5,D6};          //distance between axes
+double cn[JOINTS] = {0,-A2,-A3,0,0,0};         //common normal
+double alpha[JOINTS] = {R90,0,0,R90,-R90,0};   //angles
 
 class EndEffector{
 public:
@@ -30,11 +36,11 @@ std::ostream& operator<<(std::ostream& os, const EndEffector& ef){
     return os << ef.position;
 }
 
-void T(Matrix4d& m, const Eigen::VectorXd& q, int index){
-    m << cos(q[index]), -sin(q[index])*cos(alpha[index]), sin(q[index])*sin(alpha[index]) , cn[index]*cos(q[index]),
-         sin(q[index]), cos(q[index])*cos(alpha[index]) , -cos(q[index]*sin(alpha[index])), cn[index]*sin(q[index]),
-         0            , sin(alpha[index])               , cos(alpha[index])               , d[index],
-         0            , 0                               , 0                               , 1;
+void T(Matrix4d& m, double q, int index){
+    m << cos(q), -sin(q)*cos(alpha[index]), sin(q)*sin(alpha[index]) , cn[index]*cos(q),
+         sin(q), cos(q)*cos(alpha[index]) , -cos(q)*sin(alpha[index]), cn[index]*sin(q),
+         0     , sin(alpha[index])        , cos(alpha[index])        , d[index],
+         0     , 0                        , 0                        , 1;
 }
 
 EndEffector::EndEffector(){
@@ -43,19 +49,19 @@ EndEffector::EndEffector(){
 }
 
 void EndEffector::compute_direct(const Eigen::VectorXd& q){
-    Matrix4d T10, T21, T32, T43, T54, T65, T06;
+    Matrix4d T10, T21, T32, T43, T54, T65, T60;
 
-    T(T10, q, 0);
-    T(T21, q, 1);
-    T(T32, q, 2);
-    T(T43, q, 3);
-    T(T54, q, 4);
-    T(T65, q, 5);
+    T(T10, q[0], 0);
+    T(T21, q[1], 1);
+    T(T32, q[2], 2);
+    T(T43, q[3], 3);
+    T(T54, q[4], 4);
+    T(T65, q[5], 5);
 
-    T06 = T10*T21*T32*T43*T54*T65;
+    T60 = T10*T21*T32*T43*T54*T65;
 
-    this->orientation = T06.block<3,3>(0,0);
-    this->position = T06.block<3,1>(0,3);
+    this->orientation = T60.block<3,3>(0,0);
+    this->position = T60.block<3,1>(0,3);
 
 }
 
