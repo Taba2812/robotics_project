@@ -2,35 +2,67 @@
 #define __DIRECT_KINEMATICS_H__
 
 #include <iostream>
-#include <Eigen/Dense>
+#include <eigen3/Eigen/Dense>
+#include <cmath>
 
 #define JOINTS 6
 #define DIM 4
 
+//probable values, have to try it out
+#define D1 0.089159
+#define D4 0.10915
+#define D5 0.09465
+#define D6 0.0823
+#define A2 0.425
+#define A3 0.39225
+#define R90 1.5708  //90 degrees in radians
+
+typedef Eigen::Matrix<double, DIM, DIM> Matrix4d;
+
+double d[JOINTS] = {D1,0,0,D4,D5,D6};          //distance between axes
+double cn[JOINTS] = {0,-A2,-A3,0,0,0};         //common normal
+double alpha[JOINTS] = {R90,0,0,R90,-R90,0};   //angles
+
 class EndEffector{
 public:
-    Eigen::VectorXd pose;
+    Eigen::Vector3d position;
+    Eigen::Matrix3d orientation;
     EndEffector();
     void compute_direct(const Eigen::VectorXd& q);
     friend std::ostream& operator<<(std::ostream& os, const EndEffector& ef);
 };
 
 std::ostream& operator<<(std::ostream& os, const EndEffector& ef){
-    return os << ef.pose;
+    return os << ef.position;
+}
+
+void T(Matrix4d& m, double q, int index){
+    m << cos(q), -sin(q)*cos(alpha[index]), sin(q)*sin(alpha[index]) , cn[index]*cos(q),
+         sin(q), cos(q)*cos(alpha[index]) , -cos(q)*sin(alpha[index]), cn[index]*sin(q),
+         0     , sin(alpha[index])        , cos(alpha[index])        , d[index],
+         0     , 0                        , 0                        , 1;
 }
 
 EndEffector::EndEffector(){
-    pose.resize(6,1);
+    position << Eigen::Vector3d::Zero();
+    orientation << Eigen::Matrix3d::Zero();
 }
 
 void EndEffector::compute_direct(const Eigen::VectorXd& q){
-    Eigen::MatrixXd m1(DIM, DIM);
-    Eigen::MatrixXd m2(DIM, DIM);
-    Eigen::MatrixXd m3(DIM, DIM);
-    Eigen::MatrixXd m4(DIM, DIM);
-    Eigen::MatrixXd m5(DIM, DIM);
-    Eigen::MatrixXd m6(DIM, DIM);
-    Eigen::MatrixXd m7(DIM, DIM);
+    Matrix4d T10, T21, T32, T43, T54, T65, T60;
+
+    T(T10, q[0], 0);
+    T(T21, q[1], 1);
+    T(T32, q[2], 2);
+    T(T43, q[3], 3);
+    T(T54, q[4], 4);
+    T(T65, q[5], 5);
+
+    T60 = T10*T21*T32*T43*T54*T65;
+
+    this->orientation = T60.block<3,3>(0,0);
+    this->position = T60.block<3,1>(0,3);
+
 }
 
 #endif
