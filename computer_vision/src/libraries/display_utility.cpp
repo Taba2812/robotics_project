@@ -1,10 +1,5 @@
 #include "display_utility.h"
 
-std::list<std::string> utility::views() { 
-    std::list<std::string> tmp = {"Original", "Blurred", "Mask", "Result"};
-    return tmp;
-}
-
 std::string utility::type2str(int type) {
     std::string r;
 
@@ -28,12 +23,12 @@ std::string utility::type2str(int type) {
     return r;
 };
 
-void utility::createWindows(cv::Size src_size, int size_multiplier) {
-    int ratio = views().size() / 3;
+void utility::createWindows(cv::Size src_size, int size_multiplier, std::list<std::string> titles) {
+    int ratio = titles.size() / 3;
 
     cv::Size view_size = src_size / (ratio*size_multiplier);
     
-    for (std::string s : views()) {
+    for (std::string s : titles) {
         cv::namedWindow(s, cv::WINDOW_KEEPRATIO);
         cv::resizeWindow(s, view_size);
     }

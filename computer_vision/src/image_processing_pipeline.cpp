@@ -23,6 +23,8 @@ int dilation_size = 5;
 
 int main () {
 
+    std::list<std::string> titles = {"Original", "Blurred", "Mask", "Result"};
+
     //Get Test Image
     std::string url = setting::location + "blocks_group2_48.jpg";
 
@@ -36,7 +38,7 @@ int main () {
     cv::Size src_size = cv::Size((int)src_image.cols, (int)src_image.rows);
 
     //Setup views
-    utility::createWindows(src_size, 1);
+    utility::createWindows(src_size, 1, titles);
     utility::addTrackbars();
 
     //Main Loop
@@ -58,7 +60,7 @@ int main () {
         pipeline::maskMat(blurred, result, mask);
         //--------------------
 
-        std::list<std::string> titles = {"Original", "Blurred", "Mask", "Result"};
+        
         std::list<cv::Mat> mats = {src_image, blurred, mask, result};
         utility::showWindows(mats, titles);
 
