@@ -20,13 +20,29 @@ Destination::Destination(){
     position << Eigen::Vector3d::Zero();
 }
 
+Eigen::Vector4d P(double th1, double th5, double th6, const Eigen::MatrixXd& T60){
+    Eigen::Matrix4d T65, T54, T10;
+    Eigen::MatrixXd T61, T41;
+    Eigen::Vector4d tmp, P31;
+    double n, res;
+
+    T(T54, th5, 4);
+    T(T65, th6, 5);
+    T(T10, th1, 0);
+    T61 = T10.inverse() * T60;
+    T41 = T61 * T54.inverse() * T65.inverse();
+    tmp << 0, -d[3], 0, 1;
+    P31 = T41 * tmp;
+    return P31;   
+}
+
 void Destination::compute_inverse(const EndEffector& ee){
     Eigen::MatrixXd T60, T06, T61, T41;
-    Eigen::Matrix4d T65, T54, T10;
+    Eigen::Matrix4d T43;
     Eigen::Vector3d pos, X06, Y06;
     Eigen::Vector4d cmp, tmp, P50, P31;
     double phi, psi, R, n;
-    double th1[2], th5[4], th6[4];
+    double th1[2], th2[8], th3[8], th4[8], th5[4], th6[4];
 
     pos = ee.position;
 
@@ -64,16 +80,50 @@ void Destination::compute_inverse(const EndEffector& ee){
     th6[3] = atan2( ( (-X06(1)*sin(th1[1]) + Y06[1]*cos(th1[1])) / sin(th5[3]) ) , ( (X06(0)*sin(th1[1]) - Y06(0)*cos(th1[1])) / sin(th5[3]) ) );
 
     //theta3
-    //T41 = T61*(T54*T65).inverse()
-    T(T54, th5[0], 4);
-    T(T65, th6[0], 5);
-    T(T10, th1[0], 0);
-    T61 = T10.inverse() * T60;
-    T41 = T61 * T54.inverse() * T65.inverse();
-    tmp << 0, -d[3], 0, 1;
-    P31 = T41 * tmp;
+    P31 = P(th1[0], th5[0], th6[0], T60);
     n = P31.norm();
-    
+    th3[0] = acos((pow(n,2)-pow(cn[1],2)-pow(cn[2],2)) / 2*cn[1]*cn[2]);
+    P31 = P(th1[0], th5[1], th6[1], T60);
+    n = P31.norm();
+    th3[1] = acos((pow(n,2)-pow(cn[1],2)-pow(cn[2],2)) / 2*cn[1]*cn[2]);
+    P31 = P(th1[1], th5[2], th6[2], T60);
+    n = P31.norm();
+    th3[2] = acos((pow(n,2)-pow(cn[1],2)-pow(cn[2],2)) / 2*cn[1]*cn[2]);
+    P31 = P(th1[1], th5[3], th6[3], T60);
+    n = P31.norm();
+    th3[3] = acos((pow(n,2)-pow(cn[1],2)-pow(cn[2],2)) / 2*cn[1]*cn[2]);
+    th3[4] = -th3[0];
+    th3[5] = -th3[1];
+    th3[6] = -th3[2];
+    th3[7] = -th3[3];
+
+    //theta2
+    th2[0] = -atan2(P31[0](1),-P31[0](0)) + asin(cn[2]*sin(th3[0]) / P31[0].norm());
+    th2[1] = -atan2(P31[1](1),-P31[1](0)) + asin(cn[2]*sin(th3[1]) / P31[1].norm());
+    th2[2] = -atan2(P31[2](1),-P31[2](0)) + asin(cn[2]*sin(th3[2]) / P31[2].norm());
+    th2[3] = -atan2(P31[3](1),-P31[3](0)) + asin(cn[2]*sin(th3[3]) / P31[3].norm());
+    th2[4] = -atan2(P31[0](1),-P31[0](0)) + asin(cn[2]*sin(th3[4]) / P31[0].norm());
+    th2[5] = -atan2(P31[1](1),-P31[1](0)) + asin(cn[2]*sin(th3[5]) / P31[1].norm());
+    th2[6] = -atan2(P31[2](1),-P31[2](0)) + asin(cn[2]*sin(th3[6]) / P31[2].norm());
+    th2[7] = -atan2(P31[3](1),-P31[3](0)) + asin(cn[2]*sin(th3[7]) / P31[3].norm());
+
+    //theta4
+    T(T43, th4[0], 3);
+    th4[0] = atan2(T43(1,0), T43(0,0));
+    T(T43, th4[1], 3);
+    th4[1] = atan2(T43(1,0), T43(0,0));
+    T(T43, th4[2], 3);
+    th4[2] = atan2(T43(1,0), T43(0,0));
+    T(T43, th4[3], 3);
+    th4[3] = atan2(T43(1,0), T43(0,0));
+    T(T43, th4[4], 3);
+    th4[4] = atan2(T43(1,0), T43(0,0));
+    T(T43, th4[5], 3);
+    th4[5] = atan2(T43(1,0), T43(0,0));
+    T(T43, th4[6], 3);
+    th4[6] = atan2(T43(1,0), T43(0,0));
+    T(T43, th4[7], 3);
+    th4[7] = atan2(T43(1,0), T43(0,0));
 }
 
 #endif
