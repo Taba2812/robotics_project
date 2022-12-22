@@ -8,9 +8,9 @@
 
 namespace pipeline {
 
-    void removeNoise(cv::Mat src, cv::Mat dst);
-    void generateMask(cv::Mat src, cv::Mat mask);
-    void maskMat(cv::Mat src, cv::Mat masked, cv::Mat mask);
+    void removeNoise(cv::InputArray src, cv::OutputArray dst);
+    void generateMask(cv::Mat src, cv::Mat *mask);
+    void maskMat(cv::InputArray src, cv::OutputArray masked, cv::InputArray mask);
 
 }
 

@@ -30,9 +30,7 @@ int main () {
     cv::Mat src_image(og_image, setting::getCropRect(og_image));
 
     if(src_image.empty()){
-        printf(url.c_str());
-        printf(" Error opening image\n");
-        return EXIT_FAILURE;
+        exit(EXIT_FAILURE);
     }
 
     cv::Size src_size = cv::Size((int)src_image.cols, (int)src_image.rows);
@@ -53,15 +51,16 @@ int main () {
 
         //Range Operation
         cv::Mat mask;
-        pipeline::generateMask(blurred, mask);
+        pipeline::generateMask(blurred, &mask);
 
         //Masking Operation
         cv::Mat result;
         pipeline::maskMat(blurred, result, mask);
         //--------------------
 
+        std::list<std::string> titles = {"Original", "Blurred", "Mask", "Result"};
         std::list<cv::Mat> mats = {src_image, blurred, mask, result};
-        utility::showWindows(mats);
+        utility::showWindows(mats, titles);
 
         int c = cv::waitKey(10);
         if (c == 'k')

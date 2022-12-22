@@ -97,5 +97,7 @@
         "/home/taba/trento_lab_home/ros_ws/src/locosim/robot_control",
         "/opt/openrobots/lib/pythonPYTHON_VERSION/site-packages",
         "/home/taba/trento_lab_home/ros_ws/src/locosim/robot_control"
-    ]
+    ],
+    "cmake.sourceDirectory": "${workspaceFolder}/computer_vision/src",
+    "cmake.buildDirectory": "${workspaceFolder}/computer_vision/src/build"
 }

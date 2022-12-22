@@ -1,7 +1,8 @@
 #include "display_utility.h"
 
 std::list<std::string> utility::views() { 
-    return {"Original", "Blurred", "Mask", "Result"};
+    std::list<std::string> tmp = {"Original", "Blurred", "Mask", "Result"};
+    return tmp;
 }
 
 std::string utility::type2str(int type) {
@@ -43,11 +44,11 @@ void utility::addTrackbars() {
     //cv::createTrackbar("",*(views.begin()), &)
 }
 
-void utility::showWindows(std::list<cv::Mat> mats) {
-    std::list<std::string>::iterator it_views = views().begin();
+void utility::showWindows(std::list<cv::Mat> mats, std::list<std::string> titles) {
+    std::list<std::string>::iterator it_views = titles.begin();
     std::list<cv::Mat>::iterator     it_mats  = mats.begin();
 
-    for (;it_views != views().end();) {
+    for (;it_views != titles.end();) {
         cv::imshow(*it_views, *it_mats);
 
         it_views++;

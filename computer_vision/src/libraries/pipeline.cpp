@@ -1,17 +1,17 @@
 #include "pipeline.h"
 #include "settings.h"
 
-void pipeline::removeNoise(cv::Mat src, cv::Mat dst) {
+void pipeline::removeNoise(cv::InputArray src, cv::OutputArray dst) {
     //Bilateral Blur on Image   
     cv::bilateralFilter(src, dst, 9, 75, 75);
 }
 
-void pipeline::generateMask(cv::Mat src, cv::Mat mask) {
+void pipeline::generateMask(cv::Mat src, cv::Mat *mask) {
     cv::Mat HSVCamera, HSVRange;
     cv::cvtColor(src, HSVCamera, cv::COLOR_BGR2HSV);
 
     cv::Mat dilation, closing, erosion, opening;
-    mask = cv::Mat((int)src.rows, (int)src.cols, CV_8UC1, cv::Scalar(0));
+    *mask = cv::Mat((int)src.rows, (int)src.cols, CV_8UC1, cv::Scalar(0));
 
     //Mask for all colors that we are looking for then mix them
     for (setting::Boundry bound : setting::lookup_colors()) {
@@ -31,10 +31,10 @@ void pipeline::generateMask(cv::Mat src, cv::Mat mask) {
         cv::erode(closing, erosion, erosion_kernel);
         cv::dilate(erosion, opening, dilation_kernel);
 
-        cv::bitwise_or(mask, opening, mask);
+        cv::bitwise_or(*mask, opening, *mask);
     }
 }
 
-void pipeline::maskMat(cv::Mat src, cv::Mat masked, cv::Mat mask) {
+void pipeline::maskMat(cv::InputArray src, cv::OutputArray masked, cv::InputArray mask) {
     cv::bitwise_and(src, src, masked, mask);
 }
