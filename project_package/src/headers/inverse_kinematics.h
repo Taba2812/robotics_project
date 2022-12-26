@@ -5,8 +5,8 @@
 
 #define _USE_MATH_DEFINES
 
-typedef Eigen::Matrix<double, -1, 4> Vector4d;
-typedef Eigen::Matrix<double, -1, JOINTS> JointConfiguration;
+typedef Eigen::Matrix<double, 4, 1> Vector4d;
+typedef Eigen::Matrix<double, JOINTS, 1> JointConfiguration;
 
 class Destination{
 public:
@@ -38,9 +38,9 @@ Eigen::Vector4d P(double th1, double th5, double th6, const Eigen::MatrixXd& T60
 
 void Destination::compute_inverse(const EndEffector& ee){
     Eigen::MatrixXd T60, T06, T61, T41;
-    Eigen::Matrix4d T43;
+    Matrix4d T43;
     Eigen::Vector3d pos, X06, Y06;
-    Eigen::Vector4d cmp, tmp, P50, P31[4];
+    Vector4d cmp, tmp, P50, P31[4];
     double phi, psi, R, n;
     double th1[2], th2[8], th3[8], th4[8], th5[4], th6[4];
 
