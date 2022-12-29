@@ -52,6 +52,6 @@ void utility::showWindows(std::list<cv::Mat> mats, std::list<std::string> titles
 }
 
 void utility::saveImage(cv::Mat mat, std::string name) {
-    std::string url = "../../output_renders/" + name;
+    std::string url = "/home/dawwo/Documents/Repositories/robotics_project/computer_vision/output_renders/" + name; 
     cv::imwrite(url, mat);
 }

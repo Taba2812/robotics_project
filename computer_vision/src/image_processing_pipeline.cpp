@@ -6,6 +6,7 @@
 #include <opencv2/imgcodecs.hpp>
 #include <opencv2/highgui.hpp>
 #include <opencv2/imgproc.hpp>
+//#include <ros.h>
 
 #include "libraries/settings.h"
 #include "libraries/display_utility.h"
@@ -23,6 +24,12 @@ int dilation_size = 5;
 
 int main () {
 
+    //SETUP ------------------------------------------------------------------
+    /* ROS STUFF
+        void get_state(const [ros_type]::ConstPtr& [name]){ ... }
+        ros::Subscriber vision_sub = nh.subscribe("state", QUEUE_SIZE, get_state);
+        ros::Publisher vision_pub = nh.advertise<ros_type>("block_position", QUEUE_SIZE);
+    */
     std::list<std::string> titles = {"Original", "Blurred", "Mask", "Result"};
 
     //Get Test Image
@@ -41,13 +48,13 @@ int main () {
     utility::createWindows(src_size, 1, titles);
     utility::addTrackbars();
 
-    //Main Loop
+    //MAIN LOOP --------------------------------------------------------
     while (true) {
         frameNum += 1;
 
         std::cout << "Frame: #" << frameNum << std::endl;
 
-        //PIPELINE--------------------
+        //IMAGE PROCESSING PIPELINE-------------------------------------
         cv::Mat blurred;
         pipeline::removeNoise(src_image, blurred);
 
@@ -58,15 +65,18 @@ int main () {
         //Masking Operation
         cv::Mat result;
         pipeline::maskMat(blurred, result, mask);
-        //--------------------
 
-        
+        //OBJECT RECOGNITION -------------------------------------------
+
+        //DISPLAYING PROCESS ON SCREEN ---------------------------------
         std::list<cv::Mat> mats = {src_image, blurred, mask, result};
         utility::showWindows(mats, titles);
 
         int c = cv::waitKey(10);
-        if (c == 'k')
+        if (c == 'k') {
+            utility::saveImage(result, "Immagine Template.jpg");
             break;
+        }
     }
 
     return EXIT_SUCCESS;
