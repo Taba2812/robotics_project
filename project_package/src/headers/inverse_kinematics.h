@@ -9,15 +9,31 @@ typedef Eigen::Matrix<double, 4, 1> Vector4d;
 typedef Eigen::Vector3d BlockPosition;
 
 class Destination{
-public:
+private:
     Eigen::Vector3d position;
-    JointConfiguration joint_angles;
+    JointConfiguration ja;
+public:
     Destination();
-    JointConfiguration compute_inverse(const EndEffector& ee, const BlockPosition& pos);
+    Destination(const BlockPosition& pos);
+    Eigen::Vector3d get_position() const;
+    JointConfiguration get_joint_angles() const;
+    void compute_inverse(const EndEffector& ee);
 };
 
 Destination::Destination(){
     position << Eigen::Vector3d::Zero();
+}
+
+Destination::Destination(const BlockPosition& bp){
+    position = bp;
+}
+
+Eigen::Vector3d Destination::get_position() const{
+    return this->position;
+}
+
+JointConfiguration Destination::get_joint_angles() const{
+    return this->ja;
 }
 
 Eigen::Vector4d P(double th1, double th5, double th6, const Eigen::MatrixXd& T60){
@@ -37,19 +53,21 @@ Eigen::Vector4d P(double th1, double th5, double th6, const Eigen::MatrixXd& T60
     return P31;   
 }
 
-JointConfiguration Destination::compute_inverse(const EndEffector& ee, const BlockPosition& pos){
-    Eigen::MatrixXd T60, T06;
+void Destination::compute_inverse(const EndEffector& ee){
+    Eigen::MatrixXd T60, T06, ori;
     Matrix4d T43;
-    Eigen::Vector3d X06, Y06;
+    Eigen::Vector3d X06, Y06, pos;
     Vector4d cmp, tmp, P50, P31[4];
-    JointConfiguration jc;
     double phi, psi, R, n;
     double th1[2], th2[8], th3[8], th4[8], th5[4], th6[4];
+
+    pos = this->position;
+    ori = ee.get_orientation();     //what is the desired orientation? In the meantime, I put the current orientation
 
     //T60(th1,th2,th3,th4,th5,th6) = T10(th1)*T21(th2)*T32(th3)*T43(th4)*T54(th5)*T65(th6)
     cmp << 0,0,0,1;
     T60.resize(3,3);
-    T60 << ee.orientation;
+    T60 << ee.get_orientation();
     T60.conservativeResize(Eigen::NoChange, T60.cols()+1);
     T60.col(T60.cols()-1) = pos;
     T60.conservativeResize(T06.rows()+1, Eigen::NoChange);
@@ -125,9 +143,7 @@ JointConfiguration Destination::compute_inverse(const EndEffector& ee, const Blo
     T(T43, th4[7], 3);
     th4[7] = atan2(T43(1,0), T43(0,0));
 
-    jc << th1[0], th2[0], th3[0], th4[0], th5[0], th6[0];
-
-    return jc;
+    this->ja << th1[0], th2[0], th3[0], th4[0], th5[0], th6[0];
 }
 
 #endif
