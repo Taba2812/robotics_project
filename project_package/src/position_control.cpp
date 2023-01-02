@@ -50,10 +50,12 @@ int main(int argc, char **argv){
     while(ros::ok()){
         ee.compute_direct(q);
         vision_pub.publish(true);
-        jc = d.compute_inverse(ee, bp);
+        Destination d(bp);
+        d.compute_inverse(ee);
 
         //motion planning
 
+        jc = d.get_joint_angles();
         joint_pub.publish(jc);
     }
 
