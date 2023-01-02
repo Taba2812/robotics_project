@@ -37,7 +37,7 @@ Eigen::MatrixXd Motion::jacobian(const Eigen::VectorXd& q) const{
     //Eigen::Matrix3d rot = transformations.back().block<3, 3>(0, 0);
 
     //m=6 because the robot operates in 3 dimensions, n=6 because we have 6 joints total
-    Eigen::MatrixXd J = Eigen::MatrixXd::Zero(6, 6);
+    Eigen::MatrixXd J = Eigen::MatrixXd::Zero(JOINTS, JOINTS);
 
     for (int i = 0; i < 6; i++){
         Eigen::Vector3d z_i = transformations[i].block<3, 1>(0, 2);     //unit vector
