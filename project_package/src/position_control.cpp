@@ -18,8 +18,10 @@ void get_link(const gazebo_msgs::LinkStates::ConstPtr& ls){
     }
 }
 
-void new_pose(double x, double y, double z, double roll, double pitch, double yaw){
-    //code
+void get_position(const std_msgs::Float64MultiArray::ConstPtr& xyz){
+    bp(0) = xyz->data[0];
+    bp(1) = xyz->data[1];
+    bp(2) = xyz->data[2];
 }
 
 int main(int argc, char **argv){
@@ -31,6 +33,13 @@ int main(int argc, char **argv){
     ros::Subscriber joint_sub = nh.subscribe("/ur5/joint_states", QUEUE_SIZE, get_joint);
     ros::Subscriber link_sub = nh.subscribe("/gazebo/link_states", QUEUE_SIZE, get_link);
     ros::Publisher joint_pub = nh.advertise<std_msgs::Float64MultiArray>("/ur5/joint_group_pos_controller/command", QUEUE_SIZE);
+    ros::Subscriber vision_sub = nh.subscribe("block_position", QUEUE_SIZE, get_position);
+    ros::Publisher vision_pub = nh.advertise<std_msgs::Bool>("state", QUEUE_SIZE);
+
+    //Environment components
+    EndEffector ee;
+    Destination d;
+    JointConfiguration jc;
 
     //Make sure we have received proper joint angles already
     for(int i=0; i<2; i++){
@@ -39,7 +48,13 @@ int main(int argc, char **argv){
     }
 
     while(ros::ok()){
-        //implementation
+        ee.compute_direct(q);
+        vision_pub.publish(true);
+        jc = d.compute_inverse(ee, bp);
+
+        //motion planning
+
+        joint_pub.publish(jc);
     }
 
     return 0;

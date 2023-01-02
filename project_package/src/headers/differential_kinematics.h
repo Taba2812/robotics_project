@@ -6,8 +6,6 @@
 #include <vector>
 #include "direct_kinematics.h"
 
-using namespace std;
-
 class Motion{
 public:
     Motion(const EndEffector& ee);
@@ -32,7 +30,7 @@ Eigen::MatrixXd Motion::jacobian(const Eigen::VectorXd& q) const{
     T(T54, q[4], 4);
     T(T65, q[5], 5);
 
-    vector<Eigen::Matrix4d> transformations = {T10, T21, T32, T43, T54, T65};
+    std::vector<Eigen::Matrix4d> transformations = {T10, T21, T32, T43, T54, T65};
 
     // Calculate the position and orientation of the end effector
     Eigen::Vector3d pos = transformations.back().block<3, 1>(0, 3);

@@ -18,6 +18,7 @@
 #define R90 1.5708  //90 degrees in radians
 
 typedef Eigen::Matrix<double, DIM, DIM> Matrix4d;
+typedef Eigen::Matrix<double, JOINTS, 1> JointConfiguration;
 
 double d[JOINTS] = {D1,0,0,D4,D5,D6};          //distance between axes
 double cn[JOINTS] = {0,-A2,-A3,0,0,0};         //common normal
