@@ -20,6 +20,8 @@
 typedef Eigen::Matrix<double, DIM, DIM> Matrix4d;
 typedef Eigen::Matrix<double, JOINTS, 1> JointConfiguration;
 
+JointConfiguration q;
+
 double d[JOINTS] = {D1,0,0,D4,D5,D6};          //distance between axes
 double cn[JOINTS] = {0,-A2,-A3,0,0,0};         //common normal
 double alpha[JOINTS] = {R90,0,0,R90,-R90,0};   //angles
