@@ -5,6 +5,7 @@
 #include "ros/ros.h"
 #include "direct_kinematics.h"
 #include "inverse_kinematics.h"
+#include "motion_planning.h"
 #include "sensor_msgs/JointState.h"
 #include "std_msgs/Bool.h"
 #include "std_msgs/Float64MultiArray.h"
@@ -19,7 +20,6 @@ typedef Eigen::Vector3d BlockPosition;
 
 std::string joint_names[JOINTS] = {"elbow_joint", "shoulder_lift_joint", "shoulder_pan_joint", "wrist_1_joint", "wrist_2_joint", "wrist_3_joint"};
 std::string link_names[LINKS] = {"base_link", "shoulder_link", "upper_arm_link", "forearm_link", "wrist_1_link", "wrist_2_link", "wrist_3_link"};
-JointConfiguration q;
 double p[LINKS][3];
 BlockPosition bp = BlockPosition::Zero();
 

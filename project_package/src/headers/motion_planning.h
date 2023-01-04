@@ -16,8 +16,8 @@ public:
 };
 
 Path::Path(){
-    ic << Eigen::MatrixXd::Zero();
-    fc << Eigen::MatrixXd::Zero();
+    ic << JointConfiguration::Zero();
+    fc << JointConfiguration::Zero();
 }
 
 Path::Path(const JointConfiguration& jci, const JointConfiguration& jcf){
@@ -75,7 +75,7 @@ void Path::path_planning(){
 
     /* This is the matlab file for p2p motion planning
 
-        % Point 2 Point motion Plan
+    % Point 2 Point motion Plan
     % DK: function for direct kinematics
     % IK: function for inverse kineamtics
     % xEs, phiEs: starting configuration for the end effector

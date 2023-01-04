@@ -40,6 +40,10 @@ int main(int argc, char **argv){
     EndEffector ee;
     Destination d;
     JointConfiguration jc;
+    std_msgs::Float64MultiArray msg;
+    std_msgs::Bool status;
+
+    status.data = true;
 
     //Make sure we have received proper joint angles already
     for(int i=0; i<2; i++){
@@ -49,14 +53,27 @@ int main(int argc, char **argv){
 
     while(ros::ok()){
         ee.compute_direct(q);
-        vision_pub.publish(true);
+
+        vision_pub.publish(status);
+        status.data = false;
+
+        while(status.data == false){
+            sleep(1);
+        }
+
         Destination d(bp);
         d.compute_inverse(ee);
 
         //motion planning
+        Path p;
 
         jc = d.get_joint_angles();
-        joint_pub.publish(jc);
+
+        for(int i=0; i<JOINTS; i++){
+            msg.data[i] = jc(i);
+        }
+        
+        joint_pub.publish(msg);
     }
 
     return 0;
