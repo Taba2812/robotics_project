@@ -18,16 +18,22 @@
 #define R90 1.5708  //90 degrees in radians
 
 typedef Eigen::Matrix<double, DIM, DIM> Matrix4d;
+typedef Eigen::Matrix<double, JOINTS, 1> JointConfiguration;
+
+JointConfiguration q;
 
 double d[JOINTS] = {D1,0,0,D4,D5,D6};          //distance between axes
 double cn[JOINTS] = {0,-A2,-A3,0,0,0};         //common normal
 double alpha[JOINTS] = {R90,0,0,R90,-R90,0};   //angles
 
 class EndEffector{
-public:
+private:
     Eigen::Vector3d position;
     Eigen::Matrix3d orientation;
+public:
     EndEffector();
+    Eigen::Vector3d get_position() const;
+    Eigen::Matrix3d get_orientation() const;
     void compute_direct(const Eigen::VectorXd& q);
     friend std::ostream& operator<<(std::ostream& os, const EndEffector& ef);
 };
@@ -46,6 +52,14 @@ void T(Matrix4d& m, double q, int index){
 EndEffector::EndEffector(){
     position << Eigen::Vector3d::Zero();
     orientation << Eigen::Matrix3d::Zero();
+}
+
+Eigen::Vector3d EndEffector::get_position() const{
+    return this->position;
+}
+
+Eigen::Matrix3d EndEffector::get_orientation() const{
+    return this->orientation;
 }
 
 void EndEffector::compute_direct(const Eigen::VectorXd& q){

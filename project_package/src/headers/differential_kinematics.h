@@ -6,8 +6,6 @@
 #include <vector>
 #include "direct_kinematics.h"
 
-using namespace std;
-
 class Motion{
 public:
     Motion(const EndEffector& ee);
@@ -32,14 +30,14 @@ Eigen::MatrixXd Motion::jacobian(const Eigen::VectorXd& q) const{
     T(T54, q[4], 4);
     T(T65, q[5], 5);
 
-    vector<Eigen::Matrix4d> transformations = {T10, T21, T32, T43, T54, T65};
+    std::vector<Eigen::Matrix4d> transformations = {T10, T21, T32, T43, T54, T65};
 
     // Calculate the position and orientation of the end effector
     Eigen::Vector3d pos = transformations.back().block<3, 1>(0, 3);
     //Eigen::Matrix3d rot = transformations.back().block<3, 3>(0, 0);
 
     //m=6 because the robot operates in 3 dimensions, n=6 because we have 6 joints total
-    Eigen::MatrixXd J = Eigen::MatrixXd::Zero(6, 6);
+    Eigen::MatrixXd J = Eigen::MatrixXd::Zero(JOINTS, JOINTS);
 
     for (int i = 0; i < 6; i++){
         Eigen::Vector3d z_i = transformations[i].block<3, 1>(0, 2);     //unit vector
