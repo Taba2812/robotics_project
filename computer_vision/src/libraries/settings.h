@@ -14,6 +14,26 @@ namespace setting {
     #define EROSION_SIZE 3
     #define DILATION_SIZE 5
 
+    //IMGAGE RECOGNITION SETTINGS
+    #define X1_Y1_Z2            1
+    #define X1_Y2_Z1            1
+    #define X1_Y2_Z2            1
+    #define X1_Y2_Z2_CHAMFER    1
+    #define X1_Y2_Z2_TWINFILLET 1
+    #define X1_Y3_Z2            1
+    #define X1_Y3_Z2_FILLET     1
+    #define X1_Y4_Z1            1
+    #define X1_Y4_Z2            1
+    #define X2_Y2_Z2            1
+    #define X2_Y2_Z2_FILLET     1
+
+    #define BLUE   1
+    #define ORANGE 1
+    #define YELLOW 1
+    #define RED    1
+    #define VIOLET 1
+
+
     //STRUCTS
     struct HSV_Colorspace {
         int hue;
