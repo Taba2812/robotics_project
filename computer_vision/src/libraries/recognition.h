@@ -3,6 +3,10 @@
 
 #include <opencv2/highgui.hpp>
 #include <opencv2/imgproc.hpp>
+#include <list>
+#include <iostream>
+
+#include "settings.h"
 
 namespace recognition {
 
@@ -13,6 +17,9 @@ namespace recognition {
     void runRecognition();
     void setParameters(cv::Ptr<cv::GeneralizedHoughGuil> guil);
     void setDataset(cv::Ptr<cv::GeneralizedHoughGuil> guil);
+    void getImagesWithRightColors(std::list<cv::Mat> buffer, std::string block, int *counter);
+    void getImages(std::list<cv::Mat> buffer, std::string block, std::string color, int *counter);
+    void detection(cv::Ptr<cv::GeneralizedHoughGuil> guil);
 
     void drawResults();
 }

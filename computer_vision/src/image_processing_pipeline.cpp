@@ -11,6 +11,7 @@
 #include "libraries/settings.h"
 #include "libraries/display_utility.h"
 #include "libraries/pipeline.h"
+#include "libraries/recognition.h"
 
 //VARIABLES -----------------
 
@@ -48,8 +49,10 @@ int main () {
     utility::createWindows(src_size, 1, titles);
     utility::addTrackbars();
 
+    recognition::runRecognition();
+
     //MAIN LOOP --------------------------------------------------------
-    while (true) {
+    while (false) {
         frameNum += 1;
 
         std::cout << "Frame: #" << frameNum << std::endl;
