@@ -33,6 +33,8 @@ namespace setting {
     #define RED    1
     #define VIOLET 1
 
+    //IMAGE OVERLAP
+    #define AREA_INTERSECTION_TRESHOLD 0.7
 
     //STRUCTS
     struct HSV_Colorspace {

@@ -21,7 +21,8 @@ namespace recognition {
     void getImages(std::list<cv::Mat> *buffer, std::string block, std::string color);
     void detection(cv::Ptr<cv::GeneralizedHoughGuil> guil, std::list<cv::Mat> *buffer, cv::InputOutputArray img, std::vector<cv::Vec4f> position);
 
-    void drawResults(cv::InputOutputArray img, std::vector<cv::Vec4f> position);
+    void drawResults(cv::InputOutputArray img, std::vector<cv::Vec4f> position, int t_width, int t_height);
+    void scrapOvelappingDetections(const int height, const int width, std::vector<cv::Vec4f> position);
 }
 
 #endif
