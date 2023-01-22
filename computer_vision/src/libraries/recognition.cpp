@@ -115,14 +115,14 @@ void recognition::detection(cv::Ptr<cv::GeneralizedHoughGuil> guil, std::list<cv
 
 void recognition::drawResults(cv::InputOutputArray img, std::vector<cv::Vec4f> position) {
     for (std::vector<cv::Vec4f>::iterator iter = position.begin(); iter != position.end(); ++iter) {
-        /*cv::RotatedRect rRect = cv::RotatedRect(cv::Point2f((*iter)[0], (*iter)[1]),
-                                        cv::Size2f(w * (*iter)[2], h * (*iter)[2]),
-                                        (*iter)[3]);
+        cv::RotatedRect rRect = cv::RotatedRect(cv::Point2f((*iter)[0], (*iter)[1]),
+                                                cv::Size2f(w * (*iter)[2], h * (*iter)[2]),
+                                                (*iter)[3]);
         cv::Point2f vertices[4];
         rRect.points(vertices);
         for (int i = 0; i < 4; i++)
             line(image, vertices[i], vertices[(i + 1) % 4], Scalar(0, 255, 0), 2);
-        */
+        
         cv::circle(img, cv::Point((*iter)[0], (*iter)[1]), 1, cv::Scalar(255,255,255), 1);   
     }
 }
