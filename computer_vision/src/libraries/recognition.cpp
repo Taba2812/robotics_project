@@ -109,6 +109,7 @@ void recognition::detection(cv::Ptr<cv::GeneralizedHoughGuil> guil, std::list<cv
         guil->setTemplate(temp);
         guil->detect(grayscale, position);
 
+        recognition::scrapOvelappingDetections(temp.rows, temp.cols, &position);
         recognition::drawResults(img, position, temp.rows, temp.cols);
     }
 }
@@ -128,7 +129,7 @@ void recognition::drawResults(cv::InputOutputArray img, std::vector<cv::Vec4f> p
     }
 }
 
-void recognition::scrapOvelappingDetections(const int height, const int width, std::vector<cv::Vec4f> position) {
+void recognition::scrapOvelappingDetections(const int height, const int width, std::vector<cv::Vec4f> *position) {
 
     //If two selections are overlapping delate the smalcheck if a bit array has just 1 oneler ones
         //How to decide if two things are overlapping?
@@ -145,18 +146,21 @@ void recognition::scrapOvelappingDetections(const int height, const int width, s
     //Generating BitMap
     //I could do all that but i need to release all of this stuff, so I'm gonna go with the brute force approach because of time constrains on the project
 
-    for (std::vector<cv::Vec4f>::iterator iter_a = position.begin(); iter_a != position.end(); ++iter_a) {
+    for (std::vector<cv::Vec4f>::iterator iter_a = (*position).begin(); iter_a != (*position).end(); ++iter_a) {
         cv::RotatedRect rect_a = cv::RotatedRect(cv::Point2f((*iter_a)[0], (*iter_a)[1]),
                                                 cv::Size2f(width * (*iter_a)[2], height * (*iter_a)[2]),
                                                 (*iter_a)[3]);
         int rect_a_area = width * (*iter_a)[2] * height * (*iter_a)[2];
         
-        compareRotatedRects(++iter_a, position.end(), rect_a, rect_a_area, height, width);
+        if (++iter_a != (*position).end())
+            recognition::compareRotatedRects(position, ++iter_a, (*position).end(), rect_a, rect_a_area, height, width);
     }
 }
 
-void compareRotatedRects(std::vector<cv::Vec4f>::iterator beginning, std::vector<cv::Vec4f>::iterator ending, cv::RotatedRect rect_to_compare, int area_to_compare, int height, int width) {
+void recognition::compareRotatedRects(std::vector<cv::Vec4f> *position, std::vector<cv::Vec4f>::iterator beginning, std::vector<cv::Vec4f>::iterator ending, cv::RotatedRect rect_to_compare, int area_to_compare, int height, int width) {
+    int i = 0;
     for (std::vector<cv::Vec4f>::iterator iter = beginning; iter != ending; ++iter) {
+        std::cout << "Comparing Rects " << std::to_string(i) << std::endl;
 
         cv::Point a(rect_to_compare.center);
         cv::Point b((*iter)[0], (*iter)[1]);
@@ -168,21 +172,24 @@ void compareRotatedRects(std::vector<cv::Vec4f>::iterator beginning, std::vector
                                                      (*iter)[3]);
             int rect_b_area = width * (*iter)[2] * height * (*iter)[2];
 
-            std::array<int,8> out;
+            std::vector<cv::Point2f> out;
             if (cv::rotatedRectangleIntersection(rect_to_compare, rect_b, out)) {
                 int intersection_area = cv::contourArea(out);
                 if (area_to_compare > rect_b_area) {
                     if (intersection_area / rect_b_area > AREA_INTERSECTION_TRESHOLD) {
-                        //remove rect_b
+                        (*position).erase(iter);
+                        //Because of this the program loops, need to debug this process
+                        --iter;
                         continue;
                     }
                 } else {
                     if (intersection_area / area_to_compare > AREA_INTERSECTION_TRESHOLD) {
-                        //remove rect_a
+                        (*position).erase(--beginning);
                         break;
                     }
                 }
             }
         }
+        i++;
     }
 }
