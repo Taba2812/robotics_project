@@ -49,10 +49,8 @@ int main () {
     utility::createWindows(src_size, 1, titles);
     utility::addTrackbars();
 
-    recognition::runRecognition();
-
     //MAIN LOOP --------------------------------------------------------
-    while (false) {
+    while (true) {
         frameNum += 1;
 
         std::cout << "Frame: #" << frameNum << std::endl;
@@ -70,6 +68,7 @@ int main () {
         pipeline::maskMat(blurred, result, mask);
 
         //OBJECT RECOGNITION -------------------------------------------
+        recognition::runRecognition(result);
 
         //DISPLAYING PROCESS ON SCREEN ---------------------------------
         std::list<cv::Mat> mats = {src_image, blurred, mask, result};

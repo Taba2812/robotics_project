@@ -14,14 +14,14 @@ namespace recognition {
 
     //Change to 0 to skip detection of those blocks or colors
 
-    void runRecognition();
+    void runRecognition(cv::InputOutputArray img);
     void setParameters(cv::Ptr<cv::GeneralizedHoughGuil> guil);
-    void setDataset(cv::Ptr<cv::GeneralizedHoughGuil> guil);
-    void getImagesWithRightColors(std::list<cv::Mat> buffer, std::string block, int *counter);
-    void getImages(std::list<cv::Mat> buffer, std::string block, std::string color, int *counter);
-    void detection(cv::Ptr<cv::GeneralizedHoughGuil> guil);
+    void setDataset(cv::Ptr<cv::GeneralizedHoughGuil> guil, std::list<cv::Mat> *buffer);
+    void getImagesWithRightColors(std::list<cv::Mat> *buffer, std::string block);
+    void getImages(std::list<cv::Mat> *buffer, std::string block, std::string color);
+    void detection(cv::Ptr<cv::GeneralizedHoughGuil> guil, std::list<cv::Mat> *buffer, cv::InputOutputArray img, std::vector<cv::Vec4f> position);
 
-    void drawResults();
+    void drawResults(cv::InputOutputArray img, std::vector<cv::Vec4f> position);
 }
 
 #endif
