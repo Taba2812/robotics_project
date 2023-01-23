@@ -146,7 +146,12 @@ void recognition::scrapOvelappingDetections(const int height, const int width, s
     //Generating BitMap
     //I could do all that but i need to release all of this stuff, so I'm gonna go with the brute force approach because of time constrains on the project
 
+    std::cout << "Size of the positions: " << std::to_string((*position).size()) << std::endl; 
+
+    int i = 0;
     for (std::vector<cv::Vec4f>::iterator iter_a = (*position).begin(); iter_a != (*position).end(); ++iter_a) {
+        std::cout << "Now comparing detection Rect number: " << std::to_string(i) << std::endl;
+        
         cv::RotatedRect rect_a = cv::RotatedRect(cv::Point2f((*iter_a)[0], (*iter_a)[1]),
                                                 cv::Size2f(width * (*iter_a)[2], height * (*iter_a)[2]),
                                                 (*iter_a)[3]);
@@ -154,6 +159,8 @@ void recognition::scrapOvelappingDetections(const int height, const int width, s
         
         if (++iter_a != (*position).end())
             recognition::compareRotatedRects(position, ++iter_a, (*position).end(), rect_a, rect_a_area, height, width);
+
+        i++;
     }
 }
 
@@ -161,6 +168,8 @@ void recognition::compareRotatedRects(std::vector<cv::Vec4f> *position, std::vec
     int i = 0;
     for (std::vector<cv::Vec4f>::iterator iter = beginning; iter != ending; ++iter) {
         std::cout << "Comparing Rects " << std::to_string(i) << std::endl;
+        if (i > 100)
+            break;
 
         cv::Point a(rect_to_compare.center);
         cv::Point b((*iter)[0], (*iter)[1]);
@@ -177,13 +186,14 @@ void recognition::compareRotatedRects(std::vector<cv::Vec4f> *position, std::vec
                 int intersection_area = cv::contourArea(out);
                 if (area_to_compare > rect_b_area) {
                     if (intersection_area / rect_b_area > AREA_INTERSECTION_TRESHOLD) {
-                        (*position).erase(iter);
+                        std::cout << "Eliminated selection inside SECOND loop" << std::endl;
+                        iter = (*position).erase(iter);
                         //Because of this the program loops, need to debug this process
-                        --iter;
                         continue;
                     }
                 } else {
                     if (intersection_area / area_to_compare > AREA_INTERSECTION_TRESHOLD) {
+                        std::cout << "Eliminated selection inside FIRST loop" << std::endl;
                         (*position).erase(--beginning);
                         break;
                     }
@@ -191,5 +201,7 @@ void recognition::compareRotatedRects(std::vector<cv::Vec4f> *position, std::vec
             }
         }
         i++;
+
+        //After some time debugging I came to the conclusion that it is easier to store somewhere all iters for what to delete and then delete them all in a signle block, to avoid pointers to nothing
     }
 }
