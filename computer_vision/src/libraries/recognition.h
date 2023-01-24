@@ -5,6 +5,7 @@
 #include <opencv2/imgproc.hpp>
 #include <list>
 #include <iostream>
+#include <math.h>
 
 #include "settings.h"
 
@@ -24,6 +25,7 @@ namespace recognition {
     void drawResults(cv::InputOutputArray img, std::vector<cv::Vec4f> position, int t_width, int t_height);
     void scrapOvelappingDetections(const int height, const int width, std::vector<cv::Vec4f> *position);
     void compareRotatedRects(std::vector<cv::Vec4f> *position, std::vector<cv::Vec4f>::iterator beginning, std::vector<cv::Vec4f>::iterator ending, cv::RotatedRect rect_to_compare, int area_to_compare, int height, int width);
+    bool recognition::distanceCondition(int x_a, int y_a, int x_b, int y_b, int scale_a, int scale_b, int width, int height);
 }
 
 #endif

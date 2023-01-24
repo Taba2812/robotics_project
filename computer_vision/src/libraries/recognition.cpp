@@ -129,6 +129,53 @@ void recognition::drawResults(cv::InputOutputArray img, std::vector<cv::Vec4f> p
     }
 }
 
+void recognition::scrapOvelappingDetections(std::vector<cv::Vec4f> detections, int width, int height) {
+    //Create array for iters for delation
+
+    //Choose rect to compare
+
+    //Compare successive rects
+        //Index recs to delete
+
+    //Exit Loop
+
+    //Delete Overlapping
+
+    //Check Next Rect
+
+    std::vector<std::vector<cv::Vec4f>::iterator> to_delete;
+
+    for (std::vector<cv::Vec4f>::iterator iter = detections.begin(); iter != detections.end(); ++iter) {
+        cv::RotatedRect rect_a = cv::RotatedRect(cv::Point2f((*iter)[0], (*iter)[1]),
+                                                 cv::Size2f(width * (*iter)[2], height * (*iter)[2]),
+                                                 (*iter)[3]);
+
+        for (std::vector<cv::Vec4f>::iterator inner_iter = iter++; inner_iter != detections.end(); ++inner_iter) {
+            //Check if they are distant enough
+            if (recognition::distanceCondition((*iter)[0], (*iter)[1], (*inner_iter)[0], (*inner_iter)[1], (*iter)[2], (*inner_iter)[2], width, height))
+                continue;
+            
+            cv::RotatedRect rect_b = cv::RotatedRect(cv::Point2f((*inner_iter)[0], (*inner_iter)[1]),
+                                                 cv::Size2f(width * (*inner_iter)[2], height * (*inner_iter)[2]),
+                                                 (*inner_iter)[3]);
+            
+        }
+    }
+}
+
+bool recognition::distanceCondition(int x_a, int y_a, int x_b, int y_b, int scale_a, int scale_b, int width, int height) {
+    int distance = sqrt((x_b-x_a)^2 + (y_b-y_a)^2);
+
+    int max_dist = 0;
+    if (scale_a > scale_b) {
+        max_dist = sqrt(width^2 + height^2) * scale_a / 2;
+    } else {
+        max_dist = sqrt(width^2 + height^2) * scale_b / 2;
+    }
+
+    return distance > max_dist;
+}
+
 void recognition::scrapOvelappingDetections(const int height, const int width, std::vector<cv::Vec4f> *position) {
 
     //If two selections are overlapping delate the smalcheck if a bit array has just 1 oneler ones
@@ -164,6 +211,7 @@ void recognition::scrapOvelappingDetections(const int height, const int width, s
     }
 }
 
+/*
 void recognition::compareRotatedRects(std::vector<cv::Vec4f> *position, std::vector<cv::Vec4f>::iterator beginning, std::vector<cv::Vec4f>::iterator ending, cv::RotatedRect rect_to_compare, int area_to_compare, int height, int width) {
     int i = 0;
     for (std::vector<cv::Vec4f>::iterator iter = beginning; iter != ending; ++iter) {
@@ -205,3 +253,4 @@ void recognition::compareRotatedRects(std::vector<cv::Vec4f> *position, std::vec
         //After some time debugging I came to the conclusion that it is easier to store somewhere all iters for what to delete and then delete them all in a signle block, to avoid pointers to nothing
     }
 }
+*/
