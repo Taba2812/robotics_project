@@ -3,6 +3,8 @@
 
 #include "inverse_kinematics.h"
 
+#define VELOCITY 1
+
 class Path{
 private:
     JointConfiguration ic;
