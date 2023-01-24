@@ -31,7 +31,7 @@ int main () {
         ros::Subscriber vision_sub = nh.subscribe("state", QUEUE_SIZE, get_state);
         ros::Publisher vision_pub = nh.advertise<ros_type>("block_position", QUEUE_SIZE);
     */
-    std::list<std::string> titles = {"Original", "Blurred", "Mask", "Result"};
+    std::list<std::string> titles = {"Result"};
 
     //Get Test Image
     std::string url = setting::location + "blocks_group2_48.jpg";
@@ -71,7 +71,7 @@ int main () {
         recognition::runRecognition(result);
 
         //DISPLAYING PROCESS ON SCREEN ---------------------------------
-        std::list<cv::Mat> mats = {src_image, blurred, mask, result};
+        std::list<cv::Mat> mats = {result};
         utility::showWindows(mats, titles);
 
         int c = cv::waitKey(10);

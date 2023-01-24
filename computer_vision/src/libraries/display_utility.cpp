@@ -24,7 +24,7 @@ std::string utility::type2str(int type) {
 };
 
 void utility::createWindows(cv::Size src_size, int size_multiplier, std::list<std::string> titles) {
-    int ratio = titles.size() / 3;
+    int ratio = (titles.size() / 3) + 1;
 
     cv::Size view_size = src_size / (ratio*size_multiplier);
     

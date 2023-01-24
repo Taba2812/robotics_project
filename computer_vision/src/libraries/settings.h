@@ -28,10 +28,10 @@ namespace setting {
     #define X2_Y2_Z2_FILLET     0
 
     #define BLUE   1
-    #define ORANGE 1
-    #define YELLOW 1
-    #define RED    1
-    #define VIOLET 1
+    #define ORANGE 0
+    #define YELLOW 0
+    #define RED    0
+    #define VIOLET 0
 
     //IMAGE OVERLAP
     #define AREA_INTERSECTION_TRESHOLD 0.7

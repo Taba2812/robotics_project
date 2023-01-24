@@ -104,14 +104,20 @@ void recognition::getImages(std::list<cv::Mat> *buffer, std::string block, std::
 void recognition::detection(cv::Ptr<cv::GeneralizedHoughGuil> guil, std::list<cv::Mat> *buffer, cv::InputOutputArray img, std::vector<cv::Vec4f> position) {
     cv::Mat grayscale;
     cv::cvtColor(img, grayscale, cv::COLOR_RGB2GRAY);
+    int total_detections = 0;
 
     for (cv::Mat temp : *buffer) {
         guil->setTemplate(temp);
         guil->detect(grayscale, position);
 
-        recognition::scrapOvelappingDetections(temp.rows, temp.cols, &position);
+        recognition::scrapOvelappingDetections(&position, temp.cols, temp.rows);
+
+        total_detections+= position.size();
+
         recognition::drawResults(img, position, temp.rows, temp.cols);
     }
+
+    std::cout << "Total detections across all images: " << std::to_string(total_detections) << std::endl;
 }
 
 void recognition::drawResults(cv::InputOutputArray img, std::vector<cv::Vec4f> position, int template_h, int template_w) {
@@ -129,7 +135,7 @@ void recognition::drawResults(cv::InputOutputArray img, std::vector<cv::Vec4f> p
     }
 }
 
-void recognition::scrapOvelappingDetections(std::vector<cv::Vec4f> detections, int width, int height) {
+void recognition::scrapOvelappingDetections(std::vector<cv::Vec4f> *detections, int width, int height) {
     //Create array for iters for delation
 
     //Choose rect to compare
@@ -144,13 +150,16 @@ void recognition::scrapOvelappingDetections(std::vector<cv::Vec4f> detections, i
     //Check Next Rect
 
     std::vector<std::vector<cv::Vec4f>::iterator> to_delete;
+    bool is_pointed_to_deleted = false;
 
-    for (std::vector<cv::Vec4f>::iterator iter = detections.begin(); iter != detections.end(); ++iter) {
+    for (std::vector<cv::Vec4f>::iterator iter = (*detections).begin(); iter != (*detections).end(); ++iter) {
         cv::RotatedRect rect_a = cv::RotatedRect(cv::Point2f((*iter)[0], (*iter)[1]),
                                                  cv::Size2f(width * (*iter)[2], height * (*iter)[2]),
                                                  (*iter)[3]);
 
-        for (std::vector<cv::Vec4f>::iterator inner_iter = iter++; inner_iter != detections.end(); ++inner_iter) {
+        int rect_a_area = width * height * (*iter)[2] * (*iter)[2];
+
+        for (std::vector<cv::Vec4f>::iterator inner_iter = iter++; inner_iter != (*detections).end(); ++inner_iter) {
             //Check if they are distant enough
             if (recognition::distanceCondition((*iter)[0], (*iter)[1], (*inner_iter)[0], (*inner_iter)[1], (*iter)[2], (*inner_iter)[2], width, height))
                 continue;
@@ -158,8 +167,43 @@ void recognition::scrapOvelappingDetections(std::vector<cv::Vec4f> detections, i
             cv::RotatedRect rect_b = cv::RotatedRect(cv::Point2f((*inner_iter)[0], (*inner_iter)[1]),
                                                  cv::Size2f(width * (*inner_iter)[2], height * (*inner_iter)[2]),
                                                  (*inner_iter)[3]);
-            
+
+            int rect_b_area = width * height * (*inner_iter)[2] * (*inner_iter)[2];
+
+            //Calculate intersection
+            std::vector<cv::Point2f> out;
+
+            if (cv::rotatedRectangleIntersection(rect_a, rect_b, out)) {
+                int intersection_area = cv::contourArea(out);
+
+                if (rect_a_area > rect_b_area) {
+                    if (intersection_area / rect_b_area > AREA_INTERSECTION_TRESHOLD)
+                        to_delete.push_back(inner_iter);
+                        //Add rect b to deleting
+                } else {
+                    if (intersection_area / rect_a_area > AREA_INTERSECTION_TRESHOLD)
+                        to_delete.push_back(iter);
+                        //Add rect a to deleting
+                }
+            }
         }
+
+        //std::cout << "Fount to delete = " << std::to_string(to_delete.size()) << std::endl; 
+
+        /*
+        //Deleting compromised detections
+        if (false) {
+        for (std::vector<std::vector<cv::Vec4f>::iterator>::iterator del_iter = to_delete.begin(); del_iter != to_delete.end(); ++del_iter) {
+            if ((*del_iter) != iter) {
+                is_pointed_to_deleted = false;
+                (*detections).erase((*del_iter));
+            } else {
+                //is_pointed_to_deleted = true;
+                //(*detections).erase((*del_iter));
+            }
+        }
+
+        to_delete.clear(); } */
     }
 }
 
@@ -175,7 +219,7 @@ bool recognition::distanceCondition(int x_a, int y_a, int x_b, int y_b, int scal
 
     return distance > max_dist;
 }
-
+/*
 void recognition::scrapOvelappingDetections(const int height, const int width, std::vector<cv::Vec4f> *position) {
 
     //If two selections are overlapping delate the smalcheck if a bit array has just 1 oneler ones
@@ -209,7 +253,7 @@ void recognition::scrapOvelappingDetections(const int height, const int width, s
 
         i++;
     }
-}
+}*/
 
 /*
 void recognition::compareRotatedRects(std::vector<cv::Vec4f> *position, std::vector<cv::Vec4f>::iterator beginning, std::vector<cv::Vec4f>::iterator ending, cv::RotatedRect rect_to_compare, int area_to_compare, int height, int width) {
