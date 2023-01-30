@@ -5,7 +5,6 @@ project(project_package)
 find_package(catkin REQUIRED COMPONENTS roscpp std_msgs sensor_msgs)
 find_package(Eigen3 3.3 REQUIRED)
 
-
 ## Declare a catkin package
 catkin_package()
 
