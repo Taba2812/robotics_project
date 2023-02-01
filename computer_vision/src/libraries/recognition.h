@@ -25,7 +25,7 @@ namespace recognition {
     void drawResults(cv::InputOutputArray img, std::vector<cv::Vec4f> position, int t_width, int t_height);
     void scrapOvelappingDetections(std::vector<cv::Vec4f> *detections, int width, int height);
     void compareRotatedRects(std::vector<cv::Vec4f> *position, std::vector<cv::Vec4f>::iterator beginning, std::vector<cv::Vec4f>::iterator ending, cv::RotatedRect rect_to_compare, int area_to_compare, int height, int width);
-    bool distanceCondition(int x_a, int y_a, int x_b, int y_b, int scale_a, int scale_b, int width, int height);
+    bool distanceCondition(cv::Vec4f first, cv::Vec4f second, int width, int height);
 }
 
 #endif
