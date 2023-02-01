@@ -131,22 +131,9 @@ void Destination::compute_inverse(const EndEffector& ee){
     //theta4 - WRONG, i'm building T43 wrong i think
     // T43 = (T21 * T32)^-1 * T41
 
-    T(T43, 1, 3);
+    T(T43, q[3], 3);
+
     th4[0] = atan2(T43(1,0), T43(0,0));
-    T(T43, 1, 3);
-    th4[1] = atan2(T43(1,0), T43(0,0));
-    T(T43, 1, 3);
-    th4[2] = atan2(T43(1,0), T43(0,0));
-    T(T43, 1, 3);
-    th4[3] = atan2(T43(1,0), T43(0,0));
-    T(T43, 1, 3);
-    th4[4] = atan2(T43(1,0), T43(0,0));
-    T(T43, 1, 3);
-    th4[5] = atan2(T43(1,0), T43(0,0));
-    T(T43, 1, 3);
-    th4[6] = atan2(T43(1,0), T43(0,0));
-    T(T43, 1, 3);
-    th4[7] = atan2(T43(1,0), T43(0,0));
 
     this->ja << th1[0], th2[0], th3[0], th4[0], th5[0], th6[0];
 }

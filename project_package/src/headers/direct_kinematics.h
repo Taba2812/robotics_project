@@ -3,7 +3,7 @@
 
 #include <iostream>
 #include <eigen3/Eigen/Dense>
-#include <cmath>
+#include <math.h>
 
 #define JOINTS 6
 #define DIM 4
@@ -15,16 +15,15 @@
 #define D6 0.0823
 #define A2 0.425
 #define A3 0.39225
-#define R90 1.5708  //90 degrees in radians
 
 typedef Eigen::Matrix<double, DIM, DIM> Matrix4d;
 typedef Eigen::Matrix<double, JOINTS, 1> JointConfiguration;
 
 JointConfiguration q;
 
-double d[JOINTS] = {D1,0,0,D4,D5,D6};          //distance between axes
-double cn[JOINTS] = {0,-A2,-A3,0,0,0};         //common normal
-double alpha[JOINTS] = {R90,0,0,R90,-R90,0};   //angles
+double d[JOINTS] = {D1, 0, 0, D4, D5, D6};                  //distance between axes
+double cn[JOINTS] = {0, -A2, -A3, 0, 0, 0};                 //common normal
+double alpha[JOINTS] = {M_PI_2, 0, 0, M_PI_2, -M_PI_2, 0};  //angles
 
 class EndEffector{
 private:
