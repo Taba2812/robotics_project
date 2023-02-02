@@ -105,6 +105,7 @@ void recognition::detection(cv::Ptr<cv::GeneralizedHoughGuil> guil, std::list<cv
     cv::Mat grayscale;
     cv::cvtColor(img, grayscale, cv::COLOR_RGB2GRAY);
     int total_detections = 0;
+    std::vector<cv::Mat> pTemplate;
 
     for (cv::Mat temp : *buffer) {
         std::vector<cv::Vec4f> partial_detections;
@@ -112,6 +113,10 @@ void recognition::detection(cv::Ptr<cv::GeneralizedHoughGuil> guil, std::list<cv
         guil->detect(grayscale, partial_detections);
 
         position.insert(position.end(), partial_detections.begin(), partial_detections.end());
+        for (int i = 0; i < partial_detections.size(); i++) {
+            pTemplate.push_back(temp);
+        }
+
         partial_detections.clear();
     }
 
@@ -119,24 +124,37 @@ void recognition::detection(cv::Ptr<cv::GeneralizedHoughGuil> guil, std::list<cv
     REFACTOR OVERLAP CHECK AND DRAWRESULTS
 
     recognition::scrapOvelappingDetections(&partial_detections, temp.cols, temp.rows);
-    recognition::drawResults(img, partial_detections, temp.rows, temp.cols);
+    
     */
+    std::cout << "Before Draw Call " << std::endl;
+
+    recognition::drawResults(img, position, buffer, pTemplate);
 
     std::cout << "Total detections across all images: " << std::to_string(position.size()) << std::endl;
 }
 
-void recognition::drawResults(cv::InputOutputArray img, std::vector<cv::Vec4f> position, int template_h, int template_w) {
+void recognition::drawResults(cv::InputOutputArray img, std::vector<cv::Vec4f> position, std::list<cv::Mat> *buffer, std::vector<cv::Mat> pTemplate) {
+    if (position.size() != pTemplate.size()) {return;}
     
-    for (std::vector<cv::Vec4f>::iterator iter = position.begin(); iter != position.end(); ++iter) {
-        cv::RotatedRect rRect = cv::RotatedRect(cv::Point2f((*iter)[0], (*iter)[1]),
-                                                cv::Size2f(template_w * (*iter)[2], template_h * (*iter)[2]),
-                                                (*iter)[3]);
+    //ITERATION BOUNDARIES
+    std::vector<cv::Vec4f>::iterator pos_iter = position.begin();
+    std::vector<cv::Mat>::iterator temp_iter = pTemplate.begin();
+    
+    for (; pos_iter != position.end();) {
+        cv::RotatedRect rRect = cv::RotatedRect(cv::Point2f((*pos_iter)[0], (*pos_iter)[1]),
+                                                cv::Size2f((*temp_iter).cols * (*pos_iter)[2], (*temp_iter).rows * (*pos_iter)[2]),
+                                                (*pos_iter)[3]);
+
         cv::Point2f vertices[4];
         rRect.points(vertices);
         for (int i = 0; i < 4; i++)
             cv::line(img, vertices[i], vertices[(i + 1) % 4], cv::Scalar(0, 255, 0), 2);
         
-        cv::circle(img, cv::Point((*iter)[0], (*iter)[1]), 1, cv::Scalar(255,255,255), 1);   
+        cv::circle(img, cv::Point((*pos_iter)[0], (*pos_iter)[1]), 1, cv::Scalar(255,255,255), 1); 
+
+        //INCREMENTS
+        ++pos_iter;
+        ++temp_iter;
     }
 }
 
