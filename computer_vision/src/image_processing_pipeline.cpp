@@ -53,7 +53,7 @@ int main () {
     while (true) {
         frameNum += 1;
 
-        std::cout << "Frame: #" << frameNum << std::endl;
+        std::cout << "Frame: #" << frameNum << " --------------------------------------------------------" << std::endl;
 
         //IMAGE PROCESSING PIPELINE-------------------------------------
         cv::Mat blurred;

@@ -107,17 +107,22 @@ void recognition::detection(cv::Ptr<cv::GeneralizedHoughGuil> guil, std::list<cv
     int total_detections = 0;
 
     for (cv::Mat temp : *buffer) {
+        std::vector<cv::Vec4f> partial_detections;
         guil->setTemplate(temp);
-        guil->detect(grayscale, position);
+        guil->detect(grayscale, partial_detections);
 
-        recognition::scrapOvelappingDetections(&position, temp.cols, temp.rows);
-
-        total_detections+= position.size();
-
-        recognition::drawResults(img, position, temp.rows, temp.cols);
+        position.insert(position.end(), partial_detections.begin(), partial_detections.end());
+        partial_detections.clear();
     }
 
-    std::cout << "Total detections across all images: " << std::to_string(total_detections) << std::endl;
+    /*
+    REFACTOR OVERLAP CHECK AND DRAWRESULTS
+
+    recognition::scrapOvelappingDetections(&partial_detections, temp.cols, temp.rows);
+    recognition::drawResults(img, partial_detections, temp.rows, temp.cols);
+    */
+
+    std::cout << "Total detections across all images: " << std::to_string(position.size()) << std::endl;
 }
 
 void recognition::drawResults(cv::InputOutputArray img, std::vector<cv::Vec4f> position, int template_h, int template_w) {
@@ -144,7 +149,6 @@ void recognition::scrapOvelappingDetections(std::vector<cv::Vec4f> *detections, 
 
     std::cout << "Size: " << std::to_string(size) << std::endl;
 
-    //WITH ITERATORS
     for (std::vector<cv::Vec4f>::iterator element = (*detections).begin(); element != std::prev((*detections).end()); ++element) {
         std::cout << "External Iteration" << std::endl;
 
@@ -168,25 +172,36 @@ void recognition::scrapOvelappingDetections(std::vector<cv::Vec4f> *detections, 
                 int intersection_area = cv::contourArea(out);
 
                 if (rect_a_area > rect_b_area) {
+                    std::cout << "      Intersection: " << std::to_string(intersection_area / rect_b_area) << std::endl;
                     if (intersection_area / rect_b_area > AREA_INTERSECTION_TRESHOLD)
                         to_delete.push_back(comparison);
                 } else {
+                    std::cout << "      Intersection: " << std::to_string(intersection_area / rect_a_area) << std::endl;
                     if (intersection_area / rect_a_area > AREA_INTERSECTION_TRESHOLD)
                         to_delete.push_back(element);
                 }
             }
         }
     }
+
+    if (to_delete.empty()) {return;}
+    std::cout << "----Found " << std::to_string(to_delete.size()) << " detections to delete" << std::endl;
+
+    for (std::vector<std::vector<cv::Vec4f>::iterator>::iterator iter = to_delete.begin(); iter != to_delete.end(); ++iter) {
+        (*detections).erase(*iter);
+    }
 }
 
 bool recognition::distanceCondition(cv::Vec4f first, cv::Vec4f second, int width, int height) {
+    
     int distance = sqrt(pow(second[0]-first[0],2) + pow(second[1]-first[1],2));
 
     int max_dist = sqrt(pow(width, 2) + pow(height, 2));
+
     if (first[3] > second[3]) {
-        max_dist *= (float)first[3] / 2;
+        max_dist *= (float)first[2] / 2;
     } else {
-        max_dist *= (float)second[3] / 2;
+        max_dist *= (float)second[2] / 2;
     }
 
     return distance > max_dist;

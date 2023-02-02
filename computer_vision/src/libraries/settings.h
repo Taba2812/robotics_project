@@ -27,8 +27,8 @@ namespace setting {
     #define X2_Y2_Z2            0
     #define X2_Y2_Z2_FILLET     0
 
-    #define BLUE   1
-    #define ORANGE 0
+    #define BLUE   0
+    #define ORANGE 1
     #define YELLOW 0
     #define RED    0
     #define VIOLET 0
