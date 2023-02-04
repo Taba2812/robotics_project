@@ -23,9 +23,9 @@ namespace recognition {
     void detection(cv::Ptr<cv::GeneralizedHoughGuil> guil, std::list<cv::Mat> *buffer, cv::InputOutputArray img, std::vector<cv::Vec4f> position);
 
     void drawResults(cv::InputOutputArray img, std::vector<cv::Vec4f> position, std::list<cv::Mat> *buffer, std::vector<cv::Mat> pTemplate);
-    void scrapOvelappingDetections(std::vector<cv::Vec4f> *detections, int width, int height);
+    void scrapOvelappingDetections(std::vector<cv::Vec4f> *detections, std::vector<cv::Mat> *pTemplate);
     void compareRotatedRects(std::vector<cv::Vec4f> *position, std::vector<cv::Vec4f>::iterator beginning, std::vector<cv::Vec4f>::iterator ending, cv::RotatedRect rect_to_compare, int area_to_compare, int height, int width);
-    bool distanceCondition(cv::Vec4f first, cv::Vec4f second, int width, int height);
+    bool distanceCondition(cv::Vec4f first, cv::Size2i first_size, cv::Vec4f second, cv::Size2i second_size);
 }
 
 #endif

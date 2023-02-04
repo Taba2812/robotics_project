@@ -120,17 +120,13 @@ void recognition::detection(cv::Ptr<cv::GeneralizedHoughGuil> guil, std::list<cv
         partial_detections.clear();
     }
 
-    /*
-    REFACTOR OVERLAP CHECK AND DRAWRESULTS
+    std::cout << "Total detections across all images: " << std::to_string(position.size()) << std::endl;
 
-    recognition::scrapOvelappingDetections(&partial_detections, temp.cols, temp.rows);
-    
-    */
-    std::cout << "Before Draw Call " << std::endl;
+    recognition::scrapOvelappingDetections(&position, &pTemplate);
+
+    std::cout << "Total detections after scrapping: " << std::to_string(position.size()) << std::endl;
 
     recognition::drawResults(img, position, buffer, pTemplate);
-
-    std::cout << "Total detections across all images: " << std::to_string(position.size()) << std::endl;
 }
 
 void recognition::drawResults(cv::InputOutputArray img, std::vector<cv::Vec4f> position, std::list<cv::Mat> *buffer, std::vector<cv::Mat> pTemplate) {
@@ -158,68 +154,83 @@ void recognition::drawResults(cv::InputOutputArray img, std::vector<cv::Vec4f> p
     }
 }
 
-void recognition::scrapOvelappingDetections(std::vector<cv::Vec4f> *detections, int width, int height) {
+void recognition::scrapOvelappingDetections(std::vector<cv::Vec4f> *detections, std::vector<cv::Mat> *pTemplate) {
 
-    if ((*detections).empty()) {return;}
+    if (detections->empty() || pTemplate->empty()) {return;}
+    if (detections->size()  != pTemplate->size())  {return;}
 
-    std::vector<std::vector<cv::Vec4f>::iterator> to_delete;
-    int size = (*detections).size();
+    std::vector<cv::Vec4f>::iterator outer_pos_iter = detections->begin();
+    std::vector<cv::Mat>::iterator outer_temp_iter = pTemplate->begin();
+    bool need_to_increment = true;
+    
+    while (outer_pos_iter != std::prev(detections->end())) {
+        
+        need_to_increment = true;
 
-    std::cout << "Size: " << std::to_string(size) << std::endl;
+        cv::Vec4f element = *outer_pos_iter;
+        cv::Mat element_temp = *outer_temp_iter;
 
-    for (std::vector<cv::Vec4f>::iterator element = (*detections).begin(); element != std::prev((*detections).end()); ++element) {
-        std::cout << "External Iteration" << std::endl;
+        cv::RotatedRect element_rect = cv::RotatedRect (cv::Point2f(element[0], element[1]), 
+                                                        cv::Size2f(element_temp.cols * element[2], element_temp.rows * element[2]), 
+                                                        element[3]);
+        int element_rect_area = element_temp.cols * element_temp.rows * element[2] * element[2];
 
-        cv::Vec4f obj_a = *element;
-        cv::RotatedRect rect_a = cv::RotatedRect(cv::Point2f(obj_a[0], obj_a[1]), cv::Size2f(width * obj_a[2], height * obj_a[2]), obj_a[3]);
-        int rect_a_area = width * height * obj_a[2] * obj_a[2];
+        //SECOND LOOP
+        std::vector<cv::Vec4f>::iterator inner_pos_iter = outer_pos_iter + 1;
+        std::vector<cv::Mat>::iterator inner_temp_iter = outer_temp_iter + 1;
 
-        for (std::vector<cv::Vec4f>::iterator comparison = element + 1; comparison != (*detections).end(); ++comparison) {
-            std::cout << "  Internal Iteration" << std::endl;
+        while (inner_pos_iter != detections->end()) {
 
-            cv::Vec4f obj_b = *comparison;
-            if (recognition::distanceCondition(obj_a, obj_b, width, height)) {continue;}
+            cv::Vec4f comparison = *inner_pos_iter;
+            cv::Mat comparison_temp = *inner_temp_iter;
 
-            cv::RotatedRect rect_b = cv::RotatedRect(cv::Point2f(obj_b[0], obj_b[1]), cv::Size2f(width * obj_b[2], height * obj_b[2]), obj_b[3]);
+            if (recognition::distanceCondition(element, element_temp.size(), comparison, comparison_temp.size())) 
+                {++inner_pos_iter;++inner_temp_iter;continue;}
 
-            int rect_b_area = width * height * obj_b[2] * obj_b[2];
-
+            cv::RotatedRect comparison_rect = cv::RotatedRect (cv::Point2f(comparison[0], comparison[1]), 
+                                                                cv::Size2f(comparison_temp.cols * comparison[2], comparison_temp.rows * comparison[2]), 
+                                                                comparison[3]);
+            int comparison_rect_area = comparison_temp.cols * comparison_temp.rows * comparison[2] * comparison[2];
+            
             std::vector<cv::Point2f> out;
-
-            if (cv::rotatedRectangleIntersection(rect_a, rect_b, out)) {
+            if (cv::rotatedRectangleIntersection(element_rect, comparison_rect, out)) {
                 int intersection_area = cv::contourArea(out);
-
-                if (rect_a_area > rect_b_area) {
-                    std::cout << "      Intersection: " << std::to_string(intersection_area / rect_b_area) << std::endl;
-                    if (intersection_area / rect_b_area > AREA_INTERSECTION_TRESHOLD)
-                        to_delete.push_back(comparison);
+                if (element_rect_area > comparison_rect_area) {
+                    if ((double)intersection_area / (double)comparison_rect_area > AREA_INTERSECTION_TRESHOLD) {
+                        inner_pos_iter = detections->erase(inner_pos_iter);
+                        inner_temp_iter = pTemplate->erase(inner_temp_iter);
+                        continue;
+                    }
                 } else {
-                    std::cout << "      Intersection: " << std::to_string(intersection_area / rect_a_area) << std::endl;
-                    if (intersection_area / rect_a_area > AREA_INTERSECTION_TRESHOLD)
-                        to_delete.push_back(element);
+                    if ((double)intersection_area / (double)element_rect_area > AREA_INTERSECTION_TRESHOLD) {
+                        outer_pos_iter = detections->erase(outer_pos_iter);
+                        outer_temp_iter = pTemplate->erase(outer_temp_iter);
+                        need_to_increment = false;
+                        break;
+                    }
                 }
             }
+            //INCREMENTS 
+            ++inner_pos_iter;
+            ++inner_temp_iter;          
         }
-    }
 
-    if (to_delete.empty()) {return;}
-    std::cout << "----Found " << std::to_string(to_delete.size()) << " detections to delete" << std::endl;
-
-    for (std::vector<std::vector<cv::Vec4f>::iterator>::iterator iter = to_delete.begin(); iter != to_delete.end(); ++iter) {
-        (*detections).erase(*iter);
+        if (need_to_increment) {
+            ++outer_pos_iter;
+            ++outer_temp_iter;
+        }       
     }
 }
 
-bool recognition::distanceCondition(cv::Vec4f first, cv::Vec4f second, int width, int height) {
+bool recognition::distanceCondition(cv::Vec4f first, cv::Size2i first_size, cv::Vec4f second, cv::Size2i second_size) {
     
     int distance = sqrt(pow(second[0]-first[0],2) + pow(second[1]-first[1],2));
 
-    int max_dist = sqrt(pow(width, 2) + pow(height, 2));
-
-    if (first[3] > second[3]) {
-        max_dist *= (float)first[2] / 2;
+    int max_dist = 1;
+    if (first_size.area() > second_size.area()) {
+        max_dist = (sqrt(pow(first_size.width, 2) + pow(first_size.height, 2)) * (double)first[2]) / 2;
     } else {
-        max_dist *= (float)second[2] / 2;
+        max_dist = (sqrt(pow(second_size.width, 2) + pow(second_size.height, 2)) * (double)second[2]) / 2;
     }
 
     return distance > max_dist;
