@@ -127,6 +127,8 @@ void recognition::detection(cv::Ptr<cv::GeneralizedHoughGuil> guil, std::list<cv
     std::cout << "Total detections after scrapping: " << std::to_string(position.size()) << std::endl;
 
     recognition::drawResults(img, position, buffer, pTemplate);
+
+    //ADDED COMMENT
 }
 
 void recognition::drawResults(cv::InputOutputArray img, std::vector<cv::Vec4f> position, std::list<cv::Mat> *buffer, std::vector<cv::Mat> pTemplate) {
