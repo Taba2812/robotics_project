@@ -56,7 +56,7 @@ Vector4d P(double th1, double th5, double th6, const Eigen::MatrixXd& T60){
 void Destination::compute_inverse(const EndEffector& ee){
     Eigen::MatrixXd T60, T06;
     Eigen::Matrix3d ori;
-    Matrix4d T43;
+    Matrix4d T65, T54, T43, T32, T21, T10;
     Eigen::Vector3d X06, Y06, pos;
     Vector4d cmp, tmp, P50, P31[4];
     double phi, psi, R, n;
@@ -128,11 +128,13 @@ void Destination::compute_inverse(const EndEffector& ee){
     th2[6] = -atan2(P31[2](1),-P31[2](0)) + asin(cn[2]*sin(th3[6]) / P31[2].norm());
     th2[7] = -atan2(P31[3](1),-P31[3](0)) + asin(cn[2]*sin(th3[7]) / P31[3].norm());
 
-    //theta4 - WRONG, i'm building T43 wrong i think
-    // T43 = (T21 * T32)^-1 * T41
-
-    T(T43, q[3], 3);
-
+    T(T65, th6[0], 5);
+    T(T54, th5[0], 4);
+    T(T32, th3[0], 2);
+    T(T21, th2[0], 1);
+    T(T10, th1[0], 0);
+    T43 = T32.inverse() * T21.inverse() * T10.inverse() * T60 * T65.inverse() * T54.inverse();
+    
     th4[0] = atan2(T43(1,0), T43(0,0));
 
     this->ja << th1[0], th2[0], th3[0], th4[0], th5[0], th6[0];
