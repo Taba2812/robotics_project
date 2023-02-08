@@ -25,6 +25,16 @@ void get_position(const std_msgs::Float64MultiArray::ConstPtr& xyz){
 }
 
 int main(int argc, char **argv){
+    /*
+        State machine:
+        waiting -> status -> vision
+        vision -> block_position -> control
+        control -> kinematics -> command
+        command -> ack -> homing
+        homing -> end -> waiting
+
+    */
+
     ros::init(argc, argv, "position_control");
     ros::NodeHandle nh;
     ros::Rate loop_rate(LOOP_RATE);
@@ -38,11 +48,13 @@ int main(int argc, char **argv){
 
     //Environment components
     EndEffector ee;
-    Destination d;
+    Destination block_start, block_end;
     JointConfiguration jc;
     std_msgs::Float64MultiArray msg;
     std_msgs::Bool status;
+    std_msgs::Float64MultiArray home;
 
+    home.data = {0, 0, 0};
     status.data = true;
 
     //Make sure we have received proper joint angles already
@@ -51,9 +63,12 @@ int main(int argc, char **argv){
         loop_rate.sleep();
     }
 
-    while(ros::ok()){
-        ee.compute_direct(q);
+    ee.compute_direct(q);
+    for(int i=0; i<3; i++){
+        home.data[i] = ee.get_position()[i];
+    }
 
+    while(ros::ok()){
         vision_pub.publish(status);
         status.data = false;
 
@@ -62,18 +77,27 @@ int main(int argc, char **argv){
         }
 
         Destination d(bp);
-        d.compute_inverse(ee);
+        block_start.compute_inverse(ee);
 
         //motion planning
         Path p;
 
-        jc = d.get_joint_angles();
+        jc = block_start.get_joint_angles();
 
         for(int i=0; i<JOINTS; i++){
             msg.data[i] = jc(i);
         }
+
+        //Have to figure out how to wait for the end of the movement
         
+        //move to block
         joint_pub.publish(msg);
+
+        //move the block in the desired position
+        joint_pub.publish(block_end);
+
+        //homing
+        joint_pub.publish(home);
     }
 
     return 0;
