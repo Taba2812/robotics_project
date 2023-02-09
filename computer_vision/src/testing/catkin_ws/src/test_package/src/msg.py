@@ -2,7 +2,7 @@
 
 import rospy
 from std_msgs.msg import String
-from std_msgs.msg import Float32MultiArray
+from sensor_msgs.point_cloud2 import PointCloud2
 
 import pyzed.sl as sl
 import math
@@ -68,8 +68,8 @@ def main():
 
 
 def talker(np_array):
-    pub = rospy.Publisher('chatter', Float32MultiArray, queue_size=10)
-    object_to_publish = Float32MultiArray(data = np_array)
+    pub = rospy.Publisher('chatter', PointCloud2, queue_size=10)
+    object_to_publish = PointCloud2(data = np_array)
     rospy.init_node('talker', anonymous=True)
     rate = rospy.Rate(10)
     while not rospy.is_shutdown():
