@@ -1,29 +1,7 @@
 #ifndef __DIRECT_KINEMATICS_H__
 #define __DIRECT_KINEMATICS_H__
 
-#include <iostream>
-#include <eigen3/Eigen/Dense>
-#include <math.h>
-
-#define JOINTS 6
-#define DIM 4
-
-//probable values, have to try it out
-#define D1 0.089159
-#define D4 0.10915
-#define D5 0.09465
-#define D6 0.0823
-#define A2 0.425
-#define A3 0.39225
-
-typedef Eigen::Matrix<double, DIM, DIM> Matrix4d;
-typedef Eigen::Matrix<double, JOINTS, 1> JointConfiguration;
-
-JointConfiguration q;
-
-double d[JOINTS] = {D1, 0, 0, D4, D5, D6};                  //distance between axes
-double cn[JOINTS] = {0, -A2, -A3, 0, 0, 0};                 //common normal
-double alpha[JOINTS] = {M_PI_2, 0, 0, M_PI_2, -M_PI_2, 0};  //angles
+#include "ur5.h"
 
 class EndEffector{
 private:
@@ -75,7 +53,6 @@ void EndEffector::compute_direct(const Eigen::VectorXd& q){
 
     this->orientation = T60.block<3,3>(0,0);
     this->position = T60.block<3,1>(0,3);
-
 }
 
 #endif
