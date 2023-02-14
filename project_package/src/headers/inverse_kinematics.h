@@ -3,11 +3,6 @@
 
 #include "direct_kinematics.h"
 
-#define _USE_MATH_DEFINES
-
-typedef Eigen::Matrix<double, 4, 1> Vector4d;
-typedef Eigen::Vector3d BlockPosition;
-
 class Destination{
 private:
     Eigen::Vector3d position;

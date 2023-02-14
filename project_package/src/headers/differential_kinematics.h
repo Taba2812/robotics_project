@@ -1,10 +1,8 @@
 #ifndef __DIFFERENTIAL_KINEMATICS_H__
 #define __DIFFERENTIAL_KINEMATICS_H__
 
-#include <eigen3/Eigen/Dense>
-#include <cmath>
-#include <vector>
-#include "direct_kinematics.h"
+#include "ur5.h"
+#include "inverse_kinematics.h"
 
 class Motion{
 public:
