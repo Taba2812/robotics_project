@@ -1,6 +1,7 @@
 #include "ros/ros.h"
 #include "std_msgs/String.h"
 #include "sensor_msgs/PointCloud2.h"
+<<<<<<< HEAD
 #include "sensor_msgs/PointField.h"
 #include <pcl_ros/point_cloud.h>
 //#include <opencv2/core.hpp>
@@ -8,6 +9,11 @@
 
 void save_to_file(const sensor_msgs::PointCloud2ConstPtr &point_cloud) {
 
+=======
+
+void ros_callback(const sensor_msgs::PointCloud2 &point_cloud) {
+    std::cout << "received data " << point_cloud.data[0] << std::endl;
+>>>>>>> 943d46c7e21d4a60b1650f15a94494aa8ab4078d
 }
 
 std::vector<float> get_data(const sensor_msgs::PointCloud2ConstPtr &point_cloud, int row, int col) {
