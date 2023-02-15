@@ -1,19 +1,35 @@
 #include "ros/ros.h"
 #include "std_msgs/String.h"
 #include "sensor_msgs/PointCloud2.h"
-<<<<<<< HEAD
 #include "sensor_msgs/PointField.h"
-#include <pcl_ros/point_cloud.h>
+#include <pcl-1.10/pcl/point_cloud.h>
+#include <pcl-1.10/pcl/point_types.h>
+#include <pcl-1.10/pcl/conversions.h>
+#include <pcl-1.10/pcl/PCLPointCloud2.h>
+#include <pcl_conversions/pcl_conversions.h>
+
 //#include <opencv2/core.hpp>
 #include <vector>
 
+typedef pcl::PointCloud<pcl::PointXYZ> PTL_PointCloud;
+
 void save_to_file(const sensor_msgs::PointCloud2ConstPtr &point_cloud) {
 
-=======
+}
 
-void ros_callback(const sensor_msgs::PointCloud2 &point_cloud) {
-    std::cout << "received data " << point_cloud.data[0] << std::endl;
->>>>>>> 943d46c7e21d4a60b1650f15a94494aa8ab4078d
+void ros_callback(const sensor_msgs::PointCloud2ConstPtr &point_cloud) {
+    
+    pcl::PCLPointCloud2 pcl_pc2;
+    pcl_conversions::toPCL(*point_cloud,pcl_pc2);
+    pcl::PointCloud<pcl::PointXYZ>::Ptr temp_cloud(new pcl::PointCloud<pcl::PointXYZ>);
+    pcl::fromPCLPointCloud2(pcl_pc2,*temp_cloud);
+
+    std::cout << "Width: " << temp_cloud->width << " Height: " << temp_cloud->height << std::endl; 
+
+    for (auto point : temp_cloud->points) {
+        std::cout << "x: " << point.x << " y: " << point.y << " z: " << point.z << std::endl;
+    }
+
 }
 
 std::vector<float> get_data(const sensor_msgs::PointCloud2ConstPtr &point_cloud, int row, int col) {
@@ -54,21 +70,6 @@ std::vector<std::vector<std::vector<float>>> pc2_to_Mat(const sensor_msgs::Point
     }
 
     return pcm;
-}
-
-void ros_callback(const sensor_msgs::PointCloud2ConstPtr &point_cloud) {
-    std::cout << "received data " << std::endl;
-
-    std::cout << "Height: " << point_cloud->height << " Width: " << point_cloud->width << std::endl;
-    std::cout << "Row Step: " << point_cloud->row_step << " Point Step: " << point_cloud->point_step << std::endl;
-
-    for (auto field : point_cloud->fields) {
-        std::cout << field << " ";
-    }
-    std::cout << std::endl;
-
-    pc2_to_Mat(point_cloud);
-
 }
 
 
