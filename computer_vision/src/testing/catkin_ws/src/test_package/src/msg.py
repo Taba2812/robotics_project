@@ -2,13 +2,17 @@
 
 import rospy
 from std_msgs.msg import String
-from sensor_msgs.point_cloud2 import PointCloud2
+
+from sensor_msgs import point_cloud2
+from sensor_msgs.msg import PointCloud2, PointField
+from std_msgs.msg import Header
 
 import pyzed.sl as sl
 import math
 import numpy as np
 import sys
 import cv2 
+import struct
 
 def main():
     # Create a Camera object
@@ -64,21 +68,54 @@ def main():
     zed.close()
 
 
+def ficticious_pc2():
+    points = []
+    lim = 8
+    for i in range(lim):
+        for j in range(lim):
+            for k in range(lim):
+                x = float(i) / lim
+                y = float(j) / lim
+                z = float(k) / lim
+                r = int(x * 255.0)
+                g = int(y * 255.0)
+                b = int(z * 255.0)
+                a = 255
+
+                rgb = struct.unpack('I', struct.pack('BBBB', b, g, r, a))[0]
+
+                pt = [x, y, z, rgb]
+                points.append(pt)
+
+    print("generated ", len(points), " points")
+
+    fields = [PointField('x', 0, PointField.FLOAT32, 1),
+              PointField('y', 4, PointField.FLOAT32, 1),
+              PointField('z', 8, PointField.FLOAT32, 1),
+              #PointField('rgb', 12, PointField.UINT32, 1),
+              PointField('rgba', 12, PointField.UINT32, 1),]
+
+    #print (points)
+
+    header = Header()
+    header.frame_id = "map"
+    return point_cloud2.create_cloud(header, fields, points)
 
 
+def talker():
+    pc2 = ficticious_pc2()
 
-def talker(np_array):
     pub = rospy.Publisher('chatter', PointCloud2, queue_size=10)
-    object_to_publish = PointCloud2(data = np_array)
     rospy.init_node('talker', anonymous=True)
     rate = rospy.Rate(10)
     while not rospy.is_shutdown():
-        rospy.loginfo(object_to_publish)
-        pub.publish(object_to_publish)
+        rospy.loginfo(pc2)
+        pub.publish(pc2)
         rate.sleep()
 
 if __name__ == '__main__':
     try:
-        main()
+        #main()
+        talker()
     except rospy.ROSInterruptException:
         pass
