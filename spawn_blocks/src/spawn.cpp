@@ -6,6 +6,7 @@
 #include "std_msgs/Float64MultiArray.h"
 #include "std_msgs/Int16.h"
 
+#define HEIGHT 0.9
 #define LOOP_RATE 1
 
 int main(int argc, char **argv){
