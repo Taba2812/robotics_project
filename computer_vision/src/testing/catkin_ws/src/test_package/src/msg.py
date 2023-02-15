@@ -74,17 +74,13 @@ def ficticious_pc2():
     for i in range(lim):
         for j in range(lim):
             for k in range(lim):
-                x = float(i) / lim
-                y = float(j) / lim
-                z = float(k) / lim
-                r = int(x * 255.0)
-                g = int(y * 255.0)
-                b = int(z * 255.0)
-                a = 255
+                x = float(i + 1) / lim
+                y = float(j + 1) / lim
+                z = float(k + 1) / lim
 
-                rgb = struct.unpack('I', struct.pack('BBBB', b, g, r, a))[0]
+                pt = [x, y, z]
 
-                pt = [x, y, z, rgb]
+                print("x: ", x, " y: ", y, " z: ", z)
                 points.append(pt)
 
     print("generated ", len(points), " points")
@@ -93,7 +89,8 @@ def ficticious_pc2():
               PointField('y', 4, PointField.FLOAT32, 1),
               PointField('z', 8, PointField.FLOAT32, 1),
               #PointField('rgb', 12, PointField.UINT32, 1),
-              PointField('rgba', 12, PointField.UINT32, 1),]
+              #PointField('rgba', 12, PointField.UINT32, 1),
+              ]
 
     #print (points)
 
@@ -109,7 +106,7 @@ def talker():
     rospy.init_node('talker', anonymous=True)
     rate = rospy.Rate(10)
     while not rospy.is_shutdown():
-        rospy.loginfo(pc2)
+        #rospy.loginfo(pc2)
         pub.publish(pc2)
         rate.sleep()
 
