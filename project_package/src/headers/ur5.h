@@ -5,7 +5,6 @@
 #include <eigen3/Eigen/Dense>
 #include <iostream>
 #include <vector>
-#include "gazebo_msgs/LinkStates.h"
 #include "geometry_msgs/Pose.h"
 #include "ros/ros.h"
 #include "sensor_msgs/JointState.h"

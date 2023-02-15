@@ -77,7 +77,7 @@ int main(int argc, char **argv){
         joint_pub.publish(msg);
 
         //move the block in the desired position
-        joint_pub.publish(block_end);
+        //joint_pub.publish(block_end);
 
         //homing
         joint_pub.publish(home);
