@@ -67,7 +67,13 @@
         "typeinfo": "cpp",
         "variant": "cpp",
         "bit": "cpp",
-        "dense": "cpp"
+        "dense": "cpp",
+        "csignal": "cpp",
+        "any": "cpp",
+        "codecvt": "cpp",
+        "regex": "cpp",
+        "future": "cpp",
+        "valarray": "cpp"
     },
     "python.autoComplete.extraPaths": [
         "/home/taba/trento_lab_home/ros_ws/devel/lib/python3/dist-packages",
