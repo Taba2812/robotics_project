@@ -76,7 +76,8 @@ int main () {
         pipeline::maskMat(data_image, data_image, mask);
 
         //OBJECT RECOGNITION -------------------------------------------
-        recognition::runRecognition(result);
+        std::vector<cv::Vec4f> detections;
+        detections = recognition::runRecognition(result);
 
         //CALCULATION OBJECT POSITION
             //#1 Pass detection areas and Point Cloud Data

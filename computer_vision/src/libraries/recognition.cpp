@@ -1,6 +1,6 @@
 #include "recognition.h"
 
-void recognition::runRecognition(cv::InputOutputArray img) {
+std::vector<cv::Vec4f> recognition::runRecognition(cv::InputOutputArray img) {
     cv::Ptr<cv::GeneralizedHoughGuil> guil = cv::createGeneralizedHoughGuil();
     std::list<cv::Mat> buffer;
     std::vector<cv::Vec4f> guilPosition;
@@ -9,7 +9,7 @@ void recognition::runRecognition(cv::InputOutputArray img) {
 
     recognition::setDataset(guil, &buffer); 
 
-    recognition::detection(guil, &buffer, img, guilPosition);
+    return recognition::detection(guil, &buffer, img, guilPosition);
 }
 
 void recognition::setParameters(cv::Ptr<cv::GeneralizedHoughGuil> guil) {
@@ -101,7 +101,7 @@ void recognition::getImages(std::list<cv::Mat> *buffer, std::string block, std::
     }
 }
 
-void recognition::detection(cv::Ptr<cv::GeneralizedHoughGuil> guil, std::list<cv::Mat> *buffer, cv::InputOutputArray img, std::vector<cv::Vec4f> position) {
+std::vector<cv::Vec4f> recognition::detection(cv::Ptr<cv::GeneralizedHoughGuil> guil, std::list<cv::Mat> *buffer, cv::InputOutputArray img, std::vector<cv::Vec4f> position) {
     cv::Mat grayscale;
     cv::cvtColor(img, grayscale, cv::COLOR_RGB2GRAY);
     int total_detections = 0;
@@ -128,7 +128,8 @@ void recognition::detection(cv::Ptr<cv::GeneralizedHoughGuil> guil, std::list<cv
 
     recognition::drawResults(img, position, buffer, pTemplate);
 
-    //ADDED COMMENT
+    return position;
+
 }
 
 void recognition::drawResults(cv::InputOutputArray img, std::vector<cv::Vec4f> position, std::list<cv::Mat> *buffer, std::vector<cv::Mat> pTemplate) {

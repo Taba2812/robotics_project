@@ -15,12 +15,12 @@ namespace recognition {
 
     //Change to 0 to skip detection of those blocks or colors
 
-    void runRecognition(cv::InputOutputArray img);
+    std::vector<cv::Vec4f> runRecognition(cv::InputOutputArray img);
     void setParameters(cv::Ptr<cv::GeneralizedHoughGuil> guil);
     void setDataset(cv::Ptr<cv::GeneralizedHoughGuil> guil, std::list<cv::Mat> *buffer);
     void getImagesWithRightColors(std::list<cv::Mat> *buffer, std::string block);
     void getImages(std::list<cv::Mat> *buffer, std::string block, std::string color);
-    void detection(cv::Ptr<cv::GeneralizedHoughGuil> guil, std::list<cv::Mat> *buffer, cv::InputOutputArray img, std::vector<cv::Vec4f> position);
+    std::vector<cv::Vec4f> detection(cv::Ptr<cv::GeneralizedHoughGuil> guil, std::list<cv::Mat> *buffer, cv::InputOutputArray img, std::vector<cv::Vec4f> position);
 
     void drawResults(cv::InputOutputArray img, std::vector<cv::Vec4f> position, std::list<cv::Mat> *buffer, std::vector<cv::Mat> pTemplate);
     void scrapOvelappingDetections(std::vector<cv::Vec4f> *detections, std::vector<cv::Mat> *pTemplate);

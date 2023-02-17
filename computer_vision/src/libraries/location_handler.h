@@ -3,7 +3,7 @@
 
 namespace LocationHandler {
 
-    
+    void selectDetection();
 
 }
 
