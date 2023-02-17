@@ -13,6 +13,7 @@
 #include "libraries/pipeline.h"
 #include "libraries/recognition.h"
 #include "libraries/temp_file_handler.h"
+#include "libraries/location_handler.h"
 
 //VARIABLES -----------------
 
@@ -82,6 +83,8 @@ int main () {
         //CALCULATION OBJECT POSITION
             //#1 Pass detection areas and Point Cloud Data
             //#2 Choose one of the selections
+            cv::Vec4f selected_block;
+            selected_block = LocationHandler::selectDetection(detections, result.cols, result.rows);
             //#3 For choosen selection selection Make a Karis Average of the position using the distance from camera as weight
 
         //DISPLAYING PROCESS ON SCREEN ---------------------------------
