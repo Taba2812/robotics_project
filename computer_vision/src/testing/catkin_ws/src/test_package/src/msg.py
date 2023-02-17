@@ -27,7 +27,6 @@ def main():
     # Open the camera
     err = zed.open(init_params)
     if err != sl.ERROR_CODE.SUCCESS:
-        print("Camera not found!")
         exit(1)
 
     # Create and set RuntimeParameters after opening the camera
@@ -52,20 +51,67 @@ def main():
         if zed.grab(runtime_parameters) == sl.ERROR_CODE.SUCCESS:
             # Retrieve left image
             zed.retrieve_image(image, sl.VIEW.LEFT)
-            # Retrieve depth map. Depth is aligned on the left image
-            zed.retrieve_measure(depth, sl.MEASURE.DEPTH)
             # Retrieve colored point cloud. Point cloud is aligned on the left image.
             zed.retrieve_measure(point_cloud, sl.MEASURE.XYZRGBA)
 
+            # Get and print distance value in mm at the center of the image
+            # We measure the distance camera - object using Euclidean distance
+            x = round(image.get_width() / 2)
+            y = round(image.get_height() / 2)
+            err, point_cloud_value = point_cloud.get_value(x, y)
+
+            distance = math.sqrt(point_cloud_value[0] * point_cloud_value[0] +
+                                 point_cloud_value[1] * point_cloud_value[1] +
+                                 point_cloud_value[2] * point_cloud_value[2])
+
             point_cloud_np = point_cloud.get_data()
             point_cloud_np.dot(tr_np)
+            i += 1
 
-            talker(list(point_cloud_np))
-
-            sys.stdout.flush()
+            
 
     # Close the camera
     zed.close()
+
+    cv2.imwrite("./Example_Image_Color_MultipleBlock.png", image.get_data())
+
+    fields = [PointField('x', 0, PointField.FLOAT32, 1),
+              PointField('y', 4, PointField.FLOAT32, 1),
+              PointField('z', 8, PointField.FLOAT32, 1),
+              #PointField('rgb', 12, PointField.UINT32, 1),
+              #PointField('rgba', 12, PointField.UINT32, 1),
+              ]
+
+    #print (points)
+
+    #print(point_cloud_np)
+
+    points = []
+
+    print("Height")
+    print(image.get_height())
+    print("Width")
+    print(image.get_width())
+
+    for i in range(image.get_height()):
+        for j in range(image.get_width()):
+            point_cloud_v = point_cloud_np[i,j]
+            #print(point_cloud_v)
+            x = point_cloud_v[0]
+            y = point_cloud_v[1]
+            z = point_cloud_v[2]
+
+            pt = [x, y, z]
+            points.append(pt)
+
+
+    print("points transferred")
+    header = Header()
+    header.frame_id = "map"
+    to_return = point_cloud2.create_cloud(header, fields, points)
+    #to_return.height = image.get_height()
+    #to_return.width = image.get_width()
+    return to_return
 
 
 def ficticious_pc2():
@@ -96,11 +142,13 @@ def ficticious_pc2():
 
     header = Header()
     header.frame_id = "map"
+
     return point_cloud2.create_cloud(header, fields, points)
 
 
 def talker():
-    pc2 = ficticious_pc2()
+    #pc2 = ficticious_pc2()
+    pc2 = main()
 
     pub = rospy.Publisher('chatter', PointCloud2, queue_size=10)
     rospy.init_node('talker', anonymous=True)
