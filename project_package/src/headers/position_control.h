@@ -3,6 +3,7 @@
 
 #include "direct_kinematics.h"
 #include "motion_planning.h"
+#include "state_machine/state.h"
 
 ros::V_string joint_names = {"elbow_joint", "shoulder_lift_joint", "shoulder_pan_joint", "wrist_1_joint", "wrist_2_joint", "wrist_3_joint"};
 BlockPosition bp = BlockPosition::Zero();
