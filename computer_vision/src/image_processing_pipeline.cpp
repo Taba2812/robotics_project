@@ -12,6 +12,7 @@
 #include "libraries/display_utility.h"
 #include "libraries/pipeline.h"
 #include "libraries/recognition.h"
+#include "libraries/temp_file_handler.h"
 
 //VARIABLES -----------------
 
@@ -35,6 +36,9 @@ int main () {
 
     //Get Test Image
     std::string url = setting::location + "blocks_group2_48.jpg";
+    //Get Test Point Cloud
+    cv::Mat point_cloud;
+    TempFileHandler::LoadMatBinary("", point_cloud);
 
     cv::Mat og_image = cv::imread(url, cv::IMREAD_COLOR);
     cv::Mat src_image(og_image, setting::getCropRect(og_image));
