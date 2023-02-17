@@ -35,15 +35,18 @@ int main () {
     std::list<std::string> titles = {"Result"};
 
     //Get Test Image
-    std::string url = setting::location + "blocks_group2_48.jpg";
+    std::string image_url = setting::location + "Example_Image_Color_SingleBlock.png";
+    cv::Mat og_image = cv::imread(image_url, cv::IMREAD_COLOR);
     //Get Test Point Cloud
     cv::Mat point_cloud;
-    TempFileHandler::LoadMatBinary("", point_cloud);
+    std::string data_url = setting::location + "ExampleMatrix_SingleBlock";
+    TempFileHandler::LoadMatBinary(data_url, point_cloud);
 
-    cv::Mat og_image = cv::imread(url, cv::IMREAD_COLOR);
-    cv::Mat src_image(og_image, setting::getCropRect(og_image));
+    //Crop Images
+    cv::Mat src_image (og_image, setting::getCropRect(og_image));
+    cv::Mat data_image(point_cloud, setting::getCropRect(point_cloud));
 
-    if(src_image.empty()){
+    if(src_image.empty() or data_image.empty()){
         exit(EXIT_FAILURE);
     }
 
@@ -70,9 +73,15 @@ int main () {
         //Masking Operation
         cv::Mat result;
         pipeline::maskMat(blurred, result, mask);
+        pipeline::maskMat(data_image, data_image, mask);
 
         //OBJECT RECOGNITION -------------------------------------------
         recognition::runRecognition(result);
+
+        //CALCULATION OBJECT POSITION
+            //#1 Pass detection areas and Point Cloud Data
+            //#2 Choose one of the selections
+            //#3 For choosen selection selection Make a Karis Average of the position using the distance from camera as weight
 
         //DISPLAYING PROCESS ON SCREEN ---------------------------------
         std::list<cv::Mat> mats = {result};

@@ -48,7 +48,7 @@ namespace setting {
         HSV_Colorspace lower;
     };
 
-    const std::string location = "/home/dawwo/Documents/Repositories/robotics_project/computer_vision/images_database/official_placeholders/MultipleBlocks/";
+    const std::string location = "/home/dawwo/Documents/Repositories/robotics_project/computer_vision/images_database/complete_data_examples/";
 
     std::vector<Boundry> lookup_colors();
 

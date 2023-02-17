@@ -10,4 +10,4 @@ add_executable( ${PROJECT_NAME} image_processing_pipeline.cpp )
 
 add_subdirectory(libraries)
 
-target_link_libraries( ${PROJECT_NAME} ${OpenCV_LIBS} pipeline display_utility setting recognition temp_file_handler )
+target_link_libraries( ${PROJECT_NAME} ${OpenCV_LIBS} pipeline display_utility setting recognition temp_file_handler location_handler )
