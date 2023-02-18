@@ -11,9 +11,9 @@ catkin_package()
 ## Build talker and listener
 include_directories(include ${catkin_INCLUDE_DIRS} ${EIGEN3_INCLUDE_DIR})
 
-add_executable(position_control src/position_control.cpp)
-target_link_libraries(position_control ${catkin_LIBRARIES})
-install(TARGETS position_control
+add_executable(ur5Main src/main.cpp src/state_machine/process.cpp src/state_machine/concrete_states.cpp)
+target_link_libraries(ur5Main ${catkin_LIBRARIES})
+install(TARGETS ur5Main
   ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
   LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
   RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
