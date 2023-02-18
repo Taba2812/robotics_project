@@ -55,8 +55,14 @@ cv::Vec3f LocationHandler::extrapolateDetectionPosition(cv::Vec4f selected, cv::
 
     for (int r = 0; r < point_cloud_array.rows(); r++) {
         for (int c = 0; c < point_cloud_array.cols(); c++) {
+            cv::Point2i location(r,c);
+            cv::Vec4f point = matrice.at<cv::Vec4f>(location);
+
+            std::cout << "x: " << point[0] << " y: " << point[1] << " z: " << point[2] << " d: " << point[3] << std::endl;
+            
             if (!cv::pointPolygonTest(contour, cv::Point2f((float)c,(float)r), false)) {continue;}
 
+            /*
             cv::Point2i location(r,c);
             cv::Vec4f point = matrice.at<cv::Vec4f>(location);
             float abs_dist_form_midpoint = abs(midpoint_distance - point[3]);
@@ -67,12 +73,13 @@ cv::Vec3f LocationHandler::extrapolateDetectionPosition(cv::Vec4f selected, cv::
             value_x_tot += weight * point[0];
             value_y_tot += weight * point[1];
             value_z_tot += weight * point[2];
+            */
         }
     }
-
+    /*
     float final_x = value_x_tot / weight_tot;
     float final_y = value_y_tot / weight_tot;
     float final_z = value_z_tot / weight_tot;
-
-    return cv::Vec3f(final_x, final_y, final_z);
+    */
+    return cv::Vec3f(0, 0, 0);
 }

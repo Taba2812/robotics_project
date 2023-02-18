@@ -11,11 +11,11 @@ namespace setting {
     #define LEFT_CROP 35
     #define RIGHT_CROP 40
 
-    #define EROSION_SIZE 3
+    #define EROSION_SIZE 2
     #define DILATION_SIZE 5
 
     //IMGAGE RECOGNITION SETTINGS
-    #define X1_Y1_Z2            1
+    #define X1_Y1_Z2            0
     #define X1_Y2_Z1            0
     #define X1_Y2_Z2            0
     #define X1_Y2_Z2_CHAMFER    0
@@ -24,14 +24,14 @@ namespace setting {
     #define X1_Y3_Z2_FILLET     0
     #define X1_Y4_Z1            0
     #define X1_Y4_Z2            0
-    #define X2_Y2_Z2            0
+    #define X2_Y2_Z2            1
     #define X2_Y2_Z2_FILLET     0
 
-    #define BLUE   0
+    #define BLUE   1
     #define ORANGE 1
-    #define YELLOW 0
-    #define RED    0
-    #define VIOLET 0
+    #define YELLOW 1
+    #define RED    1
+    #define VIOLET 1
 
     //IMAGE OVERLAP
     #define AREA_INTERSECTION_TRESHOLD 0.5

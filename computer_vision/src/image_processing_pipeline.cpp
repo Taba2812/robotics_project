@@ -73,19 +73,20 @@ int main () {
 
         //Masking Operation
         cv::Mat result;
+        cv::Mat pcd;
         pipeline::maskMat(blurred, result, mask);
-        pipeline::maskMat(data_image, data_image, mask);
+        pipeline::maskMat(data_image, pcd, mask);
 
         //OBJECT RECOGNITION -------------------------------------------
         std::vector<cv::Vec4f> detections;
         detections = recognition::runRecognition(result);
 
         //CALCULATION OBJECT POSITION
-            //#1 Pass detection areas and Point Cloud Data
-            //#2 Choose one of the selections
-            cv::Vec4f selected_block;
-            selected_block = LocationHandler::selectDetection(detections, result.cols, result.rows);
-            //#3 For choosen selection selection Make a Karis Average of the position using the distance from camera as weight
+        cv::Vec4f selected_block;
+        selected_block = LocationHandler::selectDetection(detections, result.cols, result.rows);
+
+        cv::Vec3f detection_position;
+        //detection_position = LocationHandler::extrapolateDetectionPosition(selected_block, pcd, pcd.size());
 
         //DISPLAYING PROCESS ON SCREEN ---------------------------------
         std::list<cv::Mat> mats = {result};

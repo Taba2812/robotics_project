@@ -166,7 +166,9 @@ void recognition::scrapOvelappingDetections(std::vector<cv::Vec4f> *detections, 
     std::vector<cv::Mat>::iterator outer_temp_iter = pTemplate->begin();
     bool need_to_increment = true;
     
-    while (outer_pos_iter != std::prev(detections->end())) {
+    int inner_counter = 0;
+    int outer_counter = 0;
+    while (outer_pos_iter != std::prev(detections->end()) and outer_pos_iter != detections->end()) {
         
         need_to_increment = true;
 
@@ -182,19 +184,28 @@ void recognition::scrapOvelappingDetections(std::vector<cv::Vec4f> *detections, 
         std::vector<cv::Vec4f>::iterator inner_pos_iter = outer_pos_iter + 1;
         std::vector<cv::Mat>::iterator inner_temp_iter = outer_temp_iter + 1;
 
-        while (inner_pos_iter != detections->end()) {
+        inner_counter = outer_counter + 1;
+
+        while (inner_pos_iter != detections->end() and inner_temp_iter != pTemplate->end()) {
+
+            if (outer_pos_iter == detections->end() and outer_temp_iter == pTemplate->end()) {
+                need_to_increment = false;
+                break;
+            }
 
             cv::Vec4f comparison = *inner_pos_iter;
             cv::Mat comparison_temp = *inner_temp_iter;
 
             if (recognition::distanceCondition(element, element_temp.size(), comparison, comparison_temp.size())) 
-                {++inner_pos_iter;++inner_temp_iter;continue;}
+                {++inner_pos_iter;++inner_temp_iter;inner_counter++;continue;}
 
             cv::RotatedRect comparison_rect = cv::RotatedRect (cv::Point2f(comparison[0], comparison[1]), 
                                                                 cv::Size2f(comparison_temp.cols * comparison[2], comparison_temp.rows * comparison[2]), 
                                                                 comparison[3]);
             int comparison_rect_area = comparison_temp.cols * comparison_temp.rows * comparison[2] * comparison[2];
             
+            
+
             std::vector<cv::Point2f> out;
             if (cv::rotatedRectangleIntersection(element_rect, comparison_rect, out)) {
                 int intersection_area = cv::contourArea(out);
@@ -202,12 +213,14 @@ void recognition::scrapOvelappingDetections(std::vector<cv::Vec4f> *detections, 
                     if ((double)intersection_area / (double)comparison_rect_area > AREA_INTERSECTION_TRESHOLD) {
                         inner_pos_iter = detections->erase(inner_pos_iter);
                         inner_temp_iter = pTemplate->erase(inner_temp_iter);
+                        inner_counter++;
                         continue;
                     }
                 } else {
                     if ((double)intersection_area / (double)element_rect_area > AREA_INTERSECTION_TRESHOLD) {
                         outer_pos_iter = detections->erase(outer_pos_iter);
                         outer_temp_iter = pTemplate->erase(outer_temp_iter);
+                        outer_counter++;
                         need_to_increment = false;
                         break;
                     }
@@ -215,12 +228,14 @@ void recognition::scrapOvelappingDetections(std::vector<cv::Vec4f> *detections, 
             }
             //INCREMENTS 
             ++inner_pos_iter;
-            ++inner_temp_iter;          
+            ++inner_temp_iter; 
+            ++inner_counter;       
         }
 
         if (need_to_increment) {
             ++outer_pos_iter;
             ++outer_temp_iter;
+            ++outer_counter;
         }       
     }
 }
