@@ -4,7 +4,12 @@ Waiting::~Waiting(){}
 
 void Waiting::execute(Process *p){
     std::cout << "\n[WAITING]\n";
-    p -> setState(Vision::getInstance());
+    if(p -> getStatus()){
+        p -> setState(Vision::getInstance());
+    } else {
+        p -> setStatus(true);
+        p -> setState(Waiting::getInstance());
+    }
 }
 
 State &Waiting::getInstance(){
