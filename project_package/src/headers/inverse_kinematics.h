@@ -13,6 +13,7 @@ public:
     Eigen::Vector3d get_position() const;
     JointConfiguration get_joint_angles() const;
     void compute_inverse(const EndEffector& ee);
+    std_msgs::Float64MultiArray getMessage();
 };
 
 Destination::Destination(){
@@ -133,6 +134,16 @@ void Destination::compute_inverse(const EndEffector& ee){
     th4[0] = atan2(T43(1,0), T43(0,0));
 
     this->ja << th1[0], th2[0], th3[0], th4[0], th5[0], th6[0];
+}
+
+std_msgs::Float64MultiArray Destination::getMessage(){
+    std_msgs::Float64MultiArray msg;
+
+    msg.data[0] = position(0);
+    msg.data[1] = position(1);
+    msg.data[2] = position(2);
+
+    return msg;
 }
 
 #endif
