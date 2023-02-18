@@ -28,12 +28,6 @@ cv::Vec4f LocationHandler::selectDetection(std::vector<cv::Vec4f> detections, in
 }
 
 cv::Vec3f LocationHandler::extrapolateDetectionPosition(cv::Vec4f selected, cv::InputArray point_cloud_array, cv::Size2i template_size) {
-    //Make the Vec4f into a Contour
-    //Determine if a point is inside the selection
-        //Would probably be better to get all the points in a separate array but then I would still need to iterate trough them
-    //Add the thing to the karis average
-        //This needs to be done for each of the components like x,y,z 
-    //return the result of the karis average
 
     cv::RotatedRect rect = cv::RotatedRect (cv::Point2f(selected[0], selected[1]), 
                                             cv::Size2f(template_size.width * selected[2], template_size.height * selected[2]), 
@@ -45,16 +39,40 @@ cv::Vec3f LocationHandler::extrapolateDetectionPosition(cv::Vec4f selected, cv::
     cv::Point2f* lastItemPointer = (corners + sizeof corners / sizeof corners[0]);
     std::vector<cv::Point2f> contour(corners, lastItemPointer);
 
-    float weight_tot = 0; //Decide in which form to have the karis average 1/1+Luminance Distance goes 0 -> \inf so does luminance tho
-                            // So 1 / 1- Distance, this could be negative tho
-    float value_tot = 0;
+    //MIDPOINT STUFF
+    int midpoint_x = template_size.width / 2;
+    int midpoint_y = template_size.height / 2;
+    cv::Point2i center(midpoint_y, midpoint_x);
+    cv::Mat matrice = point_cloud_array.getMat();
+    cv::Vec4f midpoint = matrice.at<cv::Vec4f>(center);
+    float midpoint_distance = midpoint[3];
 
+    //AVERAGE STUFF
+    float weight_tot = 0; 
+    float value_x_tot = 0;
+    float value_y_tot = 0;
+    float value_z_tot = 0;
 
     for (int r = 0; r < point_cloud_array.rows(); r++) {
         for (int c = 0; c < point_cloud_array.cols(); c++) {
             if (!cv::pointPolygonTest(contour, cv::Point2f((float)c,(float)r), false)) {continue;}
-            //Add to the average
 
+            cv::Point2i location(r,c);
+            cv::Vec4f point = matrice.at<cv::Vec4f>(location);
+            float abs_dist_form_midpoint = abs(midpoint_distance - point[3]);
+
+            float weight = 1 / (1 + abs_dist_form_midpoint); //Karis weight
+            
+            weight_tot += weight;
+            value_x_tot += weight * point[0];
+            value_y_tot += weight * point[1];
+            value_z_tot += weight * point[2];
         }
     }
+
+    float final_x = value_x_tot / weight_tot;
+    float final_y = value_y_tot / weight_tot;
+    float final_z = value_z_tot / weight_tot;
+
+    return cv::Vec3f(final_x, final_y, final_z);
 }
