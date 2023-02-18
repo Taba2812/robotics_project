@@ -45,6 +45,10 @@ cv::Vec3f LocationHandler::extrapolateDetectionPosition(cv::Vec4f selected, cv::
     cv::Point2f* lastItemPointer = (corners + sizeof corners / sizeof corners[0]);
     std::vector<cv::Point2f> contour(corners, lastItemPointer);
 
+    float weight_tot = 0; //Decide in which form to have the karis average 1/1+Luminance Distance goes 0 -> \inf so does luminance tho
+                            // So 1 / 1- Distance, this could be negative tho
+    float value_tot = 0;
+
 
     for (int r = 0; r < point_cloud_array.rows(); r++) {
         for (int c = 0; c < point_cloud_array.cols(); c++) {
