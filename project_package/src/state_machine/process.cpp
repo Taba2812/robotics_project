@@ -2,8 +2,8 @@
 #include "concrete_states.h"
 
 Process::Process(){
+    processStatus.data = false;
     currentState = &Waiting::getInstance();
-    status = false;
 }
 
 void Process::setState(State &newState){
@@ -16,10 +16,14 @@ void Process::execute(){
     currentState -> execute(this);
 }
 
-void Process::setStatus(bool s){
-        status = s;
+void Process::processOn(){
+    processStatus.data = true;
 }
 
-bool Process::getStatus() const {
-    return status;
+void Process::processOff(){
+    processStatus.data = false;
+}
+
+bool Process::getProcessStatus(){
+    return processStatus.data;
 }

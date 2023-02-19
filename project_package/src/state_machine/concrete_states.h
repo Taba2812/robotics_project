@@ -4,14 +4,15 @@
 #pragma once
 #include "state.h"
 #include "process.h"
+#include "ur5.h"
 #include <iostream>
+#include <unistd.h>
 
 class Waiting : public State {
 private:
-    Waiting(){}
+    Waiting(){ stateCode = 0; };
     Waiting(const Waiting &w);
     virtual ~Waiting();
-    Waiting &operator=(const Waiting &w);
 public:
     //void enter(Process *p);
     void execute(Process *p);
@@ -21,10 +22,9 @@ public:
 
 class Vision : public State {
 private:
-    Vision(){}
+    Vision(){ stateCode = 1; }
     Vision(const Vision &v);
     virtual ~Vision();
-    Vision &operator=(const Vision &v);
 public:
     //void enter(Process *p);
     void execute(Process *p);
@@ -34,10 +34,9 @@ public:
 
 class Position : public State {
 private:
-    Position(){}
+    Position(){ stateCode = 2; }
     Position(const Position &p);
     virtual ~Position();
-    Position &operator=(const Position &p);
 public:
     //void enter(Process *p);
     void execute(Process *p);
@@ -45,12 +44,11 @@ public:
     static State &getInstance();
 };
 
-class Motion : public State {
+class MotionTo : public State {
 private:
-    Motion(){}
-    Motion(const Motion &m);
-    virtual ~Motion();
-    Motion &operator=(const Motion &m);
+    MotionTo(){ stateCode = 3; }
+    MotionTo(const MotionTo &m);
+    virtual ~MotionTo();
 public:
     //void enter(Process *p);
     void execute(Process *p);

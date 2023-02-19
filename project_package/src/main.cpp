@@ -1,9 +1,8 @@
 #include "headers/direct_kinematics.h"
 #include "headers/inverse_kinematics.h"
-#include "headers/position_control.h"
 #include "state_machine/process.h"
 #include "state_machine/concrete_states.h"
-#include <unistd.h>
+
 
 void get_joint(const sensor_msgs::JointState::ConstPtr& js){
     for(int i=0; i<JOINTS; i++){
@@ -19,6 +18,7 @@ void get_position(const std_msgs::Float64MultiArray::ConstPtr& xyz){
     bp(0) = xyz->data[0];
     bp(1) = xyz->data[1];
     bp(2) = xyz->data[2];
+    processStatus.data = true;
 }
 
 int main(int argc, char **argv){
@@ -32,16 +32,17 @@ int main(int argc, char **argv){
 
     //publishers and subscribers
     ros::Publisher joint_pub = nh.advertise<std_msgs::Float64MultiArray>("/ur5/joint_group_pos_controller/command", QUEUE_SIZE);
-    ros::Publisher vision_pub = nh.advertise<std_msgs::Bool>("vision_pub", QUEUE_SIZE);
+    ros::Publisher vision_pub = nh.advertise<std_msgs::Bool>("Main_Bool", QUEUE_SIZE);
     ros::Subscriber joint_sub = nh.subscribe("/ur5/joint_states", QUEUE_SIZE, get_joint);
-    ros::Subscriber vision_sub = nh.subscribe("block_position", QUEUE_SIZE, get_position);
+    ros::Subscriber vision_sub = nh.subscribe("Main_MultiArray", QUEUE_SIZE, get_position);
 
     //environment components
     EndEffector ee;
-    Destination block_start, block_end;
-    JointConfiguration jc;
-    std_msgs::Float64MultiArray home;
+    Destination d;
+    FinalDestination fd;
+    std_msgs::Float64MultiArray msg, home;
 
+    //default values
     home.data = {0, 0, 0};
 
     //make sure we have received proper joint angles already
@@ -55,54 +56,48 @@ int main(int argc, char **argv){
     for(int i=0; i<3; i++){
         home.data[i] = ee.get_position()[i];
     }
-    
-    while(1){
-        process.execute();
-        sleep(1);
-    }
 
-    return 0;
-}
-
-/*
-
-int main(int argc, char **argv){
+    process.processOn();
 
     while(ros::ok()){
-        //this part is to be implemented in the state machine
+        switch(process.getCurrentState() -> getCode()){
+            //Waiting
+            case 0 :
+                vision_pub.publish(home);
+                process.execute();
+            break;
 
-        vision_pub.publish(status);
-        status.data = false;
+            //Vision
+            case 1 :
+                if(!process.getProcessStatus()) vision_pub.publish(true);
+                process.execute();
+            break;
 
-        while(status.data == false){
-            sleep(1);
+            //Position
+            case 2 :
+                if(!gripper){
+                    d.set_position(bp);
+                } else {
+                    d.set_position(fd);
+                }
+                d.compute_inverse(ee);
+                process.processOn();
+                process.execute();
+            break;
+            
+            //Motion
+            case 3 :
+                joint_pub.publish(d.getMessage());
+                gripper = !gripper;
+                process.processOn();
+                process.execute();
+            break;
+
+            default: std::cout << "\nThere's been an error\n"; exit(0);
         }
-
-        Destination d(bp);
-        block_start.compute_inverse(ee);
-
-        //motion planning
-        Path p;
-
-        jc = block_start.get_joint_angles();
-
-        for(int i=0; i<JOINTS; i++){
-            msg.data[i] = jc(i);
-        }
-
-        //Have to figure out how to wait for the end of the movement
-        
-        //move to block
-        joint_pub.publish(block_start.getMessage());
-
-        //move the block in the desired position
-        //joint_pub.publish(block_end.getMessage());
-
-        //homing
-        joint_pub.publish(home);
     }
 
     return 0;
 }
 
-*/
+//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
