@@ -1,9 +1,0 @@
-# .gitignore file for Computer Vision subdirectory
-
-# Ignore output renders, that are mostly tests and temporary files
-/output_renders/*
-
-# Ignore build bloat except for the CMakeLists file
-/src/build/*
-!CMakeLists.txt
-
