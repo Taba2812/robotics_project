@@ -86,7 +86,9 @@ int main () {
         selected_block = LocationHandler::selectDetection(detections, result.cols, result.rows);
 
         cv::Vec3f detection_position;
-        //detection_position = LocationHandler::extrapolateDetectionPosition(selected_block, pcd, pcd.size());
+        detection_position = LocationHandler::extrapolateDetectionPosition(selected_block, pcd, pcd.size());
+
+        std::cout << "Final Position | X: " << detection_position[0] << " Y: " << detection_position[1] << " Z: " << detection_position[2] << std::endl;
 
         //DISPLAYING PROCESS ON SCREEN ---------------------------------
         std::list<cv::Mat> mats = {result};
