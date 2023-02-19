@@ -26,7 +26,7 @@
 #define MAIN_CH_SEND "Main_MultiArray"
 #define MAIN_CH_RCVE "Main_Bool"
 
-#define PNG_PATH ""
+#define PNG_PATH "RGB_Image.png"
 
 #define Q_SIZE 1000
 
