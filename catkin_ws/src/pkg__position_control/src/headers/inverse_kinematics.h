@@ -60,7 +60,7 @@ void Destination::computeInverse(const EndEffector& ee){
     double th1[2], th2[8], th3[8], th4[8], th5[4], th6[4];
 
     pos = this->position;
-    ori = ee.getOrientation();     //what is the desired orientation? In the meantime, I put the current orientation
+    ori = ee.getOrientation();     //doesn't really matter since we use a dynamic link for the gripper
 
     //T60(th1,th2,th3,th4,th5,th6) = T10(th1)*T21(th2)*T32(th3)*T43(th4)*T54(th5)*T65(th6)
     cmp << 0,0,0,1;
@@ -125,14 +125,66 @@ void Destination::computeInverse(const EndEffector& ee){
     th2[6] = -atan2(P31[2](1),-P31[2](0)) + asin(cn[2]*sin(th3[6]) / P31[2].norm());
     th2[7] = -atan2(P31[3](1),-P31[3](0)) + asin(cn[2]*sin(th3[7]) / P31[3].norm());
 
+    //th4
     T(T65, th6[0], 5);
     T(T54, th5[0], 4);
     T(T32, th3[0], 2);
     T(T21, th2[0], 1);
     T(T10, th1[0], 0);
     T43 = T32.inverse() * T21.inverse() * T10.inverse() * T60 * T65.inverse() * T54.inverse();
-    
     th4[0] = atan2(T43(1,0), T43(0,0));
+
+    T(T65, th6[1], 5);
+    T(T54, th5[1], 4);
+    T(T32, th3[1], 2);
+    T(T21, th2[1], 1);
+    T43 = T32.inverse() * T21.inverse() * T10.inverse() * T60 * T65.inverse() * T54.inverse();
+    th4[1] = atan2(T43(1,0), T43(0,0));
+
+    T(T65, th6[2], 5);
+    T(T54, th5[2], 4);
+    T(T32, th3[2], 2);
+    T(T21, th2[2], 1);
+    T(T10, th1[1], 0);
+    T43 = T32.inverse() * T21.inverse() * T10.inverse() * T60 * T65.inverse() * T54.inverse();
+    th4[2] = atan2(T43(1,0), T43(0,0));
+
+    T(T65, th6[3], 5);
+    T(T54, th5[3], 4);
+    T(T32, th3[3], 2);
+    T(T21, th2[3], 1);
+    T43 = T32.inverse() * T21.inverse() * T10.inverse() * T60 * T65.inverse() * T54.inverse();
+    th4[3] = atan2(T43(1,0), T43(0,0));
+
+    T(T65, th6[0], 5);
+    T(T54, th5[0], 4);
+    T(T32, th3[4], 2);
+    T(T21, th2[4], 1);
+    T(T10, th1[0], 0);
+    T43 = T32.inverse() * T21.inverse() * T10.inverse() * T60 * T65.inverse() * T54.inverse();
+    th4[4] = atan2(T43(1,0), T43(0,0));
+
+    T(T65, th6[1], 5);
+    T(T54, th5[1], 4);
+    T(T32, th3[5], 2);
+    T(T21, th2[5], 1);
+    T43 = T32.inverse() * T21.inverse() * T10.inverse() * T60 * T65.inverse() * T54.inverse();
+    th4[5] = atan2(T43(1,0), T43(0,0));
+
+    T(T65, th6[2], 5);
+    T(T54, th5[2], 4);
+    T(T32, th3[6], 2);
+    T(T21, th2[6], 1);
+    T(T10, th1[1], 0);
+    T43 = T32.inverse() * T21.inverse() * T10.inverse() * T60 * T65.inverse() * T54.inverse();
+    th4[6] = atan2(T43(1,0), T43(0,0));
+
+    T(T65, th6[3], 5);
+    T(T54, th5[3], 4);
+    T(T32, th3[7], 2);
+    T(T21, th2[7], 1);
+    T43 = T32.inverse() * T21.inverse() * T10.inverse() * T60 * T65.inverse() * T54.inverse();
+    th4[7] = atan2(T43(1,0), T43(0,0));
 
     this->jc << th1[0], th2[0], th3[0], th4[0], th5[0], th6[0];
 }
