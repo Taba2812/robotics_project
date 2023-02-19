@@ -66,8 +66,8 @@ int main (int argc, char **argv) {
     ros::Publisher camera_pub = rec_handle.advertise<std_msgs::Bool>(CAMERA_CH_SEND, Q_SIZE);
     ros::Publisher main_pub = rec_handle.advertise<std_msgs::Float64MultiArray>(MAIN_CH_SEND, Q_SIZE);
 
-    auto main_callback = [&](const std_msgs::BoolConstPtr &point_cloud) {
-        //Send request to camera
+    auto main_callback = [&](const std_msgs::BoolConstPtr &request) {
+        if (!request->data) {return;}
         camera_pub.publish(true);
     };
 
@@ -85,18 +85,19 @@ int main (int argc, char **argv) {
         cv::Mat new_cv_mat = pcl_to_Mat(temp_cloud);
 
         //Block detection 
+        cv::Vec3f result;
+        //result = Detection(new_cv_mat, image_loaded);
+        
         //Send data to main
+        //Convert Vec3 to Float_MultiArray
+        //main_pub.publish(that array);
 
     };   
 
     ros::Subscriber camera_sub = rec_handle.subscribe<sensor_msgs::PointCloud2>(CAMERA_CH_RCVE, Q_SIZE, camera_callback);
     ros::Subscriber main_sub = rec_handle.subscribe<std_msgs::Bool>(MAIN_CH_RCVE, Q_SIZE, main_callback);
 
-    
-
     ros::spin();
-
-    //ADD SENDER AND RECIEVER FOR ORDER FROM MAIN NODE
     
     return 0;
 
