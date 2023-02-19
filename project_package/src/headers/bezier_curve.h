@@ -61,7 +61,7 @@ void BezierCurve::follow_curve(EndEffector& ee, Destination& dest) const{
     for(int i = 0; i < get_numpoints(); i++){
         Eigen::Vector3d B = get_point(i);
         ee.set_position(B);
-        JointConfiguration q = dest.compute_inverse(ee);
+        //JointConfiguration q = dest.compute_inverse(ee);
         //inverse
         //direct(?)
         //differential
