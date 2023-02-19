@@ -1,5 +1,7 @@
 #include "ros/ros.h"
 #include "std_msgs/String.h"
+#include "std_msgs/Bool.h"
+#include "std_msgs/Float64MultiArray.h"
 #include "sensor_msgs/PointCloud2.h"
 #include "sensor_msgs/PointField.h"
 #include <pcl-1.10/pcl/point_cloud.h>
@@ -7,6 +9,7 @@
 #include <pcl-1.10/pcl/conversions.h>
 #include <pcl-1.10/pcl/PCLPointCloud2.h>
 #include <pcl_conversions/pcl_conversions.h>
+#include "libraries/temp_file_handler.h"
 
 #include <opencv2/core.hpp>
 #include <opencv2/imgproc.hpp>
@@ -17,8 +20,17 @@
 #define IMAGE_WIDTH 1280
 #define IMAGE_HEIGHT 720
 
+#define CAMERA_CH_SEND "Camera_Bool"
+#define CAMERA_CH_RCVE "Camera_Pcl"
+#define MAIN_CH_SEND "Main_MultiArray"
+#define MAIN_CH_RCVE "Main_Bool"
+
+#define Q_SIZE 1000
+
 typedef pcl::PointCloud<pcl::PointXYZ> PTL_PointCloud;
 typedef pcl::PointCloud<pcl::PointXYZ>::Ptr PTL_PointCloudPtr;
+
+enum State { Idle, Sending, Waiting };
 
 cv::Mat pcl_to_Mat(const PTL_PointCloudPtr point_cloud) {
     cv::Mat pcm(IMAGE_HEIGHT, IMAGE_WIDTH, CV_32FC4, cv::Scalar(0));
@@ -36,37 +48,6 @@ cv::Mat pcl_to_Mat(const PTL_PointCloudPtr point_cloud) {
     return pcm;
 }
 
-void ros_callback(const sensor_msgs::PointCloud2ConstPtr &point_cloud) {
-    
-    std::cout << "Package Received" << std::endl;
-
-    pcl::PCLPointCloud2 pcl_pc2;
-    pcl_conversions::toPCL(*point_cloud,pcl_pc2);
-    PTL_PointCloudPtr temp_cloud(new pcl::PointCloud<pcl::PointXYZ>);
-    pcl::fromPCLPointCloud2(pcl_pc2,*temp_cloud);
-
-    std::cout << "Width: " << temp_cloud->width << " Height: " << temp_cloud->height << std::endl; 
-
-    cv::Mat new_cv_mat = pcl_to_Mat(temp_cloud);
-
-    //cv::Mat display_cloud;
-    //cv::cvtColor(new_cv_mat, display_cloud,)
-
-    //cv::imshow("PointCloudMap", new_cv_mat);
-
-    if (i == 0) {
-        SaveMatBinary("ExampleMatrix_MultipleBlock", new_cv_mat);
-        i++;
-    }
-
-}
-
-
-//ADD PCL Library
-//CREATE FUNCTION TO TRANSLATE PointCloud2 TO CV::Mat
-
-#define SUBSCRIBER 1
-
 void print_matrix (cv::Mat matrice) {
     for (int h = 0; h < 1; h++) {
         for (int w = 0; w < 512; w++) {
@@ -77,19 +58,44 @@ void print_matrix (cv::Mat matrice) {
 }
 
 int main (int argc, char **argv) {
-    
-    if (SUBSCRIBER) {
-        ros::init(argc, argv, "CPP_Listener");
-        ros::NodeHandle ros_handle;
-        ros::Subscriber ros_subscriber = ros_handle.subscribe("chatter", 1000, ros_callback);
 
-        ros::spin();
-    } else {
-        cv::Mat pcm(1, 512, CV_32FC4, cv::Scalar(0));
-        LoadMatBinary("TestMatrixBinary", pcm);
-        print_matrix(pcm);
-    }
+    ros::init(argc, argv, "CPP_Listener");
+
+    ros::NodeHandle rec_handle;
+
+    ros::Publisher camera_pub = rec_handle.advertise<std_msgs::Bool>(CAMERA_CH_SEND, Q_SIZE);
+    ros::Publisher main_pub = rec_handle.advertise<std_msgs::Float64MultiArray>(MAIN_CH_SEND, Q_SIZE);
+
+    auto main_callback = [&](const std_msgs::BoolConstPtr &point_cloud) {
+        //Send request to camera
+        camera_pub.publish(true);
+    };
+
+    auto  camera_callback = [&] (const sensor_msgs::PointCloud2ConstPtr &point_cloud) {
     
+        std::cout << "Package Received" << std::endl;
+
+        pcl::PCLPointCloud2 pcl_pc2;
+        pcl_conversions::toPCL(*point_cloud,pcl_pc2);
+        PTL_PointCloudPtr temp_cloud(new pcl::PointCloud<pcl::PointXYZ>);
+        pcl::fromPCLPointCloud2(pcl_pc2,*temp_cloud);
+
+        std::cout << "Width: " << temp_cloud->width << " Height: " << temp_cloud->height << std::endl; 
+
+        cv::Mat new_cv_mat = pcl_to_Mat(temp_cloud);
+
+        //Block detection 
+        //Send data to main
+
+    };   
+
+    ros::Subscriber camera_sub = rec_handle.subscribe<sensor_msgs::PointCloud2>(CAMERA_CH_RCVE, Q_SIZE, camera_callback);
+    ros::Subscriber main_sub = rec_handle.subscribe<std_msgs::Bool>(MAIN_CH_RCVE, Q_SIZE, main_callback);
+
+    
+
+    ros::spin();
+
     //ADD SENDER AND RECIEVER FOR ORDER FROM MAIN NODE
     
     return 0;
