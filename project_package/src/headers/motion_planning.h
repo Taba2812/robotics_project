@@ -12,9 +12,9 @@ private:
 public:
     Path();
     Path(const JointConfiguration& jci, const JointConfiguration& jcf);
-    JointConfiguration get_ic() const;
-    JointConfiguration get_fc() const;
-    void path_planning();
+    JointConfiguration getIc() const;
+    JointConfiguration getFc() const;
+    void pathPlanning();
 };
 
 Path::Path(){
@@ -27,15 +27,15 @@ Path::Path(const JointConfiguration& jci, const JointConfiguration& jcf){
     fc = jcf;
 }
 
-JointConfiguration Path::get_ic() const{
+JointConfiguration Path::getIc() const{
     return this -> ic;
 }
 
-JointConfiguration Path::get_fc() const{
+JointConfiguration Path::getFc() const{
     return this -> fc;
 }
 
-void Path::path_planning(){
+void Path::pathPlanning(){
     //linear phase: acceleration is zero, velocity is constant, position is linear
     //parabolic phase: acceleration is constant, velocity is linear and position is quadratic
 

@@ -6,15 +6,15 @@
 class Destination{
 private:
     Eigen::Vector3d position;
-    JointConfiguration ja;
+    JointConfiguration jc;
 public:
     Destination();
     Destination(const BlockPosition& pos);
-    Eigen::Vector3d get_position() const;
-    JointConfiguration get_joint_angles() const;
-    void compute_inverse(const EndEffector& ee);
+    Eigen::Vector3d getPosition() const;
+    JointConfiguration getJointAngles() const;
+    void computeInverse(const EndEffector& ee);
     std_msgs::Float64MultiArray getMessage();
-    void set_position(Eigen::Vector3d p);
+    void setPosition(Eigen::Vector3d p);
 };
 
 Destination::Destination(){
@@ -25,12 +25,12 @@ Destination::Destination(const BlockPosition& bp){
     position = bp;
 }
 
-Eigen::Vector3d Destination::get_position() const{
+Eigen::Vector3d Destination::getPosition() const{
     return this->position;
 }
 
-JointConfiguration Destination::get_joint_angles() const{
-    return this->ja;
+JointConfiguration Destination::getJointAngles() const{
+    return this->jc;
 }
 
 Vector4d P(double th1, double th5, double th6, const Eigen::MatrixXd& T60){
@@ -50,7 +50,7 @@ Vector4d P(double th1, double th5, double th6, const Eigen::MatrixXd& T60){
     return P31;   
 }
 
-void Destination::compute_inverse(const EndEffector& ee){
+void Destination::computeInverse(const EndEffector& ee){
     Eigen::MatrixXd T60, T06;
     Eigen::Matrix3d ori;
     Matrix4d T65, T54, T43, T32, T21, T10;
@@ -60,12 +60,12 @@ void Destination::compute_inverse(const EndEffector& ee){
     double th1[2], th2[8], th3[8], th4[8], th5[4], th6[4];
 
     pos = this->position;
-    ori = ee.get_orientation();     //what is the desired orientation? In the meantime, I put the current orientation
+    ori = ee.getOrientation();     //what is the desired orientation? In the meantime, I put the current orientation
 
     //T60(th1,th2,th3,th4,th5,th6) = T10(th1)*T21(th2)*T32(th3)*T43(th4)*T54(th5)*T65(th6)
     cmp << 0,0,0,1;
     T60.resize(3,3);
-    T60 << ee.get_orientation();
+    T60 << ee.getOrientation();
     T60.conservativeResize(Eigen::NoChange, T60.cols()+1);
     T60.col(T60.cols()-1) = pos;
     T60.conservativeResize(T60.rows()+1, Eigen::NoChange);
@@ -134,20 +134,20 @@ void Destination::compute_inverse(const EndEffector& ee){
     
     th4[0] = atan2(T43(1,0), T43(0,0));
 
-    this->ja << th1[0], th2[0], th3[0], th4[0], th5[0], th6[0];
+    this->jc << th1[0], th2[0], th3[0], th4[0], th5[0], th6[0];
 }
 
 std_msgs::Float64MultiArray Destination::getMessage(){
     std_msgs::Float64MultiArray msg;
 
     for(int i=0; i<JOINTS; i++){
-        msg.data[i] = ja(i);
+        msg.data[i] = jc(i);
     }
 
     return msg;
 }
 
-void Destination::set_position(Eigen::Vector3d p){
+void Destination::setPosition(Eigen::Vector3d p){
     position = p;
 }
 

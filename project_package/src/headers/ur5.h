@@ -36,11 +36,11 @@ double alpha[JOINTS] = {M_PI_2, 0, 0, M_PI_2, -M_PI_2, 0};  //angles
 std_msgs::Bool processStatus;
 bool gripper = false;
 
-ros::V_string joint_names = {"elbow_joint", "shoulder_lift_joint", "shoulder_pan_joint", "wrist_1_joint", "wrist_2_joint", "wrist_3_joint"};
+ros::V_string jointNames = {"elbow_joint", "shoulder_lift_joint", "shoulder_pan_joint", "wrist_1_joint", "wrist_2_joint", "wrist_3_joint"};
 BlockPosition bp = BlockPosition::Zero();
 JointConfiguration q;
 
-void get_joint(const sensor_msgs::JointState::ConstPtr& js);
-void get_position(const std_msgs::Float64MultiArray::ConstPtr& xyz);
+void getJoint(const sensor_msgs::JointState::ConstPtr& js);
+void getPosition(const std_msgs::Float64MultiArray::ConstPtr& xyz);
 
 #endif

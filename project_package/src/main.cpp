@@ -4,17 +4,17 @@
 #include "state_machine/concrete_states.h"
 
 
-void get_joint(const sensor_msgs::JointState::ConstPtr& js){
+void getJoint(const sensor_msgs::JointState::ConstPtr& js){
     for(int i=0; i<JOINTS; i++){
         for(int j=0; j<JOINTS; j++){
-            if(joint_names[j] == js->name.at(i)){
+            if(jointNames[j] == js->name.at(i)){
                 q(i) = js->position[i];
             }
         }
     }
 }
 
-void get_position(const std_msgs::Float64MultiArray::ConstPtr& xyz){
+void getPosition(const std_msgs::Float64MultiArray::ConstPtr& xyz){
     bp(0) = xyz->data[0];
     bp(1) = xyz->data[1];
     bp(2) = xyz->data[2];
@@ -33,8 +33,8 @@ int main(int argc, char **argv){
     //publishers and subscribers
     ros::Publisher joint_pub = nh.advertise<std_msgs::Float64MultiArray>("/ur5/joint_group_pos_controller/command", QUEUE_SIZE);
     ros::Publisher vision_pub = nh.advertise<std_msgs::Bool>("Main_Bool", QUEUE_SIZE);
-    ros::Subscriber joint_sub = nh.subscribe("/ur5/joint_states", QUEUE_SIZE, get_joint);
-    ros::Subscriber vision_sub = nh.subscribe("Main_MultiArray", QUEUE_SIZE, get_position);
+    ros::Subscriber joint_sub = nh.subscribe("/ur5/joint_states", QUEUE_SIZE, getJoint);
+    ros::Subscriber vision_sub = nh.subscribe("Main_MultiArray", QUEUE_SIZE, getPosition);
 
     //environment components
     EndEffector ee;
@@ -52,9 +52,9 @@ int main(int argc, char **argv){
     }
 
     //get default position
-    ee.compute_direct(q);
+    ee.computeDirect(q);
     for(int i=0; i<3; i++){
-        home.data[i] = ee.get_position()[i];
+        home.data[i] = ee.getPosition()[i];
     }
 
     process.processOn();
@@ -76,11 +76,11 @@ int main(int argc, char **argv){
             //Position
             case 2 :
                 if(!gripper){
-                    d.set_position(bp);
+                    d.setPosition(bp);
                 } else {
-                    d.set_position(fd);
+                    d.setPosition(fd);
                 }
-                d.compute_inverse(ee);
+                d.computeInverse(ee);
                 process.processOn();
                 process.execute();
             break;

@@ -8,7 +8,7 @@ class Motion{
 public:
     Motion(const EndEffector& ee);
     Eigen::MatrixXd jacobian(const Eigen::VectorXd& q) const;
-    Eigen::VectorXd compute_differential(const Eigen::VectorXd& q, const Eigen::VectorXd& dq) const;
+    Eigen::VectorXd computeDifferential(const Eigen::VectorXd& q, const Eigen::VectorXd& dq) const;
 private:
     const EndEffector& ee;
 };
@@ -49,7 +49,7 @@ Eigen::MatrixXd Motion::jacobian(const Eigen::VectorXd& q) const{
     return J;
 }
 
-Eigen::VectorXd Motion::compute_differential(const Eigen::VectorXd& q, const Eigen::VectorXd& dq) const{
+Eigen::VectorXd Motion::computeDifferential(const Eigen::VectorXd& q, const Eigen::VectorXd& dq) const{
     Eigen::MatrixXd J = jacobian(q);
     return J * dq;
 }
