@@ -30,6 +30,10 @@
 
 #define Q_SIZE 1000
 
+#define FAKING_DATA 1
+#define FAKE_PCL_MAT_PATH "/home/dawwo/Documents/Repositories/robotics_project/computer_vision/images_database/complete_data_examples/ExampleMatrix_SingleBlock"
+#define FAKE_PNG_MAT_PATH "/home/dawwo/Documents/Repositories/robotics_project/computer_vision/images_database/complete_data_examples/Example_Image_Color_SingleBlock.png"
+
 typedef pcl::PointCloud<pcl::PointXYZ> PTL_PointCloud;
 typedef pcl::PointCloud<pcl::PointXYZ>::Ptr PTL_PointCloudPtr;
 
@@ -69,9 +73,34 @@ int main (int argc, char **argv) {
     ros::Publisher camera_pub = rec_handle.advertise<std_msgs::Bool>(CAMERA_CH_SEND, Q_SIZE);
     ros::Publisher main_pub = rec_handle.advertise<std_msgs::Float64MultiArray>(MAIN_CH_SEND, Q_SIZE);
 
+    auto fake_camera_callback = [&] (cv::Mat mat_PCL) {
+        cv::Mat mat_PNG = cv::imread(FAKE_PNG_MAT_PATH);
+
+        //Block detection 
+        cv::Vec3f result;
+        result = Detection::Detect(mat_PCL, mat_PNG);
+        
+        //Send data to main
+        //Convert Vec3f to Float_MultiArray
+        std_msgs::Float64MultiArray payload;
+        payload.data[0] = result[0];
+        payload.data[1] = result[1];
+        payload.data[2] = result[2];
+        
+        main_pub.publish(payload);
+    };
+    
     auto main_callback = [&](const std_msgs::BoolConstPtr &request) {
         if (!request->data) {return;}
-        camera_pub.publish(true);
+        
+        if (!FAKING_DATA) {
+            camera_pub.publish(true);
+        } else {
+            //TAKE PLACEHOLDER POINTCLOUD FROM FILE BUT DO THE SAME PROCESSING
+            cv::Mat pcl;
+            TempFileHandler::LoadMatBinary(FAKE_PCL_MAT_PATH, pcl);
+            fake_camera_callback(pcl);
+        }
     };
 
     auto camera_callback = [&] (const sensor_msgs::PointCloud2ConstPtr &point_cloud) {
