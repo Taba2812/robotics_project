@@ -14,7 +14,7 @@ link_directories(
 add_subdirectory(libraries)
 
 add_executable( ${PROJECT_NAME} image_processing_pipeline.cpp )
-target_link_libraries( ${PROJECT_NAME} ${OpenCV_LIBS} pipeline display_utility setting recognition temp_file_handler location_handler )
+target_link_libraries( ${PROJECT_NAME} ${OpenCV_LIBS} pipeline display_utility setting recognition temp_file_handler location_handler detection )
 
 add_executable( final block_detection_rosrun.cpp )
-target_link_libraries( ${PROJECT_NAME} ${OpenCV_LIBS} ${PCL_LIBRARIES} pipeline display_utility setting recognition temp_file_handler location_handler )
+target_link_libraries( ${PROJECT_NAME} ${OpenCV_LIBS} ${PCL_LIBRARIES} pipeline display_utility setting recognition temp_file_handler location_handler detection )

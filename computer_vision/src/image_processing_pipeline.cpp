@@ -14,6 +14,7 @@
 #include "libraries/recognition.h"
 #include "libraries/temp_file_handler.h"
 #include "libraries/location_handler.h"
+#include "libraries/detection.h"
 
 //VARIABLES -----------------
 

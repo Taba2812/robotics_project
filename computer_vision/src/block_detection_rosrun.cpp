@@ -10,6 +10,7 @@
 #include <pcl-1.10/pcl/PCLPointCloud2.h>
 #include <pcl_conversions/pcl_conversions.h>
 #include "libraries/temp_file_handler.h"
+#include "libraries/detection.h"
 
 #include <opencv2/core.hpp>
 #include <opencv2/imgproc.hpp>
@@ -24,6 +25,8 @@
 #define CAMERA_CH_RCVE "Camera_Pcl"
 #define MAIN_CH_SEND "Main_MultiArray"
 #define MAIN_CH_RCVE "Main_Bool"
+
+#define PNG_PATH ""
 
 #define Q_SIZE 1000
 
@@ -71,7 +74,7 @@ int main (int argc, char **argv) {
         camera_pub.publish(true);
     };
 
-    auto  camera_callback = [&] (const sensor_msgs::PointCloud2ConstPtr &point_cloud) {
+    auto camera_callback = [&] (const sensor_msgs::PointCloud2ConstPtr &point_cloud) {
     
         std::cout << "Package Received" << std::endl;
 
@@ -82,15 +85,21 @@ int main (int argc, char **argv) {
 
         std::cout << "Width: " << temp_cloud->width << " Height: " << temp_cloud->height << std::endl; 
 
-        cv::Mat new_cv_mat = pcl_to_Mat(temp_cloud);
+        cv::Mat mat_PCL = pcl_to_Mat(temp_cloud);
+        cv::Mat mat_PNG = cv::imread(PNG_PATH);
 
         //Block detection 
         cv::Vec3f result;
-        //result = Detection(new_cv_mat, image_loaded);
+        result = Detection::Detect(mat_PCL, mat_PNG);
         
         //Send data to main
-        //Convert Vec3 to Float_MultiArray
-        //main_pub.publish(that array);
+        //Convert Vec3f to Float_MultiArray
+        std_msgs::Float64MultiArray payload;
+        payload.data[0] = result[0];
+        payload.data[1] = result[1];
+        payload.data[2] = result[2];
+        
+        main_pub.publish(payload);
 
     };   
 
