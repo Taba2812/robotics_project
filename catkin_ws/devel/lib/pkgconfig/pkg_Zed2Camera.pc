@@ -1,0 +1,8 @@
+prefix=/home/dawwo/Documents/Repositories/robotics_project/catkin_ws/devel
+
+Name: pkg_Zed2Camera
+Description: Description of pkg_Zed2Camera
+Version: 0.0.0
+Cflags: 
+Libs: -L${prefix}/lib 
+Requires: 
