@@ -3,11 +3,14 @@
 Waiting::~Waiting(){}
 
 void Waiting::execute(Process *p){
-    std::cout << "\n[WAITING]\n";
-    if(p -> getStatus()){
+    std::cout << "\n[WAITING] press a key to advance\n";
+    std::cin.get();
+
+    if(p -> getProcessStatus()){
+        p -> processOff();
         p -> setState(Vision::getInstance());
     } else {
-        p -> setStatus(true);
+        usleep(WAITING_TIME);
         p -> setState(Waiting::getInstance());
     }
 }
@@ -21,7 +24,14 @@ Vision::~Vision(){}
 
 void Vision::execute(Process *p){
     std::cout << "\n[VISION]\n";
-    p -> setState(Position::getInstance());
+
+    if(p -> getProcessStatus()){
+        p -> processOff();
+        p -> setState(Position::getInstance());
+    } else {
+        usleep(WAITING_TIME);
+        p -> setState(Vision::getInstance());
+    }
 }
 
 State &Vision::getInstance(){
@@ -33,7 +43,14 @@ Position::~Position(){}
 
 void Position::execute(Process *p){
     std::cout << "\n[POSITION]\n";
-    p -> setState(Motion::getInstance());
+    
+    if(p -> getProcessStatus()){
+        p -> processOff();
+        p -> setState(MotionTo::getInstance());
+    } else {
+        usleep(WAITING_TIME);
+        p -> setState(Position::getInstance());
+    }
 }
 
 State &Position::getInstance(){
@@ -41,14 +58,21 @@ State &Position::getInstance(){
     return singleton;
 }
 
-Motion::~Motion(){}
+MotionTo::~MotionTo(){}
 
-void Motion::execute(Process *p){
-    std::cout << "\n[MOTION]\n";
-    p -> setState(Waiting::getInstance());
+void MotionTo::execute(Process *p){
+    std::cout << "\n[MOVING TO BLOCK]\n";
+    
+    if(p -> getProcessStatus()){
+        p -> processOff();
+        p -> setState(Waiting::getInstance());
+    } else {
+        usleep(WAITING_TIME);
+        p -> setState(MotionTo::getInstance());
+    }
 }
 
-State &Motion::getInstance(){
-    static Motion singleton;
+State &MotionTo::getInstance(){
+    static MotionTo singleton;
     return singleton;
 }

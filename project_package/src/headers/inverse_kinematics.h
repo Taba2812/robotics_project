@@ -14,6 +14,7 @@ public:
     JointConfiguration get_joint_angles() const;
     void compute_inverse(const EndEffector& ee);
     std_msgs::Float64MultiArray getMessage();
+    void set_position(Eigen::Vector3d p);
 };
 
 Destination::Destination(){
@@ -139,11 +140,15 @@ void Destination::compute_inverse(const EndEffector& ee){
 std_msgs::Float64MultiArray Destination::getMessage(){
     std_msgs::Float64MultiArray msg;
 
-    msg.data[0] = position(0);
-    msg.data[1] = position(1);
-    msg.data[2] = position(2);
+    for(int i=0; i<JOINTS; i++){
+        msg.data[i] = ja(i);
+    }
 
     return msg;
+}
+
+void Destination::set_position(Eigen::Vector3d p){
+    position = p;
 }
 
 #endif
