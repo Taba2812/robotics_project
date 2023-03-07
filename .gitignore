@@ -2,4 +2,6 @@
 
 /catkin_ws/devel/*
 
+/catkin_ws/.catkin_tools/profiles.yaml
+
 /catkin_ws/src/output_renders/*
