@@ -60,11 +60,14 @@ int main(int argc, char **argv){
             case WAITING  : break;
             case VISION   : break;
             case POSITION : break;
-            case MOTION   : break;
+            case TO_BLOCK : break;
+            case TO_FINAL : break;
             case HOMING   : break;
-            default:
+            default: std::cout << std::endl;
         }
     }
+
+    return 0;
 }
 
 /*

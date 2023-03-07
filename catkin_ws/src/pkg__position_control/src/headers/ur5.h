@@ -29,8 +29,9 @@
 #define WAITING  0
 #define VISION   1
 #define POSITION 2
-#define MOTION   3
-#define HOMING   4
+#define TO_BLOCK 3
+#define TO_FINAL 4
+#define HOMING   5
 
 #define _USE_MATH_DEFINES
 
