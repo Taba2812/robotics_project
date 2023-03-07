@@ -81,14 +81,7 @@
         "/opt/ros/noetic/lib/python3/dist-packages",
         "/opt/openrobots/lib/pythonPYTHON_VERSION/site-packages",
         "/home/taba/trento_lab_home/ros_ws/src/locosim/robot_control",
-        "/opt/openrobots/lib/pythonPYTHON_VERSION/site-packages",
-        "/home/taba/trento_lab_home/ros_ws/src/locosim/robot_control",
-        "/opt/openrobots/lib/pythonPYTHON_VERSION/site-packages",
-        "/home/taba/trento_lab_home/ros_ws/src/locosim/robot_control",
-        "/opt/openrobots/lib/python3.8/site-packages",
-        "/home/taba/trento_lab_home/ros_ws/src/locosim/robot_control",
-        "/opt/openrobots/lib/pythonPYTHON_VERSION/site-packages",
-        "/home/taba/trento_lab_home/ros_ws/src/locosim/robot_control"
+        "/opt/openrobots/lib/python3.8/site-packages"
     ],
     "python.analysis.extraPaths": [
         "/home/taba/trento_lab_home/ros_ws/devel/lib/python3/dist-packages",
@@ -105,6 +98,6 @@
         "/opt/openrobots/lib/pythonPYTHON_VERSION/site-packages",
         "/home/taba/trento_lab_home/ros_ws/src/locosim/robot_control"
     ],
-    "cmake.sourceDirectory": "${workspaceFolder}/computer_vision/src",
-    "cmake.buildDirectory": "${workspaceFolder}/computer_vision/src/build"
+    "cmake.sourceDirectory": "${workspaceFolder}/catkin_ws/src",
+    "cmake.buildDirectory": "${workspaceFolder}/catkin_ws/build"
 }
