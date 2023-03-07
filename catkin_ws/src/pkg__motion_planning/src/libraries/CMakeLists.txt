@@ -1,0 +1,2 @@
+add_library(bezier_curve bezier_curve.cpp)
+add_library(motion_planning motion_planning.cpp)

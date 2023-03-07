@@ -193,7 +193,7 @@ std_msgs::Float64MultiArray Destination::getMessage(){
     std_msgs::Float64MultiArray msg;
 
     for(int i=0; i<JOINTS; i++){
-        msg.data[i] = jc(i);
+        msg.data = jc;
     }
 
     return msg;
