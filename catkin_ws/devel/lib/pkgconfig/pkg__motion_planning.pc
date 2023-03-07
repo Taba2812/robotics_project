@@ -1,4 +1,4 @@
-prefix=/home/dawwo/Documents/Repositories/robotics_project/catkin_ws/devel
+prefix=/home/taba/trento_lab_home/ros_ws/src/catkin_ws/devel
 
 Name: pkg__motion_planning
 Description: Description of pkg__motion_planning

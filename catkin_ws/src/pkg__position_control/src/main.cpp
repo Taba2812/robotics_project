@@ -1,8 +1,7 @@
 #include "headers/direct_kinematics.h"
 #include "headers/inverse_kinematics.h"
-#include "state_machine/process.h"
-#include "state_machine/concrete_states.h"
-
+//#include "state_machine/process.h"
+//#include "state_machine/concrete_states.h"
 
 void getJoint(const sensor_msgs::JointState::ConstPtr& js){
     for(int i=0; i<JOINTS; i++){
@@ -22,13 +21,10 @@ void getPosition(const std_msgs::Float64MultiArray::ConstPtr& xyz){
 }
 
 int main(int argc, char **argv){
-    //state machine
-    Process process;
-
     //initialize node
     ros::init(argc, argv, "ur5Main");
     ros::NodeHandle nh;
-    ros::Rate loop_rate(LOOP_RATE);
+    ros::Rate loopRate(LOOP_RATE);
 
     //publishers and subscribers
     ros::Publisher joint_pub = nh.advertise<std_msgs::Float64MultiArray>("/ur5/joint_group_pos_controller/command", QUEUE_SIZE);
@@ -48,7 +44,7 @@ int main(int argc, char **argv){
     //make sure we have received proper joint angles already
     for(int i=0; i<2; i++){
         ros::spinOnce();
-        loop_rate.sleep();
+        loopRate.sleep();
     }
 
     //get default position
@@ -57,15 +53,30 @@ int main(int argc, char **argv){
         home.data[i] = ee.getPosition()[i];
     }
 
-    process.processOn();
+    int currentState = 0;
+
+    while(ros::ok()){
+        switch(currentState){
+            case WAITING  : break;
+            case VISION   : break;
+            case POSITION : break;
+            case MOTION   : break;
+            case HOMING   : break;
+            default:
+        }
+    }
+}
+
+/*
+int main(int argc, char **argv){
 
     while(ros::ok()){
         std_msgs::Bool reply;
         reply.data = true;
+
         switch(process.getCurrentState() -> getCode()){
             //Waiting
             case 0 :
-                vision_pub.publish(home);
                 process.execute();
             break;
 
@@ -101,5 +112,6 @@ int main(int argc, char **argv){
 
     return 0;
 }
+*/
 
 //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

@@ -46,7 +46,7 @@ void Position::execute(Process *p){
     
     if(p -> getProcessStatus()){
         p -> processOff();
-        p -> setState(MotionTo::getInstance());
+        p -> setState(Motion::getInstance());
     } else {
         usleep(WAITING_TIME);
         p -> setState(Position::getInstance());
@@ -58,9 +58,9 @@ State &Position::getInstance(){
     return singleton;
 }
 
-MotionTo::~MotionTo(){}
+Motion::~Motion(){}
 
-void MotionTo::execute(Process *p){
+void Motion::execute(Process *p){
     std::cout << "\n[MOVING TO BLOCK]\n";
     
     if(p -> getProcessStatus()){
@@ -68,11 +68,11 @@ void MotionTo::execute(Process *p){
         p -> setState(Waiting::getInstance());
     } else {
         usleep(WAITING_TIME);
-        p -> setState(MotionTo::getInstance());
+        p -> setState(Motion::getInstance());
     }
 }
 
-State &MotionTo::getInstance(){
-    static MotionTo singleton;
+State &Motion::getInstance(){
+    static Motion singleton;
     return singleton;
 }

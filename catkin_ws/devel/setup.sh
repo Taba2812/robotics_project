@@ -11,7 +11,7 @@
 
 # since this file is sourced either use the provided _CATKIN_SETUP_DIR
 # or fall back to the destination set at configure time
-: ${_CATKIN_SETUP_DIR:=/home/dawwo/Documents/Repositories/robotics_project/catkin_ws/devel}
+: ${_CATKIN_SETUP_DIR:=/home/taba/trento_lab_home/ros_ws/src/catkin_ws/devel}
 _SETUP_UTIL="$_CATKIN_SETUP_DIR/_setup_util.py"
 unset _CATKIN_SETUP_DIR
 
