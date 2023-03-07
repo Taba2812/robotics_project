@@ -19,11 +19,19 @@
 #define D4 0.10915
 #define D5 0.09465
 #define D6 0.0823
+
 #define JOINTS 6
 #define LOOP_RATE 100
 #define MATRIX_DIM 4
 #define QUEUE_SIZE 1
 #define WAITING_TIME 500000
+
+#define WAITING  0
+#define VISION   1
+#define POSITION 2
+#define MOTION   3
+#define HOMING   4
+
 #define _USE_MATH_DEFINES
 
 typedef Eigen::Vector3d BlockPosition;

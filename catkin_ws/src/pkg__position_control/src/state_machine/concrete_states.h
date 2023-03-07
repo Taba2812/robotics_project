@@ -44,11 +44,11 @@ public:
     static State &getInstance();
 };
 
-class MotionTo : public State {
+class Motion : public State {
 private:
-    MotionTo(){ stateCode = 3; }
-    MotionTo(const MotionTo &m);
-    virtual ~MotionTo();
+    Motion(){ stateCode = 3; }
+    Motion(const Motion &m);
+    virtual ~Motion();
 public:
     //void enter(Process *p);
     void execute(Process *p);
