@@ -3,6 +3,7 @@
 
 #include <vector>
 #include <math.h>
+#include <iostream>
 
 namespace Bezier {
 
@@ -20,6 +21,8 @@ namespace Bezier {
             Curve(Node dest, int seg);
             Node getNext();
     };
+
+    void printNode(Node node);
 }
 
 #endif
