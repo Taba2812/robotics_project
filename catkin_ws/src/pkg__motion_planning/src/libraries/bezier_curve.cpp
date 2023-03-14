@@ -16,24 +16,21 @@ Bezier::Curve::Curve(Bezier::Node dest, int seg) {
     this->nodes.push_back({0,0,-3});
     this->nodes.push_back({dest[0], dest[1], dest[2] + 3});
     this->nodes.push_back(dest);
-
-    std::cout << "Destination handle: ";
-    Bezier::printNode(this->nodes[2]);
 }
 
 Bezier::Node Bezier::Curve::calculate(float t) {
-    std::cout << "Calculating with t=" << t << std::endl;
     
     //k_x are the 4 coefficient for the Bernstein Polynomial form to calculate Bezier Curves
-    float k_0 = (-1*pow(t,3)) + ( 3*pow(t,2)) - ((3*t)+1);
-    float k_1 = ( 3*pow(t,3)) + (-6*pow(t,2)) -  (3*t);
+    float k_0 = (-1*pow(t,3)) + ( 3*pow(t,2)) - (3*t) + 1;
+    float k_1 = ( 3*pow(t,3)) + (-6*pow(t,2)) + (3*t);
     float k_2 = (-3*pow(t,3)) + ( 3*pow(t,2));
     float k_3 =     pow(t,3);
 
     Bezier::Node result;
 
-    for (int i = 0; i < 4; i++) {
-        result.push_back(nodes[0][i] * k_0 + nodes[1][i] * k_1 + nodes[2][i] * k_2 + nodes[3][i] * k_3);
+    for (int i = 0; i < 3; i++) {
+        float value = nodes[0][i] * k_0 + nodes[1][i] * k_1 + nodes[2][i] * k_2 + nodes[3][i] * k_3;
+        result.push_back(value);
     }
 
     return result;
