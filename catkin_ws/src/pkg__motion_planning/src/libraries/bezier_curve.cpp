@@ -5,6 +5,7 @@ void Bezier::printNode(Bezier::Node node) {
               << " y: " << node[1]
               << " z: " << node[2]
               << std::endl;
+              
 }
 
 Bezier::Curve::Curve(Bezier::Node dest, int seg) {

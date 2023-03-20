@@ -19,4 +19,5 @@ include_directories(
   ${catkin_INCLUDE_DIRS}
 )
 
-
+add_executable(motion_planning_testnode src/motion_planning.testnode.cpp)
+target_link_libraries(motion_planning_testnode ${catkin_LIBRARIES})
