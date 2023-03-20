@@ -1,0 +1,13 @@
+/home/dawwo/Documents/Repositories/robotics_project/catkin_ws/install/_setup_util.py
+/home/dawwo/Documents/Repositories/robotics_project/catkin_ws/install/env.sh
+/home/dawwo/Documents/Repositories/robotics_project/catkin_ws/install/setup.bash
+/home/dawwo/Documents/Repositories/robotics_project/catkin_ws/install/local_setup.bash
+/home/dawwo/Documents/Repositories/robotics_project/catkin_ws/install/setup.sh
+/home/dawwo/Documents/Repositories/robotics_project/catkin_ws/install/local_setup.sh
+/home/dawwo/Documents/Repositories/robotics_project/catkin_ws/install/setup.zsh
+/home/dawwo/Documents/Repositories/robotics_project/catkin_ws/install/local_setup.zsh
+/home/dawwo/Documents/Repositories/robotics_project/catkin_ws/install/.rosinstall
+/home/dawwo/Documents/Repositories/robotics_project/catkin_ws/install/lib/pkgconfig/pkg__dummy_nodes.pc
+/home/dawwo/Documents/Repositories/robotics_project/catkin_ws/install/share/pkg__dummy_nodes/cmake/pkg__dummy_nodesConfig.cmake
+/home/dawwo/Documents/Repositories/robotics_project/catkin_ws/install/share/pkg__dummy_nodes/cmake/pkg__dummy_nodesConfig-version.cmake
+/home/dawwo/Documents/Repositories/robotics_project/catkin_ws/install/share/pkg__dummy_nodes/package.xml

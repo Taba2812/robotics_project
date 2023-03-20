@@ -1,0 +1,15 @@
+/home/dawwo/Documents/Repositories/robotics_project/catkin_ws/install/_setup_util.py
+/home/dawwo/Documents/Repositories/robotics_project/catkin_ws/install/env.sh
+/home/dawwo/Documents/Repositories/robotics_project/catkin_ws/install/setup.bash
+/home/dawwo/Documents/Repositories/robotics_project/catkin_ws/install/local_setup.bash
+/home/dawwo/Documents/Repositories/robotics_project/catkin_ws/install/setup.sh
+/home/dawwo/Documents/Repositories/robotics_project/catkin_ws/install/local_setup.sh
+/home/dawwo/Documents/Repositories/robotics_project/catkin_ws/install/setup.zsh
+/home/dawwo/Documents/Repositories/robotics_project/catkin_ws/install/local_setup.zsh
+/home/dawwo/Documents/Repositories/robotics_project/catkin_ws/install/.rosinstall
+/home/dawwo/Documents/Repositories/robotics_project/catkin_ws/install/lib/pkgconfig/pkg__detection.pc
+/home/dawwo/Documents/Repositories/robotics_project/catkin_ws/install/share/pkg__detection/cmake/pkg__detectionConfig.cmake
+/home/dawwo/Documents/Repositories/robotics_project/catkin_ws/install/share/pkg__detection/cmake/pkg__detectionConfig-version.cmake
+/home/dawwo/Documents/Repositories/robotics_project/catkin_ws/install/share/pkg__detection/package.xml
+/home/dawwo/Documents/Repositories/robotics_project/catkin_ws/install/lib/pkg__detection/Fake_True_Sender
+/home/dawwo/Documents/Repositories/robotics_project/catkin_ws/install/lib/pkg__detection/Detector_Node

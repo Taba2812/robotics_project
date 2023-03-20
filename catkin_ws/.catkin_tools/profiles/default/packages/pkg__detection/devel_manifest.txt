@@ -1,0 +1,14 @@
+pkg__detection
+/home/dawwo/Documents/Repositories/robotics_project/catkin_ws/devel/.private/pkg__detection/cmake.lock /home/dawwo/Documents/Repositories/robotics_project/catkin_ws/devel/./cmake.lock
+/home/dawwo/Documents/Repositories/robotics_project/catkin_ws/devel/.private/pkg__detection/share/pkg__detection/cmake/pkg__detectionConfig-version.cmake /home/dawwo/Documents/Repositories/robotics_project/catkin_ws/devel/share/pkg__detection/cmake/pkg__detectionConfig-version.cmake
+/home/dawwo/Documents/Repositories/robotics_project/catkin_ws/devel/.private/pkg__detection/share/pkg__detection/cmake/pkg__detectionConfig.cmake /home/dawwo/Documents/Repositories/robotics_project/catkin_ws/devel/share/pkg__detection/cmake/pkg__detectionConfig.cmake
+/home/dawwo/Documents/Repositories/robotics_project/catkin_ws/devel/.private/pkg__detection/lib/libdisplay_utility.so /home/dawwo/Documents/Repositories/robotics_project/catkin_ws/devel/lib/libdisplay_utility.so
+/home/dawwo/Documents/Repositories/robotics_project/catkin_ws/devel/.private/pkg__detection/lib/librecognition.so /home/dawwo/Documents/Repositories/robotics_project/catkin_ws/devel/lib/librecognition.so
+/home/dawwo/Documents/Repositories/robotics_project/catkin_ws/devel/.private/pkg__detection/lib/libpipeline.so /home/dawwo/Documents/Repositories/robotics_project/catkin_ws/devel/lib/libpipeline.so
+/home/dawwo/Documents/Repositories/robotics_project/catkin_ws/devel/.private/pkg__detection/lib/libtemp_file_handler.so /home/dawwo/Documents/Repositories/robotics_project/catkin_ws/devel/lib/libtemp_file_handler.so
+/home/dawwo/Documents/Repositories/robotics_project/catkin_ws/devel/.private/pkg__detection/lib/liblocation_handler.so /home/dawwo/Documents/Repositories/robotics_project/catkin_ws/devel/lib/liblocation_handler.so
+/home/dawwo/Documents/Repositories/robotics_project/catkin_ws/devel/.private/pkg__detection/lib/libsetting.so /home/dawwo/Documents/Repositories/robotics_project/catkin_ws/devel/lib/libsetting.so
+/home/dawwo/Documents/Repositories/robotics_project/catkin_ws/devel/.private/pkg__detection/lib/libdetection.so /home/dawwo/Documents/Repositories/robotics_project/catkin_ws/devel/lib/libdetection.so
+/home/dawwo/Documents/Repositories/robotics_project/catkin_ws/devel/.private/pkg__detection/lib/pkg__detection/Fake_True_Sender /home/dawwo/Documents/Repositories/robotics_project/catkin_ws/devel/lib/pkg__detection/Fake_True_Sender
+/home/dawwo/Documents/Repositories/robotics_project/catkin_ws/devel/.private/pkg__detection/lib/pkg__detection/Detector_Node /home/dawwo/Documents/Repositories/robotics_project/catkin_ws/devel/lib/pkg__detection/Detector_Node
+/home/dawwo/Documents/Repositories/robotics_project/catkin_ws/devel/.private/pkg__detection/lib/pkgconfig/pkg__detection.pc /home/dawwo/Documents/Repositories/robotics_project/catkin_ws/devel/lib/pkgconfig/pkg__detection.pc

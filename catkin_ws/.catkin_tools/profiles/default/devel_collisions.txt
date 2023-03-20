@@ -1,0 +1,1 @@
+/home/dawwo/Documents/Repositories/robotics_project/catkin_ws/devel/./cmake.lock 10
