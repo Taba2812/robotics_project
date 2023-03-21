@@ -18,6 +18,7 @@ namespace Bezier {
 
             Node calculate(float t);
         public:
+            Curve();
             Curve(Node dest, int seg);
             Node getNext();
     };
