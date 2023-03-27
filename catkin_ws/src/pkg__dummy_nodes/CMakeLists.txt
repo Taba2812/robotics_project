@@ -10,7 +10,7 @@ find_package(catkin REQUIRED COMPONENTS
   pcl_ros
 )
 
-add_subdirectory(../shared_libraries ${CMAKE_CURRENT_BINARY_DIR}/libraries)
+add_subdirectory(src/libraries)
 
 catkin_package(
 #  INCLUDE_DIRS include
