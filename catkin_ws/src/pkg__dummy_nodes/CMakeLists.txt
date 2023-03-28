@@ -29,8 +29,5 @@ target_link_libraries(MotionPlanning_Dummy ${catkin_LIBRARIES})
 add_executable(Detection_Dummy src/detection.dummy.cpp)
 target_link_libraries(Detection_Dummy ${catkin_LIBRARIES})
 
-add_executable(Tempfile_Dummy src/temporary_file_converter.cpp)
-target_link_libraries(Tempfile_Dummy ${catkin_LIBRARIES} ${OpenCV_LIBS} temp_file_handler)
-
 catkin_install_python(PROGRAMS src/placeholder_camera_data.dummy.py
   DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION})
