@@ -5,7 +5,6 @@ Core -> [Float32MultiArray] -> Motion Planning | Motion_Planning_Data | [x,y,z,s
 Motion Planning -> [Float32MultiArray] -> Core | Motion_Planning_Progress [x,y,z]
 
 # Detection
-
 Core      -> [bool]              -> Detection | Detection_Request 
 Detection -> [bool]              -> Zed2      | Camera_Request
 Zed2      -> [PointCloud2]       -> Detection | Camera_Data
