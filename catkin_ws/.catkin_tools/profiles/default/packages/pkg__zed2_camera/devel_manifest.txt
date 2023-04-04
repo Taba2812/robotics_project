@@ -1,5 +1,0 @@
-pkg__zed2_camera
-/home/dawwo/Documents/Repositories/robotics_project/catkin_ws/devel/.private/pkg__zed2_camera/cmake.lock /home/dawwo/Documents/Repositories/robotics_project/catkin_ws/devel/./cmake.lock
-/home/dawwo/Documents/Repositories/robotics_project/catkin_ws/devel/.private/pkg__zed2_camera/share/pkg__zed2_camera/cmake/pkg__zed2_cameraConfig.cmake /home/dawwo/Documents/Repositories/robotics_project/catkin_ws/devel/share/pkg__zed2_camera/cmake/pkg__zed2_cameraConfig.cmake
-/home/dawwo/Documents/Repositories/robotics_project/catkin_ws/devel/.private/pkg__zed2_camera/share/pkg__zed2_camera/cmake/pkg__zed2_cameraConfig-version.cmake /home/dawwo/Documents/Repositories/robotics_project/catkin_ws/devel/share/pkg__zed2_camera/cmake/pkg__zed2_cameraConfig-version.cmake
-/home/dawwo/Documents/Repositories/robotics_project/catkin_ws/devel/.private/pkg__zed2_camera/lib/pkgconfig/pkg__zed2_camera.pc /home/dawwo/Documents/Repositories/robotics_project/catkin_ws/devel/lib/pkgconfig/pkg__zed2_camera.pc

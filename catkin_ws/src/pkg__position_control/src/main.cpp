@@ -27,19 +27,22 @@ int main(int argc, char **argv){
     ros::Rate loopRate(LOOP_RATE);
 
     //publishers and subscribers
-    ros::Publisher joint_pub = nh.advertise<std_msgs::Float64MultiArray>("/ur5/joint_group_pos_controller/command", QUEUE_SIZE);
-    ros::Publisher vision_pub = nh.advertise<std_msgs::Bool>("Main_Bool", QUEUE_SIZE);
-    ros::Subscriber joint_sub = nh.subscribe("/ur5/joint_states", QUEUE_SIZE, getJoint);
-    ros::Subscriber vision_sub = nh.subscribe("Main_MultiArray", QUEUE_SIZE, getPosition);
+    ros::Publisher jointPub = nh.advertise<std_msgs::Float64MultiArray>("/ur5/joint_group_pos_controller/command", QUEUE_SIZE);
+    ros::Publisher visionPub = nh.advertise<std_msgs::Bool>("Main_Bool", QUEUE_SIZE);
+    ros::Subscriber jointSub = nh.subscribe("/ur5/joint_states", QUEUE_SIZE, getJoint);
+    ros::Subscriber visionSub = nh.subscribe("Main_MultiArray", QUEUE_SIZE, getPosition);
 
     //environment components
     EndEffector ee;
-    Destination d;
+    Destination d, home;
     FinalDestination fd;
-    std_msgs::Float64MultiArray msg, home;
+    std_msgs::Bool msgVision;
+    std_msgs::Bool msgMotion;
 
     //default values
-    home.data = {0, 0, 0};
+    processStatus.data = false;
+    bool gripper = false;
+
 
     //make sure we have received proper joint angles already
     for(int i=0; i<2; i++){
@@ -50,71 +53,90 @@ int main(int argc, char **argv){
     //get default position
     ee.computeDirect(q);
     for(int i=0; i<3; i++){
-        home.data[i] = ee.getPosition()[i];
+        home.setPosition(ee.getPosition());
     }
 
     int currentState = 0;
 
     while(ros::ok()){
         switch(currentState){
-            case WAITING  : break;
-            case VISION   : break;
-            case POSITION : break;
-            case TO_BLOCK : break;
-            case TO_FINAL : break;
-            case HOMING   : break;
-            default: std::cout << std::endl;
-        }
-    }
-
-    return 0;
-}
-
-/*
-int main(int argc, char **argv){
-
-    while(ros::ok()){
-        std_msgs::Bool reply;
-        reply.data = true;
-
-        switch(process.getCurrentState() -> getCode()){
-            //Waiting
-            case 0 :
-                process.execute();
+            case WAITING:
+                std::cout << "\n[WAITING] press any key to advance\n";
+                std::cin.get();
+                currentState = VISION;
+                msgVision.data = true;
+                visionPub.publish(msgVision);
             break;
 
-            //Vision
-            case 1 :
-                if(!process.getProcessStatus()) vision_pub.publish(reply);
-                process.execute();
+            case VISION:
+                std::cout << "\n[VISION] object recognition\n";
+                while(!processStatus.data) usleep(WAITING_TIME);
+                currentState = POSITION;
             break;
 
-            //Position
-            case 2 :
+            case POSITION:
+                std::cout << "\n[POSITION]";
                 if(!gripper){
+                    std::cout << " home to block\n";
                     d.setPosition(bp);
                 } else {
+                    std::cout << " block to destination\n";
                     d.setPosition(fd);
                 }
                 d.computeInverse(ee);
-                process.processOn();
-                process.execute();
-            break;
-            
-            //Motion
-            case 3 :
-                joint_pub.publish(d.getMessage());
-                gripper = !gripper;
-                process.processOn();
-                process.execute();
+                currentState = MOTION;
+                msgMotion.data = true;
+                //publish on motion topic
             break;
 
-            default: std::cout << "\nThere's been an error\n"; exit(0);
+            case MOTION:
+                std::cout << "\n[MOTION] path planning\n";
+                //update with proper topic
+                while(1){
+                    usleep(WAITING_TIME);
+                }
+                if(!gripper) currentState = TO_BLOCK;
+                else currentState = TO_FINAL;
+            break;
+
+            case TO_BLOCK:
+                std::cout << "\n[TO_BLOCK] moving to detected block\n";
+                for(int i=0; i<POINTS; i++){
+                    jointPub.publish(d.getMessage());
+                }
+                //attach dynamic link for block
+                gripper = true;
+                currentState = POSITION;
+            break;
+
+            case TO_FINAL:
+                std::cout << "\n[TO_FINAL] moving to final destination\n";
+                for(int i=0; i<POINTS; i++){
+                    jointPub.publish(d.getMessage());
+                }
+                //detach dynamic link for block
+                gripper = false;
+                currentState = HOMING;
+            break;
+
+            case HOMING:
+                std::cout << "\n[HOMING] going home\n";
+                msgMotion.data = true;
+                //publish topic
+                while(1){
+                    usleep(WAITING_TIME);
+                }
+                for(int i=0; i<POINTS; i++){
+                    jointPub.publish(home.getMessage());
+                }
+                currentState = VISION;
+            break;
+
+            default: std::cout << "\n[ERROR] invalid operation\n" << std::endl;
         }
     }
 
     return 0;
 }
-*/
 
 //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

@@ -1,6 +1,0 @@
-pkg__position_control
-/home/dawwo/Documents/Repositories/robotics_project/catkin_ws/devel/.private/project_package/cmake.lock /home/dawwo/Documents/Repositories/robotics_project/catkin_ws/devel/./cmake.lock
-/home/dawwo/Documents/Repositories/robotics_project/catkin_ws/devel/.private/project_package/share/project_package/cmake/project_packageConfig-version.cmake /home/dawwo/Documents/Repositories/robotics_project/catkin_ws/devel/share/project_package/cmake/project_packageConfig-version.cmake
-/home/dawwo/Documents/Repositories/robotics_project/catkin_ws/devel/.private/project_package/share/project_package/cmake/project_packageConfig.cmake /home/dawwo/Documents/Repositories/robotics_project/catkin_ws/devel/share/project_package/cmake/project_packageConfig.cmake
-/home/dawwo/Documents/Repositories/robotics_project/catkin_ws/devel/.private/project_package/lib/project_package/ur5Main /home/dawwo/Documents/Repositories/robotics_project/catkin_ws/devel/lib/project_package/ur5Main
-/home/dawwo/Documents/Repositories/robotics_project/catkin_ws/devel/.private/project_package/lib/pkgconfig/project_package.pc /home/dawwo/Documents/Repositories/robotics_project/catkin_ws/devel/lib/pkgconfig/project_package.pc

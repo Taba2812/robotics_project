@@ -23,15 +23,17 @@
 #define JOINTS 6
 #define LOOP_RATE 100
 #define MATRIX_DIM 4
+#define POINTS 20           //to test
 #define QUEUE_SIZE 1
 #define WAITING_TIME 500000
 
 #define WAITING  0
 #define VISION   1
 #define POSITION 2
-#define TO_BLOCK 3
-#define TO_FINAL 4
-#define HOMING   5
+#define MOTION   3
+#define TO_BLOCK 4
+#define TO_FINAL 5
+#define HOMING   6
 
 #define _USE_MATH_DEFINES
 
@@ -45,7 +47,6 @@ const double d[JOINTS] = {D1, 0, 0, D4, D5, D6};                  //distance bet
 const double cn[JOINTS] = {0, -A2, -A3, 0, 0, 0};                 //common normal
 const double alpha[JOINTS] = {M_PI_2, 0, 0, M_PI_2, -M_PI_2, 0};  //angles
 static std_msgs::Bool processStatus;
-static bool gripper = false;
 
 const ros::V_string jointNames = {"elbow_joint", "shoulder_lift_joint", "shoulder_pan_joint", "wrist_1_joint", "wrist_2_joint", "wrist_3_joint"};
 static BlockPosition bp = BlockPosition::Zero();
