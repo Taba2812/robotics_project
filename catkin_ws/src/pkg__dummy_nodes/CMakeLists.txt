@@ -1,12 +1,17 @@
 cmake_minimum_required(VERSION 3.0.2)
 project(pkg__dummy_nodes)
 
+find_package(PCL 1.10 REQUIRED)
 find_package(OpenCV 4.2.0 REQUIRED)
 find_package(catkin REQUIRED COMPONENTS
   roscpp
   rospy
   std_msgs
+  sensor_msgs
   cv_bridge
+  pcl_msgs
+  pcl_conversions
+  pcl_ros
 )
 
 add_subdirectory(src/libraries)
@@ -21,6 +26,11 @@ catkin_package(
 include_directories( include
   ${catkin_INCLUDE_DIRS}
   ${OpenCV_INCLUDE_DIRS}
+  ${PCL_INCLUDE_DIRS}
+)
+
+link_directories(
+  ${PCL_LIBRARY_DIRS}
 )
 
 add_executable(MotionPlanning_Dummy src/motion_planning.dummy.cpp)
@@ -28,6 +38,9 @@ target_link_libraries(MotionPlanning_Dummy ${catkin_LIBRARIES})
 
 add_executable(Detection_Dummy src/detection.dummy.cpp)
 target_link_libraries(Detection_Dummy ${catkin_LIBRARIES})
+
+add_executable(SimulatedZed_Dummy src/simulated_zed_data.dummy.cpp)
+target_link_libraries(SimulatedZed_Dummy ${catkin_LIBRARIES})
 
 catkin_install_python(PROGRAMS src/placeholder_camera_data.dummy.py
   DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION})
