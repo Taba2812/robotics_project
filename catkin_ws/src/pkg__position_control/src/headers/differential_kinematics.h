@@ -5,12 +5,12 @@
 #include "inverse_kinematics.h"
 
 class Motion{
+private:
+    const EndEffector& ee;
 public:
     Motion(const EndEffector& ee);
     Eigen::MatrixXd jacobian(const Eigen::VectorXd& q) const;
     Eigen::VectorXd computeDifferential(const Eigen::VectorXd& q, const Eigen::VectorXd& dq) const;
-private:
-    const EndEffector& ee;
 };
 
 Motion::Motion(const EndEffector& ee) : ee(ee){

@@ -23,7 +23,7 @@
 #define JOINTS 6
 #define LOOP_RATE 100
 #define MATRIX_DIM 4
-#define POINTS 20           //to verify
+#define POINTS 20           //to test
 #define QUEUE_SIZE 1
 #define WAITING_TIME 500000
 

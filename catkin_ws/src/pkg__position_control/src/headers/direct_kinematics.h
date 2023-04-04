@@ -37,16 +37,16 @@ Eigen::Vector3d EndEffector::getPosition() const{
     return this->position;
 }
 
-void EndEffector::setPosition(Eigen::Vector3d& pos){
-    position = pos;
+void EndEffector::setPosition(Eigen::Vector3d& p){
+    position = p;
 }
 
 Eigen::Matrix3d EndEffector::getOrientation() const{
     return this->orientation;
 }
 
-void EndEffector::setOrientation(Eigen::Matrix3d& angle){
-    orientation = angle;
+void EndEffector::setOrientation(Eigen::Matrix3d& o){
+    orientation = o;
 }
 
 void EndEffector::computeDirect(const Eigen::VectorXd& q){
