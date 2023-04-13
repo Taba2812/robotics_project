@@ -63,11 +63,12 @@ cv::Mat load_raw_matrix_from_txt (std::string path) {
         raw_file >> x >> y >> z;
 
         //std::cout << x << " " << y << " " << z << std::endl;
+        tmp.at<cv::Vec3f>(h,w) = cv::Vec3f(x,y,z);
 
-        if (w == IMAGE_WIDTH) {w = 0;h++;} else {w++;}
+        if (w == IMAGE_WIDTH - 1) {w = 0;h++;} else {w++;}
 
         //std::cout << "h: " << h << " w: " << w << std::endl;
-        tmp.at<cv::Vec3f>(h,w) = cv::Vec3f(x,y,z);
+        
     }
 
     raw_file.close();
