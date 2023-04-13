@@ -1,3 +1,6 @@
+#include <iostream>
+#include <fstream>
+#include <sstream>
 #include "ros/ros.h"
 #include "sensor_msgs/Image.h"
 #include "sensor_msgs/PointCloud2.h"
@@ -17,11 +20,61 @@
 #define IMAGE_HEIGHT 1080
 #define ERROR_RANGE 0.1f
 #define IMG_PATH "/home/dawwo/Documents/Repositories/robotics_project/catkin_ws/src/images_database/complete_data_examples/SimulatedZed2_img.png"
-#define RAW_PATH "/home/dawwo/Documents/Repositories/robotics_project/catkin_ws/src/images_database/complete_data_examples/SimulatedZed2_raw.bmp"
+#define RAW_PATH "/home/dawwo/Documents/Repositories/robotics_project/catkin_ws/src/images_database/complete_data_examples/SimulatedZed2_raw.txt"
 #define PCL_PATH "/home/dawwo/Documents/Repositories/robotics_project/catkin_ws/src/images_database/complete_data_examples/SimulatedZed2_pcl.png"
 
 typedef pcl::PointCloud<pcl::PointXYZ> PTL_PointCloud;
 typedef pcl::PointCloud<pcl::PointXYZ>::Ptr PTL_PointCloudPtr;
+
+void save_raw_matrix_to_txt (cv::Mat mat) {
+    std::cout << "Saving Matrix..." << std::endl;
+
+    std::ofstream raw_file;
+    raw_file.open(RAW_PATH);
+
+    for (int h = 0; h < mat.rows; h++) {
+        for (int w = 0; w < mat.cols; w++) {
+            for (int c = 0; c < mat.channels(); c++) {
+                float val = mat.at<cv::Vec3f>(h,w)[c];
+                raw_file << val << " ";
+            }
+            raw_file << std::endl;
+        }
+    }
+
+    raw_file.close();
+}
+
+cv::Mat load_raw_matrix_from_txt (std::string path) {
+    std::cout << "Loading Matrix..." << std::endl;
+    
+    cv::Mat tmp(IMAGE_HEIGHT, IMAGE_WIDTH, CV_32FC3, cv::Scalar(0));
+    std::ifstream raw_file(RAW_PATH);
+
+    if (!raw_file.is_open()) {
+        std::cout << "Error in opening file" << std::endl;
+        return tmp;
+    }
+
+    std::string line; int h = 0, w = 0;
+    float x,y,z;
+    std::cout << "Starting Parsing..." << std::endl;
+    while (std::getline(raw_file, line)) {
+        raw_file >> x >> y >> z;
+
+        //std::cout << x << " " << y << " " << z << std::endl;
+
+        if (w == IMAGE_WIDTH) {w = 0;h++;} else {w++;}
+
+        //std::cout << "h: " << h << " w: " << w << std::endl;
+        tmp.at<cv::Vec3f>(h,w) = cv::Vec3f(x,y,z);
+    }
+
+    raw_file.close();
+
+    return tmp;
+
+}
 
 cv::Mat adjust_raw_matrix (cv::Mat mat) {
     cv::Mat tmp(mat.rows, mat.cols, CV_32FC3, cv::Scalar(0));
@@ -173,11 +226,13 @@ int main (int argc, char **argv) {
 
         matrice = pcl_to_Mat(temp_cloud);
         matrice = adjust_raw_matrix(matrice);
-        cv::imwrite(RAW_PATH, matrice);
-        cv::Mat tonemapped = tonemap_matrix(matrice);
-        cv::imwrite(PCL_PATH, tonemapped);
+
+        save_raw_matrix_to_txt(matrice);
+        //cv::imwrite(RAW_PATH, matrice);
+        //cv::Mat tonemapped = tonemap_matrix(matrice);
+        //cv::imwrite(PCL_PATH, tonemapped);
         
-        cv::Mat comparison = cv::imread(RAW_PATH);
+        cv::Mat comparison = load_raw_matrix_from_txt(RAW_PATH);
 
         /*
         if (compare_matrices(matrice, comparison)) {
@@ -186,6 +241,7 @@ int main (int argc, char **argv) {
             std::cout << "Le due matrici NON CORRISPONDONO" << std::endl;
         }*/
 
+        
         while (true) {
             cv::imshow("Original", matrice);
             cv::imshow("From file", comparison);
@@ -195,6 +251,7 @@ int main (int argc, char **argv) {
                 break;
             }
         }
+
         std::cout << "Over" << std::endl;
         i_pcl++;
     };
