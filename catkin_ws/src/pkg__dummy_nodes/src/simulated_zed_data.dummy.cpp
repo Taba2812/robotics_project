@@ -15,12 +15,64 @@
 #define RATIO 1000
 #define IMAGE_WIDTH 1920
 #define IMAGE_HEIGHT 1080
+#define ERROR_RANGE 0.1f
 #define IMG_PATH "/home/dawwo/Documents/Repositories/robotics_project/catkin_ws/src/images_database/complete_data_examples/SimulatedZed2_img.png"
-#define RAW_PATH "/home/dawwo/Documents/Repositories/robotics_project/catkin_ws/src/images_database/complete_data_examples/SimulatedZed2_raw.TIFF"
+#define RAW_PATH "/home/dawwo/Documents/Repositories/robotics_project/catkin_ws/src/images_database/complete_data_examples/SimulatedZed2_raw.hdr"
 #define PCL_PATH "/home/dawwo/Documents/Repositories/robotics_project/catkin_ws/src/images_database/complete_data_examples/SimulatedZed2_pcl.png"
 
 typedef pcl::PointCloud<pcl::PointXYZ> PTL_PointCloud;
 typedef pcl::PointCloud<pcl::PointXYZ>::Ptr PTL_PointCloudPtr;
+
+cv::Mat adjust_raw_matrix (cv::Mat mat) {
+    cv::Mat tmp(mat.rows, mat.cols, CV_32FC3, cv::Scalar(0));
+    
+    for (int h = 0; h < mat.rows; h++) {
+        for (int w = 0; w < mat.cols; w++) {
+            for (int c = 0; c < mat.channels(); c++) {
+                float val = mat.at<cv::Vec3f>(h,w)[c];
+                if (std::isnan(val)){
+                    tmp.at<cv::Vec3f>(h,w)[c] = 0.0f;
+                } else {
+                    tmp.at<cv::Vec3f>(h,w)[c] = val;
+                }
+            }
+        }
+    }
+
+    return tmp;
+}
+
+bool compare_matrices (cv::Mat mat1, cv::Mat mat2) {
+    if (mat1.rows != mat2.rows) {
+        std::cout << "Diverso numero di righe" << std::endl;
+        return false;
+    }
+    if (mat1.cols != mat2.cols) {
+        std::cout << "Diverso numero di colonne" << std::endl;
+        return false;
+    }
+    if (mat1.channels() != mat2.channels()) {
+        std::cout << "Diverso numero di canali" << std::endl;
+        return false;
+    }
+
+    for (int h = 0; h < mat1.rows; h++) {
+        for (int w = 0; w < mat1.cols; w++) {
+            for (int c = 0; c < mat1.channels(); c++) {
+                float val1 = mat1.at<cv::Vec3f>(h,w)[c];
+                float val2 = mat2.at<cv::Vec3f>(h,w)[c];
+                if (val2 > val1 + ERROR_RANGE) {
+                    std::cout << "Diverso valore al punto h:" << h << " w:" << w << " c:" << c << std::endl;
+                    std::cout << "Val1:" << val1 << " Val2:" << val2 << std::endl;
+                    return false;
+                }
+                //std::cout << "Val1:" << mat1.at<cv::Vec3f>(h,w)[c] << " Val2:" << mat2.at<cv::Vec3f>(h,w)[c] << std::endl;
+            }
+        }
+    }
+
+    return true;
+}
 
 uint16_t custom_tonemapper(double value) {
     double new_value = 0.5f;
@@ -35,14 +87,14 @@ uint16_t custom_tonemapper(double value) {
 }
 
 cv::Mat tonemap_matrix(cv::Mat original) {
-    cv::Mat tonemapped(original.rows, original.cols, CV_16UC3, cv::Scalar(0));
+    cv::Mat tonemapped(original.rows, original.cols, CV_32SC3, cv::Scalar(0));
 
-    for (int h = 0; h < original.rows; h++) {
-        for (int w = 0; w < original.cols; w++) {
-            //cv::Vec3f point = original.at<cv::Vec3f>(h,w);
+    for (int h = 0; h < tonemapped.rows; h++) {
+        for (int w = 0; w < tonemapped.cols; w++) {
+            cv::Vec3f point = original.at<cv::Vec3f>(h,w);
             //std::cout << point[0] << " " << point[1] << " " << point[2] << std::endl;
-            //tonemapped.at<cv::Vec3i>(h,w) = cv::Vec3i(custom_tonemapper(point[0]),custom_tonemapper(point[1]),custom_tonemapper(point[2]));
-            tonemapped.at<cv::Vec3f>(w,h) = cv::Vec3f(0,0,0);
+            tonemapped.at<cv::Vec3i>(h,w) = cv::Vec3i(custom_tonemapper(point[0]),custom_tonemapper(point[1]),custom_tonemapper(point[2]));
+            //tonemapped.at<cv::Vec3i>(h,w) = cv::Vec3i(0,0,0);
         }
     }
 
@@ -115,22 +167,35 @@ int main (int argc, char **argv) {
         PTL_PointCloudPtr temp_cloud(new pcl::PointCloud<pcl::PointXYZ>);
         pcl::fromPCLPointCloud2(pcl_pc2,*temp_cloud);
 
+        if (0 < (0 + 0.1f)) {
+            std::cout << "Funziona" << std::endl;
+        }
 
         matrice = pcl_to_Mat(temp_cloud);
+        matrice = adjust_raw_matrix(matrice);
         cv::imwrite(RAW_PATH, matrice);
         cv::Mat tonemapped = tonemap_matrix(matrice);
-        //cv::imwrite(PCL_PATH, tonemapped);
+        cv::imwrite(PCL_PATH, tonemapped);
         
+        cv::Mat comparison = cv::imread(RAW_PATH);
+
         /*
+        if (compare_matrices(matrice, comparison)) {
+            std::cout << "Le due matrici CORRISPONDONO" << std::endl;
+        } else {
+            std::cout << "Le due matrici NON CORRISPONDONO" << std::endl;
+        }*/
+
         while (true) {
-            cv::imshow("Window", matrice);
+            cv::imshow("Original", matrice);
+            cv::imshow("From file", comparison);
             int c = cv::waitKey(10);
             if (c == 'k') {   
                 i_pcl++;
                 break;
             }
-        }*/
-
+        }
+        std::cout << "Over" << std::endl;
         i_pcl++;
     };
 
@@ -152,7 +217,7 @@ int main (int argc, char **argv) {
     };
 
     ros::Subscriber pcl_sub = handle.subscribe<sensor_msgs::PointCloud2>("/ur5/zed_node/point_cloud/cloud_registered", RATIO, pointcloud_callback);
-    //ros::Subscriber img_sub = handle.subscribe<sensor_msgs::Image>("/ur5/zed_node/left_raw/image_raw_color", RATIO, image_callback);
+    ros::Subscriber img_sub = handle.subscribe<sensor_msgs::Image>("/ur5/zed_node/left_raw/image_raw_color", RATIO, image_callback);
 
 
     ros::spin();
