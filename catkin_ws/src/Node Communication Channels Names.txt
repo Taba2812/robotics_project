@@ -10,3 +10,6 @@ Detection -> [bool]              -> Zed2      | Camera_Request
 Zed2      -> [PointCloud2]       -> Detection | Camera_Data
 zed2      -> [String]            -> Detection | Image_String 
 Detection -> [Float32MultiArray] -> Core      | Detection_Result [x,y,z]
+Capture   -> [PointCloud2]       -> Detection | Camera_Data
+Capture   -> [RosImage]          -> Detection | Camera_Image
+Detection -> [bool]              -> Capture   | Camera_Request
