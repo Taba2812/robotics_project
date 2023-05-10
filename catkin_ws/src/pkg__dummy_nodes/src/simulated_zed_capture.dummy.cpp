@@ -33,10 +33,19 @@ Manda immagine e pointcloud
 typedef pcl::PointCloud<pcl::PointXYZ> PTL_PointCloud;
 typedef pcl::PointCloud<pcl::PointXYZ>::Ptr PTL_PointCloudPtr;
 
+void print_pointcloud(PTL_PointCloud cloud) {
+    for (int h = 0; h < cloud.height; h++) {
+        for (int w = 0; w < cloud.width; w++) {
+            pcl::PointXYZ point = cloud.at(w,h);
+            std::cout << "h: " << h << " w: " << w << "p: [" << point.x << "," << point.y << "," << point.z << "]" << std::endl;
+        }
+    }
+}
+
 PTL_PointCloud load_raw_matrix_from_txt (std::string path) {
     std::cout << "Loading Matrix..." << std::endl;
     
-    PTL_PointCloud tmp;
+    PTL_PointCloud tmp(IMAGE_WIDTH, IMAGE_HEIGHT, pcl::PointXYZ());
     std::ifstream raw_file(path);
 
     if (!raw_file.is_open()) {
@@ -51,7 +60,7 @@ PTL_PointCloud load_raw_matrix_from_txt (std::string path) {
         raw_file >> x >> y >> z;
 
         //std::cout << x << " " << y << " " << z << std::endl;
-        tmp.at(h,w) = pcl::PointXYZ(x,y,z);
+        tmp.at(w,h)= pcl::PointXYZ(x,y,z);
 
         if (w == IMAGE_WIDTH - 1) {w = 0;h++;} else {w++;}
 
@@ -60,7 +69,7 @@ PTL_PointCloud load_raw_matrix_from_txt (std::string path) {
     }
 
     raw_file.close();
-
+    std::cout << "returning pointcloud" << std::endl;
     return tmp;
 
 }
@@ -74,31 +83,37 @@ int main (int argc, char **argv) {
     ros::Publisher pcl_pub = handle.advertise<sensor_msgs::PointCloud2>("Camera_Data", RATIO);
     ros::Publisher img_pub = handle.advertise<sensor_msgs::Image>("Camera_Image", RATIO);
 
-    auto detection_callback = [&] (std_msgs::BoolConstPtr &result) {
-        if (!(result->data)) {return;}
+    auto detection_callback = [&] (/*std_msgs::BoolConstPtr &result*/) {
+        //if (!(result->data)) {return;}
    
         //Prendere Pointcloud
         PTL_PointCloud pcl = load_raw_matrix_from_txt(RAW_PATH);
+        std::cout << "Point cloud size: " << pcl.size() << std::endl;
+        sensor_msgs::PointCloud2 pcl_msg;
+        pcl::toROSMsg(pcl, pcl_msg);
         
         //Prendere immagine
-        cv::Mat img(cv::imread(IMG_PATH));
-        cv_bridge::CvImagePtr cv_ptr;
+        cv::Mat img;
+        img = cv::imread(IMG_PATH);
+        
+        if (img.empty()) {
+            std::cout << "Failed to open image from file" << std::endl;
+        }
+  
         std_msgs::Header header;
         header.seq = 1;
         header.stamp = ros::Time::now();
-        *cv_ptr = cv_bridge::CvImage(header, sensor_msgs::image_encodings::RGB16, img);
+        cv_bridge::CvImage img_bridge(header, sensor_msgs::image_encodings::RGB16, img);
 
-        sensor_msgs::Image img_msg;
-        img_msg.data = img;
-
-
-        img_pub.publish(cv_ptr->toImageMsg());
-        //pcl_pub.publish(pcl_msg);
+        img_pub.publish(img_bridge.toImageMsg());
+        pcl_pub.publish(pcl_msg);
     };
 
-    ros::Subscriber detection_sub = handle.subscribe<std_msgs::Bool>("Camera_Request", RATIO, detection_callback);
+    //ros::Subscriber detection_sub = handle.subscribe<std_msgs::Bool>("Camera_Request", RATIO, detection_callback);
 
-    ros::spin();
+    //ros::spin();
+
+    detection_callback();
 
     return EXIT_SUCCESS;
 }

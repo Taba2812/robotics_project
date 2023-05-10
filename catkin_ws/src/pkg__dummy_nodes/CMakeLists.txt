@@ -45,5 +45,8 @@ target_link_libraries(SimulatedZed_Dummy ${catkin_LIBRARIES})
 add_executable(SimulatedCapture_Dummy src/simulated_zed_capture.dummy.cpp)
 target_link_libraries(SimulatedCapture_Dummy ${catkin_LIBRARIES})
 
+add_executable(DisplayCamera_Dummy src/display_camera.dummy.cpp)
+target_link_libraries(DisplayCamera_Dummy ${catkin_LIBRARIES})
+
 catkin_install_python(PROGRAMS src/placeholder_camera_data.dummy.py
   DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION})
