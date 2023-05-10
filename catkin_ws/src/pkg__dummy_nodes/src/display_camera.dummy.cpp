@@ -2,6 +2,7 @@
 #include "std_msgs/Bool.h"
 #include "sensor_msgs/Image.h"
 #include "sensor_msgs/PointCloud2.h"
+#include "cv_bridge/cv_bridge.h"
 
 #include <pcl-1.10/pcl/point_cloud.h>
 #include <pcl-1.10/pcl/point_types.h>
@@ -85,6 +86,7 @@ int main (int argc, char **argv) {
 
         cv::Mat matrice = pcl_to_Mat(temp_cloud);
 
+        /*
         while (true) {
             cv::imshow("Recieved", matrice);
             int c = cv::waitKey(10);
@@ -92,11 +94,33 @@ int main (int argc, char **argv) {
                 break;
             }
         }        
+        */
 
         std::cout << "Over" << std::endl;
     };
 
     auto image_callback = [&] (const sensor_msgs::ImageConstPtr &result) {
+        
+        
+        cv_bridge::CvImagePtr ImgPtr;
+        
+        try {
+            //std::cout << img.height << "|" << img.width << "|" << img.step << "|" << img.data.size() << "|" << img.encoding << std::endl;
+            //std::cout << img.header.frame_id << "|" << img.header.seq << "|" << img.header.stamp << std::endl;
+            ImgPtr = cv_bridge::toCvCopy(result, sensor_msgs::image_encodings::BGR8);
+        } catch (cv_bridge::Exception& e) {
+            ROS_ERROR("cv_bridge exception: %s", e.what());
+            return;
+        }
+
+        
+        while (true) {
+            cv::imshow("Recieved", ImgPtr->image);
+            int c = cv::waitKey(10);
+            if (c == 'k') {   
+                break;
+            }
+        }        
         
     };
 

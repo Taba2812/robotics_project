@@ -101,9 +101,10 @@ int main (int argc, char **argv) {
         }
   
         std_msgs::Header header;
+        header.frame_id = 1;
         header.seq = 1;
         header.stamp = ros::Time::now();
-        cv_bridge::CvImage img_bridge(header, sensor_msgs::image_encodings::RGB16, img);
+        cv_bridge::CvImage img_bridge(header, sensor_msgs::image_encodings::BGR8, img);
 
         img_pub.publish(img_bridge.toImageMsg());
         pcl_pub.publish(pcl_msg);
