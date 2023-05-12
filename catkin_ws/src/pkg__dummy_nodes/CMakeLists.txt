@@ -12,7 +12,6 @@ find_package(catkin REQUIRED COMPONENTS
   pcl_msgs
   pcl_conversions
   pcl_ros
-  rn_handler
 )
 
 add_subdirectory(src/libraries)
@@ -48,9 +47,6 @@ target_link_libraries(SimulatedCapture_Dummy ${catkin_LIBRARIES})
 
 add_executable(DisplayCamera_Dummy src/display_camera.dummy.cpp)
 target_link_libraries(DisplayCamera_Dummy ${catkin_LIBRARIES})
-
-add_executable(Test_Dummy src/test_node.dummy.cpp)
-target_link_libraries(Test_Dummy ${catkin_LIBRARIES})
 
 catkin_install_python(PROGRAMS src/placeholder_camera_data.dummy.py
   DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION})

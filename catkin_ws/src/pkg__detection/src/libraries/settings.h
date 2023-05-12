@@ -14,6 +14,10 @@ namespace setting {
     #define EROSION_SIZE 2
     #define DILATION_SIZE 5
 
+    #define RATIO 1000
+    #define IMAGE_WIDTH 1920
+    #define IMAGE_HEIGHT 1080
+
     //IMGAGE RECOGNITION SETTINGS
     #define X1_Y1_Z2            0
     #define X1_Y2_Z1            0
