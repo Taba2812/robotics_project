@@ -37,7 +37,8 @@ int main (int argc, char **argv) {
     ros::Publisher main_pub = nh.advertise<std_msgs::Float32MultiArray>(MAIN_CH_SEND, Q_SIZE);
 
     auto detection = [&] () {
-        std::cout << "Running Detection..." << std::endl;
+        std::cout << "[Detection] Running Detection..." << std::endl;
+        std::cout << "[Detection] " << std::getenv("test_variable") << std::endl;
         //return Detection::Detect(pcl_mat, img_mat);
         return cv::Vec3f(7,8,9);
     };
