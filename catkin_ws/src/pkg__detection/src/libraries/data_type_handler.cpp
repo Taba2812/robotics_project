@@ -25,17 +25,20 @@ cv::Mat DataTypeHandler::PointCloud2Mat(const sensor_msgs::PointCloud2ConstPtr &
             i++;
         }
     }
+
+    return pcm;
 }
 
 sensor_msgs::PointCloud2 DataTypeHandler::File2PointCloud(std::string path) {
     std::cout << "Loading Matrix..." << std::endl;
     
     PTL_PointCloud tmp(IMAGE_WIDTH, IMAGE_HEIGHT, pcl::PointXYZ());
+    sensor_msgs::PointCloud2 pcl_msg;
     std::ifstream raw_file(path);
 
     if (!raw_file.is_open()) {
         std::cout << "Error in opening file" << std::endl;
-        return;
+        return pcl_msg;
     }
 
     std::string line; int h = 0, w = 0;
@@ -53,7 +56,6 @@ sensor_msgs::PointCloud2 DataTypeHandler::File2PointCloud(std::string path) {
     std::cout << "Closing File" << std::endl;
     
     std::cout << "Point cloud size: " << tmp.size() << std::endl;
-    sensor_msgs::PointCloud2 pcl_msg;
     pcl::toROSMsg(tmp, pcl_msg);
 
     return pcl_msg;
@@ -66,7 +68,7 @@ cv::Mat DataTypeHandler::Image2Mat(const sensor_msgs::ImageConstPtr &image) {
         ImgPtr = cv_bridge::toCvCopy(image, sensor_msgs::image_encodings::BGR8);
     } catch (cv_bridge::Exception& e) {
         ROS_ERROR("cv_bridge exception: %s", e.what());
-        return;
+        return ImgPtr->image;
     }
 
     return ImgPtr->image;

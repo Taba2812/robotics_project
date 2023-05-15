@@ -83,9 +83,10 @@ int main (int argc, char **argv) {
     ros::Publisher pcl_pub = handle.advertise<sensor_msgs::PointCloud2>("Camera_Data", RATIO);
     ros::Publisher img_pub = handle.advertise<sensor_msgs::Image>("Camera_Image", RATIO);
 
-    auto detection_callback = [&] (/*std_msgs::BoolConstPtr &result*/) {
+    auto detection_callback = [&] (const std_msgs::BoolConstPtr &result) {
         //if (!(result->data)) {return;}
-   
+        std::cout << "[Zed2][Dummy] Recieved Request for Data" << std::endl; 
+
         //Prendere Pointcloud
         PTL_PointCloud pcl = load_raw_matrix_from_txt(RAW_PATH);
         std::cout << "Point cloud size: " << pcl.size() << std::endl;
@@ -106,15 +107,14 @@ int main (int argc, char **argv) {
         header.stamp = ros::Time::now();
         cv_bridge::CvImage img_bridge(header, sensor_msgs::image_encodings::BGR8, img);
 
+        std::cout << "[Zed2][Dummy] Sending new Data to Detection" << std::endl; 
         img_pub.publish(img_bridge.toImageMsg());
         pcl_pub.publish(pcl_msg);
     };
 
-    //ros::Subscriber detection_sub = handle.subscribe<std_msgs::Bool>("Camera_Request", RATIO, detection_callback);
+    ros::Subscriber detection_sub = handle.subscribe<std_msgs::Bool>("Camera_Request", RATIO, detection_callback);
 
-    //ros::spin();
-
-    detection_callback();
+    ros::spin();
 
     return EXIT_SUCCESS;
 }

@@ -28,9 +28,20 @@ link_directories(
   ${PCL_LIBRARY_DIRS}
 )
 
-add_executable(Detector_Node src/block_detection_rosrun.cpp)
-target_link_libraries(Detector_Node ${catkin_LIBRARIES} detection location_handler temp_file_handler_2 recognition pipeline setting display_utility)
-install(TARGETS Detector_Node
+set( OWN_LIB_SOURCES
+  detection
+  location_handler
+  recognition
+  pipeline
+  setting
+  display_utility
+  data_type_handler
+)
+
+add_executable(Detection_Node src/detection.node.cpp)
+target_link_libraries(Detection_Node ${catkin_LIBRARIES} ${OWN_LIB_SOURCES})
+
+install(TARGETS Detection_Node
   ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
   LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
   RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
