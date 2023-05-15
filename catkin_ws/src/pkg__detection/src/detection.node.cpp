@@ -13,14 +13,13 @@
 #include "libraries/data_type_handler.h"
 #include "libraries/detection.h"
 
-#define IMAGE_WIDTH 1920
-#define IMAGE_HEIGHT 1080
 #define Q_SIZE 1000
 
-#define CAMERA_CH_SEND "Camera_Bool"
-#define CAMERA_CH_RCVE "Camera_Pcl"
-#define MAIN_CH_SEND "Main_MultiArray"
-#define MAIN_CH_RCVE "Main_Bool"
+#define CAMERA_CH_SEND     "Camera_Reuest"
+#define POINTCLOUD_CH_RCVE "Camera_Data"
+#define IMAGE_CH_RCVE      "Camera_Image"
+#define MAIN_CH_SEND       "Detection_Result"
+#define MAIN_CH_RCVE       "Detection_Request"
 
 int main (int argc, char **argv) {
 
@@ -97,8 +96,8 @@ int main (int argc, char **argv) {
         camera_pub.publish(reply);
     };
 
-    ros::Subscriber pcl_sub = nh.subscribe<sensor_msgs::PointCloud2>(CAMERA_CH_RCVE, Q_SIZE, pcl_callback);
-    ros::Subscriber img_sub = nh.subscribe<sensor_msgs::PointCloud2>(CAMERA_CH_RCVE, Q_SIZE, img_callback);
+    ros::Subscriber pcl_sub = nh.subscribe<sensor_msgs::PointCloud2>(POINTCLOUD_CH_RCVE, Q_SIZE, pcl_callback);
+    ros::Subscriber img_sub = nh.subscribe<sensor_msgs::Image>(IMAGE_CH_RCVE, Q_SIZE, img_callback);
     ros::Subscriber rec_sub = nh.subscribe<std_msgs::Bool>(MAIN_CH_RCVE, Q_SIZE, request_callback);
 
     ros::spin();

@@ -33,18 +33,15 @@ set( OWN_LIB_SOURCES
   location_handler
   recognition
   pipeline
-  settings
+  setting
   display_utility
   data_type_handler
 )
 
-add_executable(Detector_Node src/block_detection_rosrun.cpp)
-target_link_libraries(Detector_Node ${catkin_LIBRARIES} detection location_handler temp_file_handler_2 recognition pipeline setting display_utility)
-
 add_executable(Detection_Node src/detection.node.cpp)
 target_link_libraries(Detection_Node ${catkin_LIBRARIES} ${OWN_LIB_SOURCES})
 
-install(TARGETS Detector_Node
+install(TARGETS Detection_Node
   ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
   LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
   RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
