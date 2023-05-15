@@ -8,6 +8,8 @@
 #include <opencv2/imgproc.hpp>
 #include <opencv2/highgui.hpp>
 
+#include <iostream>
+
 #include "libraries/data_type_handler.h"
 #include "libraries/detection.h"
 
@@ -36,13 +38,18 @@ int main (int argc, char **argv) {
     ros::Publisher main_pub = nh.advertise<std_msgs::Float64MultiArray>(MAIN_CH_SEND, Q_SIZE);
 
     auto detection = [&] () {
+        std::cout << "Running Detection..." << std::endl;
         return Detection::Detect(pcl_mat, img_mat);
     };
     
     auto pcl_callback = [&] (const sensor_msgs::PointCloud2ConstPtr &point_cloud) {
+        std::cout << "Recieved Point Cloud..." << std::endl;
+        
         pcl_mat = DataTypeHandler::PointCloud2Mat(point_cloud);
         pcl_available = true;
         
+        std::cout << "PCL Detection Condition: " << (pcl_available && img_available) << std::endl;
+
         if (pcl_available && img_available) {
             cv::Vec3f result = detection();
             
@@ -56,8 +63,12 @@ int main (int argc, char **argv) {
     };
     
     auto img_callback = [&] (const sensor_msgs::ImageConstPtr &image) {
+        std::cout << "Recieved Image..." << std::endl;
+
         img_mat = DataTypeHandler::Image2Mat(image);
         img_available = true;
+
+        std::cout << "IMG Detection Condition: " << (pcl_available && img_available) << std::endl;
 
         if (pcl_available && img_available) {
             cv::Vec3f result = detection();
