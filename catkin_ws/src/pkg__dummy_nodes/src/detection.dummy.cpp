@@ -19,6 +19,7 @@ int main (int argc, char **argv) {
     std::cout << "Press any key ";
     std::cin.get();
 
+    std::cout << "[Core][Dummy] Sending Detection Request" << std::endl;
     std_msgs::Bool reply;
     reply.data = true;
     pub.publish(reply);

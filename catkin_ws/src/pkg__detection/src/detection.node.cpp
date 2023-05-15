@@ -1,6 +1,6 @@
 #include "ros/ros.h"
 #include "std_msgs/Bool.h"
-#include "std_msgs/Float64MultiArray.h"
+#include "std_msgs/Float32MultiArray.h"
 #include "sensor_msgs/PointCloud2.h"
 #include "sensor_msgs/Image.h"
 
@@ -15,7 +15,7 @@
 
 #define Q_SIZE 1000
 
-#define CAMERA_CH_SEND     "Camera_Reuest"
+#define CAMERA_CH_SEND     "Camera_Request"
 #define POINTCLOUD_CH_RCVE "Camera_Data"
 #define IMAGE_CH_RCVE      "Camera_Image"
 #define MAIN_CH_SEND       "Detection_Result"
@@ -23,7 +23,7 @@
 
 int main (int argc, char **argv) {
 
-    ros::init(argc, argv, "Detector_Node");
+    ros::init(argc, argv, "Detection_Node");
 
     bool pcl_available = false;
     cv::Mat pcl_mat (IMAGE_HEIGHT, IMAGE_WIDTH, CV_32FC3, cv::Scalar(0));
@@ -34,11 +34,12 @@ int main (int argc, char **argv) {
     ros::NodeHandle nh;
 
     ros::Publisher camera_pub = nh.advertise<std_msgs::Bool>(CAMERA_CH_SEND, Q_SIZE);
-    ros::Publisher main_pub = nh.advertise<std_msgs::Float64MultiArray>(MAIN_CH_SEND, Q_SIZE);
+    ros::Publisher main_pub = nh.advertise<std_msgs::Float32MultiArray>(MAIN_CH_SEND, Q_SIZE);
 
     auto detection = [&] () {
         std::cout << "Running Detection..." << std::endl;
-        return Detection::Detect(pcl_mat, img_mat);
+        //return Detection::Detect(pcl_mat, img_mat);
+        return cv::Vec3f(7,8,9);
     };
     
     auto pcl_callback = [&] (const sensor_msgs::PointCloud2ConstPtr &point_cloud) {
@@ -52,10 +53,8 @@ int main (int argc, char **argv) {
         if (pcl_available && img_available) {
             cv::Vec3f result = detection();
             
-            std_msgs::Float64MultiArray payload;
-            payload.data[0] = result[0];
-            payload.data[1] = result[1];
-            payload.data[2] = result[2];
+            std_msgs::Float32MultiArray payload;
+            payload.data = {result[0], result[1], result[2]};
         
             main_pub.publish(payload);
         }
@@ -72,16 +71,15 @@ int main (int argc, char **argv) {
         if (pcl_available && img_available) {
             cv::Vec3f result = detection();
             
-            std_msgs::Float64MultiArray payload;
-            payload.data[0] = result[0];
-            payload.data[1] = result[1];
-            payload.data[2] = result[2];
+            std_msgs::Float32MultiArray payload;
+            payload.data = {result[0], result[1], result[2]};
         
             main_pub.publish(payload);
         }
     };
 
     auto request_callback = [&] (const std_msgs::BoolConstPtr &request) {
+        std::cout << "[Detection] Detection Request Recieved" << std::endl;
         if (!(request->data)) {return;}
 
         //Reset local data
@@ -91,6 +89,7 @@ int main (int argc, char **argv) {
         img_mat = cv::Mat(IMAGE_HEIGHT, IMAGE_WIDTH,  CV_8UC3, cv::Scalar(0));
 
         //Send request for new data
+        std::cout << "[Detection] Requesting new Camera Data" << std::endl; 
         std_msgs::Bool reply;
         reply.data = true;
         camera_pub.publish(reply);
