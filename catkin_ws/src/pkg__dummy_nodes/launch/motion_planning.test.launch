@@ -1,0 +1,13 @@
+<launch>
+
+    <include file="src/launch/global.launch" />
+    <include file="$(find pkg__motion_planning)/launch/motion_planning.launch" />
+
+    <param name="X" value="6" />
+    <param name="Y" value="6" />
+    <param name="Z" value="6" />
+    <param name="STEP" value="20" />
+
+    <node pkg="pkg__dummy_nodes" type="MotionPlanning_Dummy" name="MotionPlanning_Dummy" output="screen" />
+
+</launch>

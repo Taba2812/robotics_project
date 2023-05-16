@@ -14,7 +14,7 @@ include_directories(
 
 add_subdirectory(src/libraries)
 
-add_executable(MotionPlanning_Node src/motion_planning_node.cpp)
+add_executable(MotionPlanning_Node src/motion_planning.node.cpp)
 target_link_libraries(MotionPlanning_Node ${catkin_LIBRARIES} bezier_curve motion_planning)
 
 add_executable(MotionPlanning_Test src/motion_planning.test.cpp)

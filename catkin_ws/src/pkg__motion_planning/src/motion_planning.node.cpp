@@ -6,8 +6,6 @@
 #define RATIO 1000
 
 int main (int argc, char **argv) {
-    
-    std::cout << "starting program" << std::endl;
 
     Bezier::Curve curve;
 
@@ -16,7 +14,15 @@ int main (int argc, char **argv) {
 
     ros::NodeHandle handle;
 
-    ros::Publisher data_publisher = handle.advertise<std_msgs::Float32MultiArray>("Motion_Planning_Progress", RATIO);
+    //Setup Params
+    std::string pub_data, sub_data, sub_prog;
+    int queue;
+    handle.getParam("MP2Core_Data", pub_data);
+    handle.getParam("Core2MP_Data", sub_data);
+    handle.getParam("Core2MP_Req", sub_prog);
+    handle.getParam("Q_Size", queue);
+
+    ros::Publisher data_publisher = handle.advertise<std_msgs::Float32MultiArray>(pub_data, queue);
 
 
     auto next_callback = [&] (const std_msgs::BoolConstPtr &next) {
@@ -45,8 +51,8 @@ int main (int argc, char **argv) {
         }
     };
 
-    ros::Subscriber data_subscriber = handle.subscribe<std_msgs::Float32MultiArray>("Motion_Planning_Data", RATIO, motion_planning_callback);
-    ros::Subscriber progress_subscriber = handle.subscribe<std_msgs::Bool>("Motion_Planning_Request", RATIO, next_callback);
+    ros::Subscriber data_subscriber = handle.subscribe<std_msgs::Float32MultiArray>(sub_data, queue, motion_planning_callback);
+    ros::Subscriber progress_subscriber = handle.subscribe<std_msgs::Bool>(sub_prog, queue, next_callback);
 
     std::cout << "Starting Spin" << std::endl;
 

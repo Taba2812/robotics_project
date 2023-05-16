@@ -1,0 +1,7 @@
+<launch>
+
+    <include file="src/launch/global.launch" />
+
+    <node pkg="pkg__motion_planning" type="MotionPlanning_Node" name="MotionPlanning_Node" output="screen" />
+
+</launch>
