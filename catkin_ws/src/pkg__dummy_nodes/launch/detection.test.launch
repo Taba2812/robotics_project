@@ -3,6 +3,9 @@
     <include file="src/launch/global.launch" />
     <include file="$(find pkg__detection)/launch/detection.launch" />
 
+    <param name="IMG_PATH" value="/home/dawwo/Documents/Repositories/robotics_project/catkin_ws/src/images_database/complete_data_examples/SimulatedZed2_img.png" />
+    <param name="RAW_PATH" value="/home/dawwo/Documents/Repositories/robotics_project/catkin_ws/src/images_database/complete_data_examples/SimulatedZed2_raw.txt" />
+
     <node pkg="pkg__dummy_nodes" type="Core-Detection_Dummy" name="Detection_Dummy" output="screen" /> 
     <node pkg="pkg__dummy_nodes" type="SimulatedCapture_Dummy" name="SimulatedCapture_Dummy" output="screen" />
 

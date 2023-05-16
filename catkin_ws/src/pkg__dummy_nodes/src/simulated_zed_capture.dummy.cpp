@@ -18,17 +18,8 @@
 #include <pcl-1.10/pcl/PCLPointCloud2.h>
 #include <pcl_conversions/pcl_conversions.h>
 
-/*
-Riceve bool da detection
-Manda immagine e pointcloud
-*/
-
-#define RATIO 1000
 #define IMAGE_WIDTH 1920
 #define IMAGE_HEIGHT 1080
-#define ERROR_RANGE 0.1f
-#define IMG_PATH "/home/dawwo/Documents/Repositories/robotics_project/catkin_ws/src/images_database/complete_data_examples/SimulatedZed2_img.png"
-#define RAW_PATH "/home/dawwo/Documents/Repositories/robotics_project/catkin_ws/src/images_database/complete_data_examples/SimulatedZed2_raw.txt"
 
 typedef pcl::PointCloud<pcl::PointXYZ> PTL_PointCloud;
 typedef pcl::PointCloud<pcl::PointXYZ>::Ptr PTL_PointCloudPtr;
@@ -37,39 +28,31 @@ void print_pointcloud(PTL_PointCloud cloud) {
     for (int h = 0; h < cloud.height; h++) {
         for (int w = 0; w < cloud.width; w++) {
             pcl::PointXYZ point = cloud.at(w,h);
-            std::cout << "h: " << h << " w: " << w << "p: [" << point.x << "," << point.y << "," << point.z << "]" << std::endl;
         }
     }
 }
 
 PTL_PointCloud load_raw_matrix_from_txt (std::string path) {
-    std::cout << "Loading Matrix..." << std::endl;
     
     PTL_PointCloud tmp(IMAGE_WIDTH, IMAGE_HEIGHT, pcl::PointXYZ());
     std::ifstream raw_file(path);
 
     if (!raw_file.is_open()) {
-        std::cout << "Error in opening file" << std::endl;
         return tmp;
     }
 
     std::string line; int h = 0, w = 0;
     float x,y,z;
-    std::cout << "Starting Parsing..." << std::endl;
     while (std::getline(raw_file, line)) {
         raw_file >> x >> y >> z;
 
-        //std::cout << x << " " << y << " " << z << std::endl;
         tmp.at(w,h)= pcl::PointXYZ(x,y,z);
 
         if (w == IMAGE_WIDTH - 1) {w = 0;h++;} else {w++;}
-
-        //std::cout << "h: " << h << " w: " << w << std::endl;
         
     }
 
     raw_file.close();
-    std::cout << "returning pointcloud" << std::endl;
     return tmp;
 
 }
@@ -80,8 +63,19 @@ int main (int argc, char **argv) {
 
     ros::NodeHandle handle;
 
-    ros::Publisher pcl_pub = handle.advertise<sensor_msgs::PointCloud2>("Camera_Data", RATIO);
-    ros::Publisher img_pub = handle.advertise<sensor_msgs::Image>("Camera_Image", RATIO);
+    //setup params
+    std::string pub_pcl, pub_img, sub_req;
+    std::string IMG_PATH, RAW_PATH;
+    int queue;
+    handle.getParam("Zed2Det_Data", pub_pcl);
+    handle.getParam("Zed2Det_Img", pub_img);
+    handle.getParam("Det2Zed_Req", sub_req);
+    handle.getParam("IMG_PATH", IMG_PATH);
+    handle.getParam("RAW_PATH", RAW_PATH);
+    handle.getParam("Q_Size", queue);
+
+    ros::Publisher pcl_pub = handle.advertise<sensor_msgs::PointCloud2>(pub_pcl, queue);
+    ros::Publisher img_pub = handle.advertise<sensor_msgs::Image>(pub_img, queue);
 
     auto detection_callback = [&] (const std_msgs::BoolConstPtr &result) {
         //if (!(result->data)) {return;}
@@ -89,7 +83,6 @@ int main (int argc, char **argv) {
 
         //Prendere Pointcloud
         PTL_PointCloud pcl = load_raw_matrix_from_txt(RAW_PATH);
-        std::cout << "Point cloud size: " << pcl.size() << std::endl;
         sensor_msgs::PointCloud2 pcl_msg;
         pcl::toROSMsg(pcl, pcl_msg);
         
@@ -98,7 +91,7 @@ int main (int argc, char **argv) {
         img = cv::imread(IMG_PATH);
         
         if (img.empty()) {
-            std::cout << "Failed to open image from file" << std::endl;
+            std::cout << "[Zed2][Dummy] Failed to open image from file" << std::endl;
         }
   
         std_msgs::Header header;
@@ -112,7 +105,7 @@ int main (int argc, char **argv) {
         pcl_pub.publish(pcl_msg);
     };
 
-    ros::Subscriber detection_sub = handle.subscribe<std_msgs::Bool>("Camera_Request", RATIO, detection_callback);
+    ros::Subscriber detection_sub = handle.subscribe<std_msgs::Bool>(sub_req, queue, detection_callback);
 
     ros::spin();
 
