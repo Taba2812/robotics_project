@@ -7,6 +7,9 @@
         <param name="IMAGE_WIDTH" value="1920" />
 
     <!-- ROS NODE NAMES -->
+        <!--QUEUE SIZE-->
+        <param name="Q_Size" value="1000" />
+
         <!--MOTION PLANNING-->
         <param name="Core2MP_Req"  value="MotionPlanning_Request" />  <!--bool-->
         <param name="Core2MP_Data" value="MotionPlanning_Data" />     <!--Float32MultiArray-->
@@ -23,6 +26,6 @@
         <param name="Docker_Data"  value="/ur5/zed_node/point_cloud/cloud_registered" /> <!--PointCloud2-->
         <param name="Docker_Image" value="/ur5/zed_node/left_raw/image_raw_color" />     <!--Image-->
 
-        <param name="test_variable" value="this is an environment variable" /> 
+
 
 </launch>      
