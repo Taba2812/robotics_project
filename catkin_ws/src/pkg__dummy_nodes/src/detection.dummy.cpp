@@ -8,6 +8,8 @@ int main (int argc, char **argv) {
     ros::init(argc, argv, "Detection_Dummy");
 
     ros::NodeHandle handle;
+
+    
     ros::Publisher pub = handle.advertise<std_msgs::Bool>("Detection_Request", RATIO);
 
     auto detection_callback = [&] (const std_msgs::Float32MultiArrayConstPtr &result) {
