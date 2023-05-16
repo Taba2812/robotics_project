@@ -3,7 +3,7 @@
     <include file="src/launch/global.launch" />
     <include file="$(find pkg__detection)/launch/detection.launch" />
 
-    <node pkg="pkg__dummy_nodes" type="Detection_Dummy" name="Detection_Dummy" output="screen" /> 
+    <node pkg="pkg__dummy_nodes" type="Core-Detection_Dummy" name="Detection_Dummy" output="screen" /> 
     <node pkg="pkg__dummy_nodes" type="SimulatedCapture_Dummy" name="SimulatedCapture_Dummy" output="screen" />
 
 </launch>

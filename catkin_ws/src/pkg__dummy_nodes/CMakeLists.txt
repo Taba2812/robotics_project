@@ -36,8 +36,8 @@ link_directories(
 add_executable(MotionPlanning_Dummy src/motion_planning.dummy.cpp)
 target_link_libraries(MotionPlanning_Dummy ${catkin_LIBRARIES})
 
-add_executable(Detection_Dummy src/detection.dummy.cpp)
-target_link_libraries(Detection_Dummy ${catkin_LIBRARIES})
+add_executable(Core-Detection_Dummy src/detection.dummy.cpp)
+target_link_libraries(Core-Detection_Dummy ${catkin_LIBRARIES})
 
 add_executable(SimulatedZed_Dummy src/simulated_zed_data.dummy.cpp)
 target_link_libraries(SimulatedZed_Dummy ${catkin_LIBRARIES})
