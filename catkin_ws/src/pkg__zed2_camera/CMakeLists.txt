@@ -17,6 +17,9 @@ include_directories(
   ${catkin_INCLUDE_DIRS}
 )
 
+add_executable(Docker_Proxy src/docker_proxy.node.cpp)
+target_link_libraries(Docker_Proxy ${catkin_LIBRARIES})
+
 #catkin_install_python(PROGRAMS src/camera_rosrun.py
 #  DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
 #)

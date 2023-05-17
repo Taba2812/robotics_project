@@ -1,0 +1,7 @@
+<launch>
+
+    <include file="src/launch/global.launch" />
+
+    <node pkg="pkg__zed2_camera" type="" name="" output="screen" />
+
+</launch>
