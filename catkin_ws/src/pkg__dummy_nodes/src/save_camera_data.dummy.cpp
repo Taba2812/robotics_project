@@ -22,11 +22,11 @@
 typedef pcl::PointCloud<pcl::PointXYZ> PTL_PointCloud;
 typedef pcl::PointCloud<pcl::PointXYZ>::Ptr PTL_PointCloudPtr;
 
-void save_raw_matrix_to_txt (cv::Mat mat) {
+void save_raw_matrix_to_txt (cv::Mat mat, std::string path) {
     std::cout << "Saving Matrix..." << std::endl;
 
     std::ofstream raw_file;
-    raw_file.open(RAW_PATH);
+    raw_file.open(path);
 
     for (int h = 0; h < mat.rows; h++) {
         for (int w = 0; w < mat.cols; w++) {
@@ -45,7 +45,7 @@ cv::Mat load_raw_matrix_from_txt (std::string path) {
     std::cout << "Loading Matrix..." << std::endl;
     
     cv::Mat tmp(IMAGE_HEIGHT, IMAGE_WIDTH, CV_32FC3, cv::Scalar(0));
-    std::ifstream raw_file(RAW_PATH);
+    std::ifstream raw_file(path);
 
     if (!raw_file.is_open()) {
         std::cout << "Error in opening file" << std::endl;
@@ -202,7 +202,7 @@ int main (int argc, char **argv) {
         matrice = pcl_to_Mat(temp_cloud);
         matrice = adjust_raw_matrix(matrice);
 
-        save_raw_matrix_to_txt(matrice);
+        save_raw_matrix_to_txt(matrice, RAW_PATH);
 
         std::cout << "Over" << std::endl;
         i_pcl++;
