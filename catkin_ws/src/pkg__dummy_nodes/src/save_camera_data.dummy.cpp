@@ -19,10 +19,6 @@
 #define IMAGE_WIDTH 1920
 #define IMAGE_HEIGHT 1080
 #define ERROR_RANGE 0.1f
-#define IMG_PATH "/home/dawwo/Documents/Repositories/robotics_project/catkin_ws/src/images_database/complete_data_examples/SimulatedZed2_img.png"
-#define RAW_PATH "/home/dawwo/Documents/Repositories/robotics_project/catkin_ws/src/images_database/complete_data_examples/SimulatedZed2_raw.txt"
-#define PCL_PATH "/home/dawwo/Documents/Repositories/robotics_project/catkin_ws/src/images_database/complete_data_examples/SimulatedZed2_pcl.png"
-
 typedef pcl::PointCloud<pcl::PointXYZ> PTL_PointCloud;
 typedef pcl::PointCloud<pcl::PointXYZ>::Ptr PTL_PointCloudPtr;
 
@@ -61,18 +57,11 @@ cv::Mat load_raw_matrix_from_txt (std::string path) {
     std::cout << "Starting Parsing..." << std::endl;
     while (std::getline(raw_file, line)) {
         raw_file >> x >> y >> z;
-
-        //std::cout << x << " " << y << " " << z << std::endl;
         tmp.at<cv::Vec3f>(h,w) = cv::Vec3f(x,y,z);
-
-        if (w == IMAGE_WIDTH - 1) {w = 0;h++;} else {w++;}
-
-        //std::cout << "h: " << h << " w: " << w << std::endl;
-        
+        if (w == IMAGE_WIDTH - 1) {w = 0;h++;} else {w++;}     
     }
 
     raw_file.close();
-
     return tmp;
 
 }
@@ -120,11 +109,9 @@ bool compare_matrices (cv::Mat mat1, cv::Mat mat2) {
                     std::cout << "Val1:" << val1 << " Val2:" << val2 << std::endl;
                     return false;
                 }
-                //std::cout << "Val1:" << mat1.at<cv::Vec3f>(h,w)[c] << " Val2:" << mat2.at<cv::Vec3f>(h,w)[c] << std::endl;
             }
         }
     }
-
     return true;
 }
 
@@ -146,9 +133,7 @@ cv::Mat tonemap_matrix(cv::Mat original) {
     for (int h = 0; h < tonemapped.rows; h++) {
         for (int w = 0; w < tonemapped.cols; w++) {
             cv::Vec3f point = original.at<cv::Vec3f>(h,w);
-            //std::cout << point[0] << " " << point[1] << " " << point[2] << std::endl;
             tonemapped.at<cv::Vec3i>(h,w) = cv::Vec3i(custom_tonemapper(point[0]),custom_tonemapper(point[1]),custom_tonemapper(point[2]));
-            //tonemapped.at<cv::Vec3i>(h,w) = cv::Vec3i(0,0,0);
         }
     }
 
@@ -156,36 +141,16 @@ cv::Mat tonemap_matrix(cv::Mat original) {
 }
 
 cv::Mat pcl_to_Mat(const PTL_PointCloudPtr point_cloud) {
-    //cv::Mat pcm(IMAGE_HEIGHT, IMAGE_WIDTH, CV_32FC4, cv::Scalar(0));
     cv::Mat pcm(IMAGE_HEIGHT, IMAGE_WIDTH, CV_32FC3, cv::Scalar(0));
 
-    /*
-    for (int h = 0; h < IMAGE_HEIGHT; h++) {
-        for (int w = 0; w < IMAGE_WIDTH; w++) {
-            pcl::PointXYZ pcl_point = point_cloud->points[h + w];
-            float distance = sqrt(pow(pcl_point.x,2) + pow(pcl_point.y,2) + pow(pcl_point.z,2));
-            cv::Vec4f point(pcl_point.x, pcl_point.y, pcl_point.z, distance);
-            //std::cout << "h: " << h << " w: " << 2 << " Vx: " << point[0] << " Vy: " << point[1] << " Vz: " << point[2] << " Vd: " << point[3] << std::endl;
-            pcm.at<cv::Vec4f>(h,w) = point;
-        }
-    }
-    */
     int i = 0;
     int valid_counter = 0;
     std::cout << "width:" << IMAGE_WIDTH << " height: " << IMAGE_HEIGHT << std::endl;
     for (int h = 0; h < IMAGE_HEIGHT; h++) {
         for (int w = 0; w < IMAGE_WIDTH; w++) {
             pcl::PointXYZ pcl_point = point_cloud->points[i];
-            //float distance = sqrt(pow(pcl_point.x,2) + pow(pcl_point.y,2) + pow(pcl_point.z,2));
             cv::Vec3f point(pcl_point.x, pcl_point.y, pcl_point.z);
-            //std::cout << "h: " << h << " w: " << 2 << " Vx: " << point[0] << " Vy: " << point[1] << " Vz: " << point[2] << " Vd: " << point[3] << std::endl;
-            
-            /*
-            if (!std::isnan(point[0])) {
-                std::cout << "i: " << valid_counter << " h: " << h << " w: " << w << " x: " << point[0] << std::endl;
-                valid_counter++;
-            }
-            */
+
             pcm.at<cv::Vec3f>(h,w) = point;
             i++;
         }
@@ -204,9 +169,18 @@ void print_matrix (cv::Mat matrice) {
 }
 
 int main (int argc, char **argv) {
-    ros::init(argc, argv, "SimulatedZed_Dummy");
+    ros::init(argc, argv, "CapturePlaceholders_Dummy");
 
     ros::NodeHandle handle;
+
+    //Setup Params
+    std::string in_pcl, in_img, IMG_PATH, RAW_PATH;
+    int queue;
+    handle.getParam("Docker_Data", in_pcl);
+    handle.getParam("Docker_Image", in_img);
+    handle.getParam("IMG_PATH", IMG_PATH);
+    handle.getParam("RAW_PATH", RAW_PATH);
+    handle.getParam("Q_Size", queue);
 
     cv::Mat matrice(IMAGE_HEIGHT, IMAGE_WIDTH, CV_32FC3, cv::Scalar(0));
 
@@ -229,29 +203,6 @@ int main (int argc, char **argv) {
         matrice = adjust_raw_matrix(matrice);
 
         save_raw_matrix_to_txt(matrice);
-        //cv::imwrite(RAW_PATH, matrice);
-        //cv::Mat tonemapped = tonemap_matrix(matrice);
-        //cv::imwrite(PCL_PATH, tonemapped);
-        
-        cv::Mat comparison = load_raw_matrix_from_txt(RAW_PATH);
-
-        /*
-        if (compare_matrices(matrice, comparison)) {
-            std::cout << "Le due matrici CORRISPONDONO" << std::endl;
-        } else {
-            std::cout << "Le due matrici NON CORRISPONDONO" << std::endl;
-        }*/
-
-        
-        while (true) {
-            cv::imshow("Original", matrice);
-            cv::imshow("From file", comparison);
-            int c = cv::waitKey(10);
-            if (c == 'k') {   
-                i_pcl++;
-                break;
-            }
-        }
 
         std::cout << "Over" << std::endl;
         i_pcl++;
@@ -274,8 +225,8 @@ int main (int argc, char **argv) {
         i_img++;
     };
 
-    ros::Subscriber pcl_sub = handle.subscribe<sensor_msgs::PointCloud2>("/ur5/zed_node/point_cloud/cloud_registered", RATIO, pointcloud_callback);
-    ros::Subscriber img_sub = handle.subscribe<sensor_msgs::Image>("/ur5/zed_node/left_raw/image_raw_color", RATIO, image_callback);
+    ros::Subscriber pcl_sub = handle.subscribe<sensor_msgs::PointCloud2>(in_pcl, queue, pointcloud_callback);
+    ros::Subscriber img_sub = handle.subscribe<sensor_msgs::Image>(in_img, queue, image_callback);
 
 
     ros::spin();

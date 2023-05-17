@@ -2,6 +2,6 @@
 
     <include file="src/launch/global.launch" />
 
-    <node pkg="pkg__zed2_camera" type="" name="" output="screen" />
+    <node pkg="pkg__zed2_camera" type="Docker_Proxy" name="Docker_Proxy" output="screen" />
 
 </launch>
