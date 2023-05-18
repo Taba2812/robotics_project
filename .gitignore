@@ -11,4 +11,4 @@ catkin_ws/.catkin_tools/profiles/*
 
 /catkin_ws/src/output_renders/*
 
-/locosim/*
+locosim
