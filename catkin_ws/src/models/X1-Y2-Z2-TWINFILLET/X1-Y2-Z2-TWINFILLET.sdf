@@ -1,0 +1,13 @@
+<sdf version="1.6">
+  <model name="X1-Y2-Z2-TWINFILLET">
+    <link name="link122T">
+      <visual name="visual">
+        <geometry>
+          <mesh>
+            <uri>X1-Y2-Z2-TWINFILLET.dae</uri>
+          </mesh>
+        </geometry>
+      </visual>
+    </link>
+  </model>
+</sdf>

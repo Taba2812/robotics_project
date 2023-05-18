@@ -1,0 +1,13 @@
+<sdf version="1.6">
+  <model name="X2-Y2-Z2">
+    <link name="link222">
+      <visual name="visual">
+        <geometry>
+          <mesh>
+            <uri>X2-Y2-Z2.dae</uri>
+          </mesh>
+        </geometry>
+      </visual>
+    </link>
+  </model>
+</sdf>
