@@ -1,0 +1,23 @@
+<?xml version="1.0" ?>
+<sdf version="1.5">
+  <model name="X1-Y1-Z2">
+    <link name="link112">
+      <visual name="visual">
+        <geometry>
+          <mesh>
+            <uri>model://X1-Y1-Z2/meshes/X1-Y1-Z2.dae</uri>
+            <!--il formato è model:://NOME_CARTELLA/meshes/NOME_DAE-->
+          </mesh>
+        </geometry>
+        <material>
+          <!--QUESTI SONO I COLORI CHE PUO AVERE-->
+          <ambient>0 0 1 1</ambient>
+          <diffuse>0 0 0 1</diffuse>
+          <specular>1 1 1 1</specular>
+          <emissive>0 0 1 0.2</emissive>
+        </material>
+      </visual>
+    </link>
+    <static>true</static>
+  </model>
+</sdf>
