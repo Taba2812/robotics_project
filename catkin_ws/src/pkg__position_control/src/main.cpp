@@ -59,6 +59,7 @@ int main(int argc, char **argv){
 
     int motionCounter = 0;
     auto getMotion = [&] (const std_msgs::Float32MultiArrayConstPtr &next_position) {
+        motionCounter++;
 
         if (next_position->data == d.getDestination().data) {
             std::cout << "[Core] Destination reached sending RESET signal" << std::endl;
