@@ -47,3 +47,6 @@ target_link_libraries(SimulatedCapture_Dummy ${catkin_LIBRARIES})
 
 add_executable(DisplayCamera_Dummy src/display_camera.dummy.cpp)
 target_link_libraries(DisplayCamera_Dummy ${catkin_LIBRARIES})
+
+add_executable(Detection-Core_Dummy src/core_detection.dummy.cpp)
+target_link_libraries(Detection-Core_Dummy ${catkin_LIBRARIES})
