@@ -23,22 +23,15 @@ int main (int argc, char **argv) {
     ros::Publisher pub = handle.advertise<std_msgs::Float32MultiArray>(det_res, queue);
 
     auto detection_callback = [&] (const std_msgs::BoolConstPtr &result) {
-        std::cout <<  "[Detection][Dummy] Sending Detection Position" << std::endl;
+        std::cout <<  "[Detection][Dummy] Recieved Request for Detection" << std::endl;
 
         std_msgs::Float32MultiArray payload;
         payload.data = {x, y, z};
+        std::cout <<  "[Detection][Dummy] Sending Detection Position" << std::endl;
         pub.publish(payload);
     };
 
     ros::Subscriber sub = handle.subscribe<std_msgs::Bool>(det_req, queue, detection_callback);
-
-    std::cout << "[Detection][Dummy] Press any key to send a detection request: ";
-    std::cin.get();
-
-    std::cout << "[Detection][Dummy] Sending Detection Request" << std::endl;
-    std_msgs::Bool reply;
-    reply.data = true;
-    pub.publish(reply);
 
     ros::spin();
 }
