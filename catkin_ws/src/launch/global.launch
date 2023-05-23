@@ -23,9 +23,10 @@
         <param name="Zed2Det_Img"  value="Camera_Image" />      <!--Image-->
 
         <!--DOCKER MITM-->
-        <param name="Docker_Data"  value="/ur5/zed_node/point_cloud/cloud_registered" /> <!--PointCloud2-->
-        <param name="Docker_Image" value="/ur5/zed_node/left_raw/image_raw_color" />     <!--Image-->
-
+        <param name="Docker_Data"  value="/ur5/zed_node/point_cloud/cloud_registered" />  <!--PointCloud2-->
+        <param name="Docker_Image" value="/ur5/zed_node/left_raw/image_raw_color" />      <!--Image-->
+        <param name="Docker_Joint_In" value="/ur5/joint_states" />                        <!--JointState-->
+        <param name="Docker_Joint_Out" value="/ur5/joint_group_pos_controller/command" /> <!--Float64MultiArray-->
 
 
 </launch>      

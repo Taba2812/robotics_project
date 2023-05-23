@@ -26,11 +26,18 @@ int main(int argc, char **argv){
     ros::NodeHandle nh;
     ros::Rate loopRate(LOOP_RATE);
 
+    //setup ros params
+    std::string joint_docker_in, joint_docker_out, detection_req, detection_res;
+    nh.getParam("Docker_Joint_In", joint_docker_in);
+    nh.getParam("Docker_Joint_Out", joint_docker_out);
+    nh.getParam("Core2Det_Req", detection_req);
+    nh.getParam("Det2Core_Res", detection_res);
+
     //publishers and subscribers
-    ros::Publisher jointPub = nh.advertise<std_msgs::Float64MultiArray>("/ur5/joint_group_pos_controller/command", QUEUE_SIZE);
-    ros::Publisher visionPub = nh.advertise<std_msgs::Bool>("Main_Bool", QUEUE_SIZE);
-    ros::Subscriber jointSub = nh.subscribe("/ur5/joint_states", QUEUE_SIZE, getJoint);
-    ros::Subscriber visionSub = nh.subscribe("Main_MultiArray", QUEUE_SIZE, getPosition);
+    ros::Publisher jointPub = nh.advertise<std_msgs::Float64MultiArray>(joint_docker_out, QUEUE_SIZE);
+    ros::Publisher visionPub = nh.advertise<std_msgs::Bool>(detection_req, QUEUE_SIZE);
+    ros::Subscriber jointSub = nh.subscribe(joint_docker_in, QUEUE_SIZE, getJoint);
+    ros::Subscriber visionSub = nh.subscribe(detection_res, QUEUE_SIZE, getPosition);
 
     //environment components
     EndEffector ee;
@@ -138,5 +145,3 @@ int main(int argc, char **argv){
 
     return 0;
 }
-
-//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

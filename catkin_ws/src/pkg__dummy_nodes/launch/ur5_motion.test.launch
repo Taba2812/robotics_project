@@ -1,0 +1,9 @@
+<launch>
+
+    <include file="src/launch/global.launch" />
+    <include file="$(find pkg__position_control)/launch/ur5main.launch" />
+    <include file="$(find pkg__motion_planning)/launch/motion_planning.launch" />
+
+    <node pkg="pkg__dummy_nodes" type="" name="" />
+
+</launch>

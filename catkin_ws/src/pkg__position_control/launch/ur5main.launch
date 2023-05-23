@@ -1,0 +1,7 @@
+<launch>
+
+    <include file="src/launch/global.launch" />
+
+    <node pkg="pkg__position_control" type="ur5Main" name="ur5Main" output="screen" />
+
+</launch>
