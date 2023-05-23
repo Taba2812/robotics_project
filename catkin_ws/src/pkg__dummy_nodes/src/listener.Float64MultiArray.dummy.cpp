@@ -11,7 +11,7 @@ int main(int argc, char** argv)
 
     //Setup Params
     std::string topic_name;
-    nh.getParam("Topic", topic_name);
+    nh.getParam("Float64MultiArray_Listener/Topic", topic_name);
 
     auto messageCallback = [&] (const std_msgs::Float64MultiArrayConstPtr &msg) {
         std::cout << "[Listener][Float64MultiArray] Message of type Float64MultiArray sent in topic: " << topic_name.c_str() << std::endl;

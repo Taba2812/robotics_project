@@ -11,7 +11,7 @@ int main(int argc, char** argv)
 
     //Setup Params
     std::string topic_name;
-    nh.getParam("Topic", topic_name);
+    nh.getParam("JointState_Listener/Topic", topic_name);
 
     auto messageCallback = [&] (const sensor_msgs::JointStateConstPtr &msg) {
         std::cout << "[Listener][JointState] Message of type JointState sent in topic: " << topic_name.c_str() << std::endl;

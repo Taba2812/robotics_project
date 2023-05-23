@@ -1,5 +1,6 @@
 #include "headers/direct_kinematics.h"
 #include "headers/inverse_kinematics.h"
+#include "std_msgs/Float32MultiArray.h"
 
 void getJoint(const sensor_msgs::JointState::ConstPtr& js){
     for(int i=0; i<JOINTS; i++){
@@ -11,7 +12,7 @@ void getJoint(const sensor_msgs::JointState::ConstPtr& js){
     }
 }
 
-void getPosition(const std_msgs::Float64MultiArray::ConstPtr& xyz){
+void getPosition(const std_msgs::Float32MultiArray::ConstPtr& xyz){
     bp(0) = xyz->data[0];
     bp(1) = xyz->data[1];
     bp(2) = xyz->data[2];
@@ -52,10 +53,10 @@ int main(int argc, char **argv){
     ros::Publisher jointPub = nh.advertise<std_msgs::Float64MultiArray>(joint_docker_out, QUEUE_SIZE);
     ros::Publisher visionPub = nh.advertise<std_msgs::Bool>(detection_req, QUEUE_SIZE);
     ros::Publisher motionPub = nh.advertise<std_msgs::Bool>(motion_req, QUEUE_SIZE);
-    ros::Publisher dataPub = nh.advertise<std_msgs::Float64MultiArray>(motion_data, QUEUE_SIZE);
+    ros::Publisher dataPub = nh.advertise<std_msgs::Float32MultiArray>(motion_data, QUEUE_SIZE);
 
     ros::Subscriber jointSub = nh.subscribe<sensor_msgs::JointState>(joint_docker_in, QUEUE_SIZE, getJoint);
-    ros::Subscriber visionSub = nh.subscribe<std_msgs::Float64MultiArray>(detection_res, QUEUE_SIZE, getPosition);
+    ros::Subscriber visionSub = nh.subscribe<std_msgs::Float32MultiArray>(detection_res, QUEUE_SIZE, getPosition);
 
     int motionCounter = 0;
     auto getMotion = [&] (const std_msgs::Float32MultiArrayConstPtr &next_position) {
