@@ -2,6 +2,7 @@
 #define __INVERSE_KINEMATICS_H__
 
 #include "direct_kinematics.h"
+#include "std_msgs/Float32MultiArray.h"
 
 class Destination{
 private:
@@ -12,7 +13,9 @@ public:
     Destination(const BlockPosition& pos);
     Eigen::Vector3d getPosition() const;
     JointConfiguration getJointAngles() const;
+    std_msgs::Float32MultiArray getMessage() const;
     void computeInverse(const EndEffector& ee);
+    std_msgs::Float32MultiArray getDestination();
     std_msgs::Float64MultiArray getMessage();
     void setPosition(Eigen::Vector3d p);
 };
@@ -187,6 +190,15 @@ void Destination::computeInverse(const EndEffector& ee){
     th4[7] = atan2(T43(1,0), T43(0,0));
 
     this->jc << th1[0], th2[0], th3[0], th4[0], th5[0], th6[0];
+}
+
+std_msgs::Float32MultiArray Destination::getDestination(){
+    std_msgs::Float32MultiArray destination;
+    destination.data[0] = this->getPosition()[0];
+    destination.data[1] = this->getPosition()[1];
+    destination.data[2] = this->getPosition()[2];
+
+    return destination;
 }
 
 std_msgs::Float64MultiArray Destination::getMessage(){

@@ -2,6 +2,7 @@
 
     <include file="src/launch/global.launch" />
 
+    <param name="Steps" value="100" />
     <node pkg="pkg__position_control" type="ur5Main" name="ur5Main" output="screen" />
 
 </launch>

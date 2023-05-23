@@ -1,7 +1,5 @@
 #include "headers/direct_kinematics.h"
 #include "headers/inverse_kinematics.h"
-//#include "state_machine/process.h"
-//#include "state_machine/concrete_states.h"
 
 void getJoint(const sensor_msgs::JointState::ConstPtr& js){
     for(int i=0; i<JOINTS; i++){
@@ -26,19 +24,6 @@ int main(int argc, char **argv){
     ros::NodeHandle nh;
     ros::Rate loopRate(LOOP_RATE);
 
-    //setup ros params
-    std::string joint_docker_in, joint_docker_out, detection_req, detection_res;
-    nh.getParam("Docker_Joint_In", joint_docker_in);
-    nh.getParam("Docker_Joint_Out", joint_docker_out);
-    nh.getParam("Core2Det_Req", detection_req);
-    nh.getParam("Det2Core_Res", detection_res);
-
-    //publishers and subscribers
-    ros::Publisher jointPub = nh.advertise<std_msgs::Float64MultiArray>(joint_docker_out, QUEUE_SIZE);
-    ros::Publisher visionPub = nh.advertise<std_msgs::Bool>(detection_req, QUEUE_SIZE);
-    ros::Subscriber jointSub = nh.subscribe(joint_docker_in, QUEUE_SIZE, getJoint);
-    ros::Subscriber visionSub = nh.subscribe(detection_res, QUEUE_SIZE, getPosition);
-
     //environment components
     EndEffector ee;
     Destination d, home;
@@ -50,6 +35,45 @@ int main(int argc, char **argv){
     processStatus.data = false;
     bool gripper = false;
 
+    //setup ros params
+    int noSteps;
+    std::string joint_docker_in, joint_docker_out, detection_req, detection_res, motion_req, motion_data, motion_res;
+    
+    nh.getParam("Docker_Joint_In", joint_docker_in);
+    nh.getParam("Docker_Joint_Out", joint_docker_out);
+    nh.getParam("Core2Det_Req", detection_req);
+    nh.getParam("Det2Core_Res", detection_res);
+    nh.getParam("Core2MP_Req", motion_req);
+    nh.getParam("Core2MP_Data", motion_data);
+    nh.getParam("MP2Core_Data", motion_res);
+    nh.getParam("Steps", noSteps);
+
+    //publishers and subscribers
+    ros::Publisher jointPub = nh.advertise<std_msgs::Float64MultiArray>(joint_docker_out, QUEUE_SIZE);
+    ros::Publisher visionPub = nh.advertise<std_msgs::Bool>(detection_req, QUEUE_SIZE);
+    ros::Publisher motionPub = nh.advertise<std_msgs::Bool>(motion_req, QUEUE_SIZE);
+    ros::Publisher dataPub = nh.advertise<std_msgs::Float64MultiArray>(motion_data, QUEUE_SIZE);
+
+    ros::Subscriber jointSub = nh.subscribe<sensor_msgs::JointState>(joint_docker_in, QUEUE_SIZE, getJoint);
+    ros::Subscriber visionSub = nh.subscribe<std_msgs::Float64MultiArray>(detection_res, QUEUE_SIZE, getPosition);
+
+    int motionCounter = 0;
+    auto getMotion = [&] (const std_msgs::Float32MultiArrayConstPtr &next_position) {
+        motionCounter++;
+
+        if (next_position->data == d.getDestination().data) {
+            std::cout << "[Core] Destination reached sending RESET signal" << std::endl;
+            std_msgs::Float32MultiArray reset;
+            reset.data = {0,0,0,0};
+            dataPub.publish(reset);
+        } else {
+            std_msgs::Bool next;
+            next.data = true;
+            motionPub.publish(next);
+        }
+    };
+
+    ros::Subscriber motionSub = nh.subscribe<std_msgs::Float32MultiArray>(motion_res, QUEUE_SIZE, getMotion);
 
     //make sure we have received proper joint angles already
     for(int i=0; i<2; i++){
@@ -93,15 +117,15 @@ int main(int argc, char **argv){
                 d.computeInverse(ee);
                 currentState = MOTION;
                 msgMotion.data = true;
-                //publish on motion topic
+                motionPub.publish(msgMotion);
             break;
 
             case MOTION:
                 std::cout << "\n[MOTION] path planning\n";
-                //update with proper topic
                 while(1){
                     usleep(WAITING_TIME);
                 }
+                if(motionCounter <= noSteps) currentState = MOTION;
                 if(!gripper) currentState = TO_BLOCK;
                 else currentState = TO_FINAL;
             break;
