@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <package format="2">
-  <name>project_package</name>
+  <name>pkg__position_control</name>
   <version>0.0.0</version>
   <description>Project Package</description>
 

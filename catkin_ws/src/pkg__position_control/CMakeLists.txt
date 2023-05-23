@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 2.8.3)
-project(project_package)
+project(pkg__position_control)
 
 ## Find catkin and any catkin packages
 find_package(catkin REQUIRED COMPONENTS roscpp std_msgs sensor_msgs)

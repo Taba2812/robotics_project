@@ -1,5 +1,0 @@
-pkg__dummy_nodes
-/home/taba/trento_lab_home/ros_ws/src/catkin_ws/devel/.private/pkg__dummy_nodes/cmake.lock /home/taba/trento_lab_home/ros_ws/src/catkin_ws/devel/./cmake.lock
-/home/taba/trento_lab_home/ros_ws/src/catkin_ws/devel/.private/pkg__dummy_nodes/share/pkg__dummy_nodes/cmake/pkg__dummy_nodesConfig-version.cmake /home/taba/trento_lab_home/ros_ws/src/catkin_ws/devel/share/pkg__dummy_nodes/cmake/pkg__dummy_nodesConfig-version.cmake
-/home/taba/trento_lab_home/ros_ws/src/catkin_ws/devel/.private/pkg__dummy_nodes/share/pkg__dummy_nodes/cmake/pkg__dummy_nodesConfig.cmake /home/taba/trento_lab_home/ros_ws/src/catkin_ws/devel/share/pkg__dummy_nodes/cmake/pkg__dummy_nodesConfig.cmake
-/home/taba/trento_lab_home/ros_ws/src/catkin_ws/devel/.private/pkg__dummy_nodes/lib/pkgconfig/pkg__dummy_nodes.pc /home/taba/trento_lab_home/ros_ws/src/catkin_ws/devel/lib/pkgconfig/pkg__dummy_nodes.pc

@@ -9,5 +9,11 @@
     <param name="Z" value="6" />
 
     <node pkg="pkg__dummy_nodes" type="Detection-Core_Dummy" name="Detection-Core_Dummy" />
+    <node pkg="pkg__dummy_nodes" type="JointState_Listener" name="JointState_Listener">
+        <param name="Topic" value="/ur5/joint_states" />
+    </node>
+    <node pkg="pkg__dummy_nodes" type="Float64MultiArray_Listener" name="Float64MultiArray_Listener">
+        <param name="Topic" value="/ur5/joint_group_pos_controller/command" />
+    </node>
 
 </launch>
