@@ -13,6 +13,7 @@ void getJoint(const sensor_msgs::JointState::ConstPtr& js){
 }
 
 void getPosition(const std_msgs::Float32MultiArray::ConstPtr& xyz){
+    std::cout << "[Position] recieved Detection results data" << std::endl;
     bp(0) = xyz->data[0];
     bp(1) = xyz->data[1];
     bp(2) = xyz->data[2];
@@ -102,6 +103,7 @@ int main(int argc, char **argv){
 
             case VISION:
                 std::cout << "\n[VISION] object recognition\n";
+                /*Probably should add a ros::spinOnce() here*/
                 while(!processStatus.data) usleep(WAITING_TIME);
                 currentState = POSITION;
             break;
