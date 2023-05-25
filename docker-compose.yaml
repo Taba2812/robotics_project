@@ -1,0 +1,7 @@
+services:
+  app:
+    build: .
+    container_name: ur5-project
+    command: cd catkin_ws
+    volumes:
+      - .:/code
