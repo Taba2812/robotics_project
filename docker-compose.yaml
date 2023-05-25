@@ -2,6 +2,6 @@ services:
   app:
     build: .
     container_name: ur5-project
-    command: cd catkin_ws
+    tty: true
     volumes:
-      - .:/code
+      - .:/root/code
