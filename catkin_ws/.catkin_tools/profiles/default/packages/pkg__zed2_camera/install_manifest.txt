@@ -1,0 +1,13 @@
+/root/code/catkin_ws/install/_setup_util.py
+/root/code/catkin_ws/install/env.sh
+/root/code/catkin_ws/install/setup.bash
+/root/code/catkin_ws/install/local_setup.bash
+/root/code/catkin_ws/install/setup.sh
+/root/code/catkin_ws/install/local_setup.sh
+/root/code/catkin_ws/install/setup.zsh
+/root/code/catkin_ws/install/local_setup.zsh
+/root/code/catkin_ws/install/.rosinstall
+/root/code/catkin_ws/install/lib/pkgconfig/pkg__zed2_camera.pc
+/root/code/catkin_ws/install/share/pkg__zed2_camera/cmake/pkg__zed2_cameraConfig.cmake
+/root/code/catkin_ws/install/share/pkg__zed2_camera/cmake/pkg__zed2_cameraConfig-version.cmake
+/root/code/catkin_ws/install/share/pkg__zed2_camera/package.xml
