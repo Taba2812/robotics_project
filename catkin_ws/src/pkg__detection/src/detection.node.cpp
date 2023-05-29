@@ -63,7 +63,7 @@ int main (int argc, char **argv) {
     };
     
     auto img_callback = [&] (const sensor_msgs::ImageConstPtr &image) {
-        std::cout << "[Detection] Recieved Image..." << std::endl;
+        std::cout << "[Detection] Received Image..." << std::endl;
 
         img_mat = DataTypeHandler::Image2Mat(image);
         img_available = true;

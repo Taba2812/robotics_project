@@ -23,7 +23,7 @@ int main (int argc, char **argv) {
     ros::Publisher pub = handle.advertise<std_msgs::Float32MultiArray>(det_res, queue);
 
     auto detection_callback = [&] (const std_msgs::BoolConstPtr &result) {
-        std::cout <<  "[Detection][Dummy] Recieved Request for Detection" << std::endl;
+        std::cout <<  "[Detection][Dummy] Received Request for Detection" << std::endl;
 
         std_msgs::Float32MultiArray payload;
         payload.data = {x, y, z};
