@@ -3,6 +3,8 @@
 #include "std_msgs/Float32MultiArray.h"
 
 int main(int argc, char **argv){
+    sleep(1);
+
     //initialize node
     ros::init(argc, argv, "ur5Main");
     ros::NodeHandle nh;
@@ -17,7 +19,8 @@ int main(int argc, char **argv){
     std_msgs::Bool msgJS;
 
     //default values
-    processStatus.data = false;
+    bool jointStatus = false;
+    bool positionStatus = false;
     bool gripper = false;
 
     //setup ros params
@@ -40,10 +43,10 @@ int main(int argc, char **argv){
     //publishers
     //ros::Publisher jointPub = nh.advertise<std_msgs::Float64MultiArray>(joint_docker_out, QUEUE_SIZE);
     ros::Publisher jointPub = nh.advertise<sensor_msgs::JointState>(js_new, queue_size);
-    ros::Publisher requestPub = nh.advertise<std_msgs::Bool>(js_req, queue_size);
     ros::Publisher visionPub = nh.advertise<std_msgs::Bool>(detection_req, queue_size);
     ros::Publisher motionPub = nh.advertise<std_msgs::Bool>(motion_req, queue_size);
     ros::Publisher dataPub = nh.advertise<std_msgs::Float32MultiArray>(motion_data, queue_size);
+    ros::Publisher requestPub = nh.advertise<std_msgs::Bool>(js_req, queue_size);
 
     //lambda callbacks
 
@@ -52,7 +55,7 @@ int main(int argc, char **argv){
         motionCounter++;
 
         if (next_position->data == d.getDestination().data) {
-            std::cout << "[Core] Destination reached sending RESET signal" << std::endl;
+            std::cout << "\n[Core] Destination reached sending RESET signal\n";
             std_msgs::Float32MultiArray reset;
             reset.data = {0,0,0,0};
             dataPub.publish(reset);
@@ -64,7 +67,7 @@ int main(int argc, char **argv){
     };
 
     auto getJoint = [&] (const sensor_msgs::JointState::ConstPtr &js) {
-        std::cout << "[Core] received joint states" << std::endl;
+        std::cout << "\n[Core] received joint states\n";
 
         for(int i=0; i<JOINTS; i++){
             for(int j=0; j<JOINTS; j++){
@@ -73,15 +76,18 @@ int main(int argc, char **argv){
                 }
             }
         }
+
+        jointStatus = true;
     };
 
     auto getPosition = [&] (const std_msgs::Float32MultiArray::ConstPtr &xyz) {
-        std::cout << "[Core] received Detection results data" << std::endl;
+        std::cout << "\n[Core] received Detection results data\n";
 
         bp(0) = xyz->data[0];
         bp(1) = xyz->data[1];
         bp(2) = xyz->data[2];
-        processStatus.data = true;
+
+        positionStatus = true;
     };
 
     //subscribers
@@ -90,26 +96,10 @@ int main(int argc, char **argv){
     ros::Subscriber jointSub = nh.subscribe<sensor_msgs::JointState>(js_data, queue_size, getJoint);
     ros::Subscriber visionSub = nh.subscribe<std_msgs::Float32MultiArray>(detection_res, queue_size, getPosition);
 
-    std::cout << "[Core] requesting joint states\n";
-    msgJS.data = true;
-    requestPub.publish(msgJS);
-
-    ros::spinOnce();
-
-    // //make sure we have received proper joint angles already
-    // for(int i=0; i<2; i++){
-    //     ros::spinOnce();
-    //     loopRate.sleep();
-    // }
-
     //get default position
     ee.computeDirect(q);
     for(int i=0; i<3; i++){
         home.setPosition(ee.getPosition());
-    }
-
-    for(int i=0; i<JOINTS; i++){
-        std::cout << "[J" << i << "] " << q(i);
     }
 
     int currentState = WAITING;
@@ -117,45 +107,62 @@ int main(int argc, char **argv){
     while(ros::ok()){
         switch(currentState){
             case WAITING:
-                std::cout << "\n[Waiting] press any key to advance\n";
+                std::cout << "\n[Waiting] press any key to advance: ";
                 std::cin.get();
+
+                currentState = JS;
+            break;
+
+            case JS:
+                std::cout << "\n[JointStates] retrieving joint states\n";
+
+                msgJS.data = true;
+                requestPub.publish(msgJS);
+
+                while(!jointStatus) ros::spinOnce();
+                
                 currentState = VISION;
                 msgVision.data = true;
                 visionPub.publish(msgVision);
             break;
 
             case VISION:
-                std::cout << "[Vision] waiting for detection\n";
-                ros::spinOnce();
-                while(!processStatus.data) usleep(WAITING_TIME);
+                std::cout << "\n[Vision] Waiting for detection\n";
+
+                while(!positionStatus) ros::spinOnce();
                 currentState = POSITION;
             break;
 
             case POSITION:
-                std::cout << "\n[Position]";
+                std::cout << "\n[Position] Evaluating the destination\n";
                 if(!gripper){
-                    std::cout << " home to block\n";
+                    std::cout << "\n[Position] Going from home to block\n";
                     d.setPosition(bp);
+
                 } else {
-                    std::cout << " block to destination\n";
+                    std::cout << "[Position] Going from block to destination\n";
                     d.setPosition(fd);
                 }
                 d.computeInverse(ee);
+
+                if(d.isWithinJointLimits(d.getJointAngles())) std::cout << "\n[Position] Destination reachable!\n";
+                else std::cout << "\n[Error] Destination not reachable!\n";
+
                 currentState = MOTION;
                 msgMotion.data = true;
                 motionPub.publish(msgMotion);
             break;
 
             case MOTION:
-                std::cout << "\n[Motion] path planning\n";
-                while(!processStatus.data) usleep(WAITING_TIME);
+                std::cout << "\n[Motion] computing path planning\n";
+                while(!processStatus) usleep(WAITING_TIME);
                 if(motionCounter <= noSteps) currentState = MOTION;
                 if(!gripper) currentState = TO_BLOCK;
                 else currentState = TO_FINAL;
             break;
 
             case TO_BLOCK:
-                std::cout << "\n[To_Block] moving to detected block\n";
+                std::cout << "\n[ToBlock] Moving to detected block\n";
                 for(int i=0; i<POINTS; i++){
                     jointPub.publish(d.getMessage());
                 }
@@ -165,7 +172,7 @@ int main(int argc, char **argv){
             break;
 
             case TO_FINAL:
-                std::cout << "\n[To_Final] moving to final destination\n";
+                std::cout << "\n[ToFinal] Moving to final destination\n";
                 for(int i=0; i<POINTS; i++){
                     jointPub.publish(d.getMessage());
                 }
@@ -178,7 +185,7 @@ int main(int argc, char **argv){
                 std::cout << "\n[Homing] going home\n";
                 msgMotion.data = true;
                 //publish topic
-                while(!processStatus.data) usleep(WAITING_TIME);
+                while(!processStatus) usleep(WAITING_TIME);
                 for(int i=0; i<POINTS; i++){
                     jointPub.publish(home.getMessage());
                 }

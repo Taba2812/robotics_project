@@ -5,6 +5,7 @@
 
 #include <cmath>
 #include <eigen3/Eigen/Dense>
+#include <eigen3/Eigen/Geometry>
 #include <iostream>
 #include <vector>
 #include "geometry_msgs/Pose.h"
@@ -13,12 +14,27 @@
 #include "std_msgs/Bool.h"
 #include "std_msgs/Float64MultiArray.h"
 
-#define A2 0.425
-#define A3 0.39225
+//geometry constants
 #define D1 0.089159
+#define A2 -0.425
+#define A3 -0.39225
 #define D4 0.10915
 #define D5 0.09465
 #define D6 0.0823
+
+//joint limits for the UR5 arm
+static constexpr double joint1_min = -2.9671;
+static constexpr double joint1_max = 2.9671;
+static constexpr double joint2_min = -1.8326;
+static constexpr double joint2_max = -0.1;
+static constexpr double joint3_min = -2.617;
+static constexpr double joint3_max = -0.1;
+static constexpr double joint4_min = -3.1416;
+static constexpr double joint4_max = 0.1;
+static constexpr double joint5_min = -2.094;
+static constexpr double joint5_max = 2.094;
+static constexpr double joint6_min = -6.2832;
+static constexpr double joint6_max = 6.2832;
 
 #define JOINTS 6
 #define LOOP_RATE 100
@@ -27,12 +43,13 @@
 #define WAITING_TIME 500000
 
 #define WAITING  0
-#define VISION   1
-#define POSITION 2
-#define MOTION   3
-#define TO_BLOCK 4
-#define TO_FINAL 5
-#define HOMING   6
+#define JS       1
+#define VISION   2
+#define POSITION 3
+#define MOTION   4
+#define TO_BLOCK 5
+#define TO_FINAL 6
+#define HOMING   7
 
 #define _USE_MATH_DEFINES
 
@@ -45,13 +62,10 @@ typedef Eigen::Matrix<double, 4, 1> Vector4d;
 const double d[JOINTS] = {D1, 0, 0, D4, D5, D6};                  //distance between axes
 const double cn[JOINTS] = {0, -A2, -A3, 0, 0, 0};                 //common normal
 const double alpha[JOINTS] = {M_PI_2, 0, 0, M_PI_2, -M_PI_2, 0};  //angles
-static std_msgs::Bool processStatus;
+static bool processStatus;
 
 const ros::V_string jointNames = {"elbow_joint", "shoulder_lift_joint", "shoulder_pan_joint", "wrist_1_joint", "wrist_2_joint", "wrist_3_joint"};
 static BlockPosition bp = BlockPosition::Zero();
 static JointConfiguration q;
-
-void getJoint(const sensor_msgs::JointState::ConstPtr& js);
-void getPosition(const std_msgs::Float64MultiArray::ConstPtr& xyz);
 
 #endif

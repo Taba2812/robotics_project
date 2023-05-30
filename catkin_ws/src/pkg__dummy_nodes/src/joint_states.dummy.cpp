@@ -1,12 +1,18 @@
-#include <ros/ros.h>
-#include <sensor_msgs/JointState.h>
-#include <std_msgs/Bool.h>
+#include "ros/ros.h"
+#include "sensor_msgs/JointState.h"
+#include "std_msgs/Bool.h"
+
+#define JOINTS 6
+#define LOOP_RATE 100
 
 int main(int argc, char** argv) {
   ros::init(argc, argv, "JointStates_Dummy");
   ros::NodeHandle nh;
+  ros::Rate loopRate(LOOP_RATE);
 
-  bool sendJS = false;
+  sensor_msgs::JointState jointStateMsg;
+  jointStateMsg.name = {"elbow_joint", "shoulder_lift_joint", "shoulder_pan_joint", "wrist_1_joint", "wrist_2_joint", "wrist_3_joint"};
+  jointStateMsg.position = {0.0, 0.5, 1.0, 1.5, 2.0, 2.5};
 
   std::string js_data, js_new, js_req;
   int queue_size;
@@ -18,32 +24,22 @@ int main(int argc, char** argv) {
   ros::Publisher jointStatePub = nh.advertise<sensor_msgs::JointState>(js_data, queue_size);
 
   auto jointStateCallback = [&] (const sensor_msgs::JointState::ConstPtr &msg) {
-    std::cout << "[JointStates] received new values\n";
+    std::cout << "\n[JointStates] received new values\n";
+
+    for(int i=0; i<JOINTS; i++){
+      jointStateMsg.position[i] = msg->position[i];
+    }
   };
 
   auto requestCallback = [&] (const std_msgs::Bool::ConstPtr &req) {
-    std::cout << "[JointStates] request received\n";
-    sendJS = true;
+    std::cout << "\n[JointStates] received request from [Core]\n";
+    jointStatePub.publish(jointStateMsg);
   };
 
   ros::Subscriber jointStateSub = nh.subscribe<sensor_msgs::JointState>(js_new, queue_size, jointStateCallback);
-  ros::Subscriber requestSub = nh.subscribe<std_msgs::Bool>(js_req, queue_size, requestCallback);
+  ros::Subscriber requestSub = nh.subscribe<std_msgs::Bool>(js_req, 1, requestCallback);
 
-  sensor_msgs::JointState jointStateMsg;
-
-  jointStateMsg.name = {"elbow_joint", "shoulder_lift_joint", "shoulder_pan_joint", "wrist_1_joint", "wrist_2_joint", "wrist_3_joint"};
-  jointStateMsg.position = {0.0, 0.5, 1.0, 1.5, 2.0, 2.5};
-
-  while (ros::ok()) {
-
-    ros::spinOnce();
-
-    if(sendJS) {
-      jointStatePub.publish(jointStateMsg);
-      sendJS = false;
-    }
-
-  }
+  ros::spin();
 
   return 0;
 }
