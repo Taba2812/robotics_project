@@ -11,8 +11,8 @@
         </geometry>
         <material>
           <script>
-            <uri>file://media/materials/scripts/gazebo.material</uri>
-            <name>Gazebo/Blue</name>
+            <uri>model://shared/materials/scripts/block.material</uri>
+            <name>Plastic/Blue</name>
           </script>
         </material>
       </visual>
