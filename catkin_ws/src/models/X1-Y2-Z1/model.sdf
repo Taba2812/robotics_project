@@ -12,7 +12,7 @@
         <material>
           <script>
             <uri>model://shared/materials/scripts/block.material</uri>
-            <name>Plastic/Blue</name>
+            <name>Plastic/Yellow</name>
           </script>
         </material>
       </visual>

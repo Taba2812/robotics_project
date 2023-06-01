@@ -1,30 +1,64 @@
 material Plastic/Blue
 {
-   technique
-   {
-      pass
-      {
-        lighting on
-
-        ambient .3 .3 .3  1.0
-        diffuse .7 .7 .7  1.0
-        specular 0.01 0.01 0.01 1.000000 1.500000
-      }
-   }
+  technique
+  {
+    pass ambient
+    {
+      ambient 0.29 0.35 0.64
+      diffuse 0.29 0.35 0.64
+      specular 0.1 0.1 0.1 1 1
+    }
+  }
 }
 
-material Plastic/Textured
+material Plastic/Orange
 {
-    technique
+  technique
+  {
+    pass ambient
     {
-        pass
-        {
-            lighting on
-            texture_unit
-            {
-                texture plastic_texture.png
-                scale 0.5 0.5
-            }
-        }
+      ambient 0.71 0.49 0.13
+      diffuse 0.71 0.49 0.13
+      specular 0.1 0.1 0.1 1 1
     }
+  }
+}
+
+material Plastic/Red
+{
+  technique
+  {
+    pass ambient
+    {
+      ambient 0.70 0.21 0.14
+      diffuse 0.70 0.21 0.14
+      specular 0.1 0.1 0.1 1 1
+    }
+  }
+}
+
+material Plastic/Violet
+{
+  technique
+  {
+    pass ambient
+    {
+      ambient 0.35 0.22 0.35
+      diffuse 0.35 0.22 0.35
+      specular 0.1 0.1 0.1 1 1
+    }
+  }
+}
+
+material Plastic/Yellow
+{
+  technique
+  {
+    pass ambient
+    {
+      ambient 0.65 0.65 0.16
+      diffuse 0.65 0.65 0.16
+      specular 0.1 0.1 0.1 1 1
+    }
+  }
 }
