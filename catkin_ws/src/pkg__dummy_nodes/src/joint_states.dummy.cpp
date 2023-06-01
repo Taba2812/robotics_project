@@ -5,6 +5,7 @@
 #define JOINTS 6
 #define LOOP_RATE 100
 
+
 int main(int argc, char** argv) {
   ros::init(argc, argv, "JointStates_Dummy");
   ros::NodeHandle nh;
@@ -32,7 +33,6 @@ int main(int argc, char** argv) {
   };
 
   auto requestCallback = [&] (const std_msgs::Bool::ConstPtr &req) {
-    std::cout << "\n[JointStates] received request from [Core]\n";
     jointStatePub.publish(jointStateMsg);
   };
 

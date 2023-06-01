@@ -15,12 +15,16 @@ int main(int argc, char **argv){
     Destination d, home;
     FinalDestination fd;
     std_msgs::Bool msgVision;
-    std_msgs::Bool msgMotion;
     std_msgs::Bool msgJS;
+    std_msgs::Float32MultiArray msgMotion;
+    Eigen::Vector3d position;
+
+    msgMotion.data = {0,0,0,0};
 
     //default values
     bool jointStatus = false;
     bool positionStatus = false;
+    bool motionStatus = false;
     bool gripper = false;
 
     //setup ros params
@@ -54,7 +58,9 @@ int main(int argc, char **argv){
     auto getMotion = [&] (const std_msgs::Float32MultiArrayConstPtr &next_position) {
         motionCounter++;
 
-        if (next_position->data == d.getDestination().data) {
+        if (next_position->data.at(0) == d.getDestination().data.at(0) &&
+            next_position->data.at(1) == d.getDestination().data.at(1) &&
+            next_position->data.at(2) == d.getDestination().data.at(2)) {
             std::cout << "\n[Core] Destination reached sending RESET signal\n";
             std_msgs::Float32MultiArray reset;
             reset.data = {0,0,0,0};
@@ -64,11 +70,11 @@ int main(int argc, char **argv){
             next.data = true;
             motionPub.publish(next);
         }
+
+        motionStatus = true;
     };
 
     auto getJoint = [&] (const sensor_msgs::JointState::ConstPtr &js) {
-        std::cout << "\n[Core] received joint states\n";
-
         for(int i=0; i<JOINTS; i++){
             for(int j=0; j<JOINTS; j++){
                 if(jointNames[j] == js->name.at(i)){
@@ -134,13 +140,13 @@ int main(int argc, char **argv){
             break;
 
             case POSITION:
-                std::cout << "\n[Position] Evaluating the destination\n";
+                std::cout << "\n[Position] Evaluating the destination...";
                 if(!gripper){
-                    std::cout << "\n[Position] Going from home to block\n";
+                    std::cout << "going from home to block\n";
                     d.setPosition(bp);
 
                 } else {
-                    std::cout << "[Position] Going from block to destination\n";
+                    std::cout << "going from block to destination\n";
                     d.setPosition(fd);
                 }
                 d.computeInverse(ee);
@@ -149,13 +155,22 @@ int main(int argc, char **argv){
                 else std::cout << "\n[Error] Destination not reachable!\n";
 
                 currentState = MOTION;
-                msgMotion.data = true;
-                motionPub.publish(msgMotion);
             break;
 
             case MOTION:
-                std::cout << "\n[Motion] computing path planning\n";
-                while(!processStatus) usleep(WAITING_TIME);
+                std::cout << "\n[Motion] computing path planning...\n";
+                position << d.getPosition();
+
+                for(int i=0; i<3; i++){
+                    msgMotion.data.at(i) = position(i);
+                }
+
+                msgMotion.data.at(3) = noSteps;
+                
+                dataPub.publish(msgMotion);
+
+                while(!motionStatus) ros::spinOnce();
+
                 if(motionCounter <= noSteps) currentState = MOTION;
                 if(!gripper) currentState = TO_BLOCK;
                 else currentState = TO_FINAL;
@@ -183,7 +198,6 @@ int main(int argc, char **argv){
 
             case HOMING:
                 std::cout << "\n[Homing] going home\n";
-                msgMotion.data = true;
                 //publish topic
                 while(!processStatus) usleep(WAITING_TIME);
                 for(int i=0; i<POINTS; i++){
