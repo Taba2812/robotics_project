@@ -7,6 +7,13 @@
             <uri>X1-Y2-Z1.dae</uri>
           </mesh>
         </geometry>
+        <material>
+          <script>
+            <uri>model://X1-Y2-Z1/materials/scripts</uri>
+            <uri>model://X1-Y2-Z1/materials/textures</uri>
+            <name>Plastic/Blue</name>
+          </script>
+        </material>
       </visual>
     </link>
   </model>
