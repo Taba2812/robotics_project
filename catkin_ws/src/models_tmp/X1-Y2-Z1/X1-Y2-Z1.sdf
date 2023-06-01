@@ -1,18 +1,17 @@
-<?xml version="1.0" ?>
 <sdf version="1.6">
   <model name="X1-Y2-Z1">
     <link name="link121">
       <visual name="visual">
         <geometry>
           <mesh>
-            <uri>model://shared/meshes/X1-Y2-Z1.stl</uri>
-            <scale>1 1 1</scale>
+            <uri>model://X1-Y2-Z1/meshes/X1-Y2-Z1.dae</uri>
           </mesh>
         </geometry>
         <material>
           <script>
-            <uri>file://media/materials/scripts/gazebo.material</uri>
-            <name>Gazebo/Blue</name>
+            <uri>model://shared/materials/scripts</uri>
+            <uri>model://shared/materials/textures</uri>
+            <name>Plastic/Blue</name>
           </script>
         </material>
       </visual>

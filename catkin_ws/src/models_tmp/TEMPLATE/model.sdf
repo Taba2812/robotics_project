@@ -11,10 +11,11 @@
         </geometry>
         <material>
           <!--QUESTI SONO I COLORI CHE PUO AVERE-->
-          <ambient>0 0 1 1</ambient>
-          <diffuse>0 0 0 1</diffuse>
-          <specular>1 1 1 1</specular>
-          <emissive>0 0 1 0.2</emissive>
+          <script>
+            <uri>model://X1-Y2-Z1/materials/scripts</uri>
+            <uri>model://X1-Y2-Z1/materials/textures</uri>
+            <name>Plastic/Blue</name>
+          </script>
         </material>
       </visual>
     </link>
