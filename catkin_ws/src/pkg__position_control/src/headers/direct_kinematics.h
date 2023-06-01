@@ -49,17 +49,17 @@ void EndEffector::setOrientation(Eigen::Matrix3d& o){
     orientation = o;
 }
 
-void EndEffector::computeDirect(const Eigen::VectorXd& q){
-    Matrix4d T10, T21, T32, T43, T54, T65, T60;
+void EndEffector::computeDirect(const Eigen::VectorXd &q){
+    Matrix4d T1, T2, T3, T4, T5, T6, T60;
 
-    T(T10, q[0], 0);
-    T(T21, q[1], 1);
-    T(T32, q[2], 2);
-    T(T43, q[3], 3);
-    T(T54, q[4], 4);
-    T(T65, q[5], 5);
+    T(T1, q[0], 0);
+    T(T2, q[1], 1);
+    T(T3, q[2], 2);
+    T(T4, q[3], 3);
+    T(T5, q[4], 4);
+    T(T6, q[5], 5);
 
-    T60 = T10*T21*T32*T43*T54*T65;
+    T60 = T1*T2*T3*T4*T5*T6;
 
     this->orientation = T60.block<3,3>(0,0);
     this->position = T60.block<3,1>(0,3);

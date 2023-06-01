@@ -2,7 +2,7 @@
 #include "concrete_states.h"
 
 Process::Process(){
-    processStatus.data = false;
+    processStatus = false;
     currentState = &Waiting::getInstance();
 }
 
@@ -17,13 +17,13 @@ void Process::execute(){
 }
 
 void Process::processOn(){
-    processStatus.data = true;
+    processStatus = true;
 }
 
 void Process::processOff(){
-    processStatus.data = false;
+    processStatus = false;
 }
 
 bool Process::getProcessStatus(){
-    return processStatus.data;
+    return processStatus;
 }

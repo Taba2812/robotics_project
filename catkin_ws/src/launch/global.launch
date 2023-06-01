@@ -10,6 +10,11 @@
         <!--QUEUE SIZE-->
         <param name="Q_Size" value="1000" />
 
+        <!--JOINT STATES-->
+        <param name="JS2Core_Data" value="JointStates_Data" /> <!--JointState-->
+        <param name="Core2JS_Data" value="JointStates_New" /> <!--JointState-->
+        <param name="Core2JS_Req"  value="JointStates_Request" /> <!--Bool-->
+
         <!--MOTION PLANNING-->
         <param name="Core2MP_Req"  value="MotionPlanning_Request" />  <!--bool-->
         <param name="Core2MP_Data" value="MotionPlanning_Data" />     <!--Float32MultiArray-->
@@ -29,4 +34,4 @@
         <param name="Docker_Joint_Out" value="/ur5/joint_group_pos_controller/command" /> <!--Float64MultiArray-->
 
 
-</launch>      
+</launch>

@@ -1,6 +1,9 @@
 FROM ros:noetic-robot
 RUN apt-get update
 
+ARG DEBIAN_FRONTEND=noninteractive apt-get install keyboard-configuration
+RUN echo 'keyboard-configuration keyboard-configuration/layout select IT' | debconf-set-selections
+
 # Installing Catkin-Tools
 RUN apt-get -y install python3-catkin-tools
 
