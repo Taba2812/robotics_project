@@ -37,6 +37,7 @@ int main (int argc, char **argv) {
 
     auto motion_planning_callback = [&] (const std_msgs::Float32MultiArrayConstPtr &destination) {
         //First call, generate the curve
+
         Bezier::Node dest = {(float)destination->data[0],(float)destination->data[1],(float)destination->data[2]};
         curve = Bezier::Curve(dest, destination->data[3]);
 
@@ -44,9 +45,18 @@ int main (int argc, char **argv) {
             curve = Bezier::Curve();
         } else {
             Bezier::Node progress = curve.getNext();
-
             std_msgs::Float32MultiArray reply;
-            reply.data = {progress[0], progress[1], progress[2]};
+
+            std::cout << "Here!\n";
+
+            reply.data.resize(3);
+
+            std::cout << "Also here!\n";
+
+            for(int i=0; i<3; i++){
+                reply.data.at(i) = progress.at(i);
+            }
+
             data_publisher.publish(reply);
         }
     };
