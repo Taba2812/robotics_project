@@ -12,7 +12,7 @@
         <material>
           <script>
             <uri>model://shared/materials/scripts/block.material</uri>
-            <name>Plastic/Emissive2</name>
+            <name>Plastic/Blue</name>
           </script>
         </material>
       </visual>
