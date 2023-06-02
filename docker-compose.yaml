@@ -3,5 +3,6 @@ services:
     build: .
     container_name: ur5-project
     tty: true
+    network_mode: "host"
     volumes:
       - .:/root/code

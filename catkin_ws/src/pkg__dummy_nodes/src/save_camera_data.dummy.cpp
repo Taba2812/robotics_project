@@ -210,6 +210,7 @@ int main (int argc, char **argv) {
 
     auto image_callback = [&] (const sensor_msgs::ImageConstPtr &image) {
         if (i_img) {return;}
+        std::cout << "[CAMERA][Dummy] Received Image" << std::endl;
 
         //Convert from sensor_msg::Image to cv::Mat
         cv_bridge::CvImagePtr ImgPtr;
@@ -222,12 +223,15 @@ int main (int argc, char **argv) {
 
         cv::imwrite(IMG_PATH, ImgPtr->image);
 
+        std::cout << "[CAMERA][Dummy] Saved Image" << std::endl;
         i_img++;
     };
 
     ros::Subscriber pcl_sub = handle.subscribe<sensor_msgs::PointCloud2>(in_pcl, queue, pointcloud_callback);
     ros::Subscriber img_sub = handle.subscribe<sensor_msgs::Image>(in_img, queue, image_callback);
 
+    std::cout << "[CAMERA][Dummy] Type any character to take an instance of the data sent by simulated zed:" << std::endl;
+    std::cin.get();
 
     ros::spin();
 
