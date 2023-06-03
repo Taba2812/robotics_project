@@ -47,16 +47,12 @@ int main (int argc, char **argv) {
             Bezier::Node progress = curve.getNext();
             std_msgs::Float32MultiArray reply;
 
-            std::cout << "Here!\n";
-
             reply.data.resize(3);
-
-            std::cout << "Also here!\n";
 
             for(int i=0; i<3; i++){
                 reply.data.at(i) = progress.at(i);
             }
-
+            
             data_publisher.publish(reply);
         }
     };

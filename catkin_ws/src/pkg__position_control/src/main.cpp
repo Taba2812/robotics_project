@@ -44,6 +44,8 @@ int main(int argc, char **argv){
     nh.getParam("Steps", noSteps);
     nh.getParam("Q_Size", queue_size);
 
+    float steps[noSteps+1][3];
+
     //publishers
     //ros::Publisher jointPub = nh.advertise<std_msgs::Float64MultiArray>(joint_docker_out, QUEUE_SIZE);
     ros::Publisher jointPub = nh.advertise<sensor_msgs::JointState>(js_new, queue_size);
@@ -56,22 +58,32 @@ int main(int argc, char **argv){
 
     int motionCounter = 0;
     auto getMotion = [&] (const std_msgs::Float32MultiArrayConstPtr &next_position) {
-        motionCounter++;
 
-        if (next_position->data.at(0) == d.getDestination().data.at(0) &&
-            next_position->data.at(1) == d.getDestination().data.at(1) &&
-            next_position->data.at(2) == d.getDestination().data.at(2)) {
+        std::cout << "[" << motionCounter << "]";    
+        for(int i=0; i<3; i++) std::cout << next_position->data.at(i) << " ";
+        std::cout << std::endl;
+
+        if (next_position->data.at(0) == d.getPosition()[0] &&
+            next_position->data.at(1) == d.getPosition()[1] &&
+            next_position->data.at(2) == d.getPosition()[2]) {
             std::cout << "\n[Core] Destination reached sending RESET signal\n";
             std_msgs::Float32MultiArray reset;
             reset.data = {0,0,0,0};
             dataPub.publish(reset);
         } else {
+
+            for(int i=0; i<3; i++){
+                steps[motionCounter][i] = next_position->data.at(i);
+            }
+
             std_msgs::Bool next;
             next.data = true;
             motionPub.publish(next);
         }
 
-        motionStatus = true;
+        motionCounter++;
+
+        if(motionCounter == noSteps) motionStatus = true;
     };
 
     auto getJoint = [&] (const sensor_msgs::JointState::ConstPtr &js) {
