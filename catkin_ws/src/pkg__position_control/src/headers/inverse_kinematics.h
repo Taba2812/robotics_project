@@ -59,6 +59,9 @@ Vector4d P(double th1, double th5, double th6, const Eigen::MatrixXd& T60){
 void Destination::computeInverse(const EndEffector &ee) {
     Eigen::VectorXd th(6);
 
+    // std::cout << "IK Position: " << ee.getPosition() << "\n\n";
+    // std::cout << "Orientation: " << ee.getOrientation() << "\n\n";
+
     //position and orientation
     const Eigen::Vector3d &translation = ee.getPosition();
     const Eigen::Quaterniond orientation(ee.getOrientation());
@@ -71,12 +74,13 @@ void Destination::computeInverse(const EndEffector &ee) {
     th(0) = std::atan2(wristCenter(1), wristCenter(0));
 
     //theta3
-    const double th1Cos = std::cos(th(0));
-    const double th1Sin = std::sin(th(0));
     const double r = std::sqrt(std::pow(wristCenter(0), 2) + std::pow(wristCenter(1), 2));
     const double s = wristCenter(2) - D1;
     const double A = (std::pow(r, 2) + std::pow(s, 2) - std::pow(A2, 2) - std::pow(A3, 2)) / (2 * A2 * A3);
+
     th(2) = std::atan2(-std::sqrt(1 - std::pow(A, 2)), A);
+
+    std::cout << "TH3: " << th(2) << "\n\n";
 
     //theta2
     const double B = A3 * std::sin(th(2)) / std::sqrt(std::pow(r, 2) + std::pow(s, 2));

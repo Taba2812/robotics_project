@@ -10,23 +10,6 @@ int main(int argc, char **argv){
     ros::NodeHandle nh;
     ros::Rate loopRate(LOOP_RATE);
 
-    //environment components
-    EndEffector ee;
-    Destination d, home;
-    FinalDestination fd;
-    std_msgs::Bool msgVision;
-    std_msgs::Bool msgJS;
-    std_msgs::Float32MultiArray msgMotion;
-    Eigen::Vector3d position;
-
-    msgMotion.data = {0,0,0,0};
-
-    //default values
-    bool jointStatus = false;
-    bool positionStatus = false;
-    bool motionStatus = false;
-    bool gripper = false;
-
     //setup ros params
     int noSteps, queue_size;
     std::string joint_docker_in, joint_docker_out, detection_req, detection_res, motion_req, motion_data, motion_res, js_data, js_new, js_req;
@@ -44,7 +27,26 @@ int main(int argc, char **argv){
     nh.getParam("Steps", noSteps);
     nh.getParam("Q_Size", queue_size);
 
-    float steps[noSteps+1][3];
+    //environment components
+    EndEffector ee;
+    Destination d, home;
+    FinalDestination fd;
+    std_msgs::Bool msgVision;
+    std_msgs::Bool msgJS;
+    std_msgs::Float32MultiArray msgMotion;
+    Eigen::Vector3d position;
+
+    msgMotion.data = {0,0,0,0};
+    msgJS.data = true;
+
+    //default values
+    bool jointStatus = false;
+    bool positionStatus = false;
+    bool motionStatus = false;
+    bool gripper = false;
+
+    Eigen::Vector3d curveSteps[noSteps];
+    std_msgs::Float32MultiArray curveJoints[noSteps];
 
     //publishers
     //ros::Publisher jointPub = nh.advertise<std_msgs::Float64MultiArray>(joint_docker_out, QUEUE_SIZE);
@@ -59,21 +61,23 @@ int main(int argc, char **argv){
     int motionCounter = 0;
     auto getMotion = [&] (const std_msgs::Float32MultiArrayConstPtr &next_position) {
 
-        std::cout << "[" << motionCounter << "]";    
-        for(int i=0; i<3; i++) std::cout << next_position->data.at(i) << " ";
-        std::cout << std::endl;
+        // std::cout << "[" << motionCounter << "]";    
+        // for(int i=0; i<3; i++) std::cout << next_position->data.at(i) << " ";
+        // std::cout << std::endl;
 
         if (next_position->data.at(0) == d.getPosition()[0] &&
             next_position->data.at(1) == d.getPosition()[1] &&
             next_position->data.at(2) == d.getPosition()[2]) {
+
             std::cout << "\n[Core] Destination reached sending RESET signal\n";
             std_msgs::Float32MultiArray reset;
             reset.data = {0,0,0,0};
             dataPub.publish(reset);
+
         } else {
 
             for(int i=0; i<3; i++){
-                steps[motionCounter][i] = next_position->data.at(i);
+                curveSteps[motionCounter](i) = next_position->data.at(i);
             }
 
             std_msgs::Bool next;
@@ -113,12 +117,12 @@ int main(int argc, char **argv){
     //ros::Subscriber jointSub = nh.subscribe<sensor_msgs::JointState>(joint_docker_in, queue_size, getJoint);
     ros::Subscriber jointSub = nh.subscribe<sensor_msgs::JointState>(js_data, queue_size, getJoint);
     ros::Subscriber visionSub = nh.subscribe<std_msgs::Float32MultiArray>(detection_res, queue_size, getPosition);
-
+    
     //get default position
+    requestPub.publish(msgJS);
+    while(!jointStatus) ros::spinOnce();
     ee.computeDirect(q);
-    for(int i=0; i<3; i++){
-        home.setPosition(ee.getPosition());
-    }
+    home.setPosition(ee.getPosition());
 
     int currentState = WAITING;
 
@@ -134,7 +138,7 @@ int main(int argc, char **argv){
             case JS:
                 std::cout << "\n[JointStates] retrieving joint states\n";
 
-                msgJS.data = true;
+                jointStatus = false;
                 requestPub.publish(msgJS);
 
                 while(!jointStatus) ros::spinOnce();
@@ -183,15 +187,24 @@ int main(int argc, char **argv){
 
                 while(!motionStatus) ros::spinOnce();
 
+                for(int i=0; i<noSteps; i++){
+                    ee.setPosition(curveSteps[i]);
+                    d.computeInverse(ee);
+                    //std::cout << d.getJointAngles() << "\n\n";
+                    // curveJoints[i] = d.getDestination();
+                }
+
                 if(motionCounter <= noSteps) currentState = MOTION;
                 if(!gripper) currentState = TO_BLOCK;
                 else currentState = TO_FINAL;
+
+                currentState = WAITING;
             break;
 
             case TO_BLOCK:
                 std::cout << "\n[ToBlock] Moving to detected block\n";
-                for(int i=0; i<POINTS; i++){
-                    jointPub.publish(d.getMessage());
+                for(int i=0; i<noSteps; i++){
+                    jointPub.publish(curveJoints[i]);
                 }
                 //attach dynamic link for block
                 gripper = true;
