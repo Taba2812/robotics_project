@@ -33,11 +33,15 @@ int main(int argc, char** argv) {
   };
 
   auto requestCallback = [&] (const std_msgs::Bool::ConstPtr &req) {
+    std::cout << "[Joint States] Received request - sending home joint states:\n";
+    for(int i=0; i<JOINTS; i++){
+      std::cout << jointStateMsg.position.at(i) << "\n";
+    }
     jointStatePub.publish(jointStateMsg);
   };
 
   ros::Subscriber jointStateSub = nh.subscribe<sensor_msgs::JointState>(js_new, queue_size, jointStateCallback);
-  ros::Subscriber requestSub = nh.subscribe<std_msgs::Bool>(js_req, 1, requestCallback);
+  ros::Subscriber requestSub = nh.subscribe<std_msgs::Bool>(js_req, queue_size, requestCallback);
 
   ros::spin();
 

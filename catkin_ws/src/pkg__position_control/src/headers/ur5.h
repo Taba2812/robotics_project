@@ -39,7 +39,6 @@ static constexpr double joint6_max = 6.2832;
 #define JOINTS 6
 #define LOOP_RATE 100
 #define MATRIX_DIM 4
-#define POINTS 20           //to test
 #define WAITING_TIME 500000
 
 #define WAITING  0
@@ -65,7 +64,6 @@ const double alpha[JOINTS] = {M_PI_2, 0, 0, M_PI_2, -M_PI_2, 0};  //angles
 static bool processStatus;
 
 const ros::V_string jointNames = {"elbow_joint", "shoulder_lift_joint", "shoulder_pan_joint", "wrist_1_joint", "wrist_2_joint", "wrist_3_joint"};
-static BlockPosition bp = BlockPosition::Zero();
 static JointConfiguration q;
 
 #endif

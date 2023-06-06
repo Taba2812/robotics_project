@@ -80,8 +80,6 @@ void Destination::computeInverse(const EndEffector &ee) {
 
     th(2) = std::atan2(-std::sqrt(1 - std::pow(A, 2)), A);
 
-    std::cout << "TH3: " << th(2) << "\n\n";
-
     //theta2
     const double B = A3 * std::sin(th(2)) / std::sqrt(std::pow(r, 2) + std::pow(s, 2));
     th(1) = std::atan2(s, r) - std::atan2(B, std::sqrt(1 - std::pow(B, 2)));

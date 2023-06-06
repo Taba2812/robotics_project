@@ -37,7 +37,7 @@ int main (int argc, char **argv) {
 
     auto motion_planning_callback = [&] (const std_msgs::Float32MultiArrayConstPtr &destination) {
         //First call, generate the curve
-
+        
         Bezier::Node dest = {(float)destination->data[0],(float)destination->data[1],(float)destination->data[2]};
         curve = Bezier::Curve(dest, destination->data[3]);
 

@@ -17,8 +17,8 @@ public:
     friend std::ostream& operator<<(std::ostream& os, const EndEffector& ef);
 };
 
-std::ostream& operator<<(std::ostream& os, const EndEffector& ef){
-    return os << ef.position;
+std::ostream& operator<<(std::ostream& os, const EndEffector& ee){
+    return os << ee.position;
 }
 
 void T(Matrix4d& m, double q, int index){
