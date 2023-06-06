@@ -29,8 +29,11 @@ int main (int argc, char **argv) {
     int i = 0;
     auto progress_callback = [&] (const std_msgs::Float32MultiArrayConstPtr &next_position) {
         i++;
+        //if (i > 30) {return;}
+
         std::cout << "[Core][Dummy] Step #" << i << " -> x:" << next_position->data[0] << " y: " << next_position->data[1] << " z: " << next_position->data[2] << std::endl;
 
+        /*
         if (next_position->data[0] == destination.data[0] && next_position->data[1] == destination.data[1] && next_position->data[2] == destination.data[2]) {
             std::cout << "[Core][Dummy] Destinatio reached sending RESET signal" << std::endl;
             std_msgs::Float32MultiArray reset;
@@ -41,6 +44,18 @@ int main (int argc, char **argv) {
             next.data = true;
             request_publisher.publish(next);
         }
+        */
+        if (next_position->data[0] == 0 && next_position->data[1] == 0 && next_position->data[2] == 0) {
+            std::cout << "[Core][Dummy] Destinatio reached sending RESET signal" << std::endl;
+            std_msgs::Float32MultiArray reset;
+            reset.data = {0,0,0,0};
+            data_publisher.publish(reset);
+        } else {
+            std_msgs::Bool next;
+            next.data = true;
+            request_publisher.publish(next);
+        }
+        
     };
 
     ros::Subscriber data_subscriber = handle.subscribe<std_msgs::Float32MultiArray>(sub_prog, queue, progress_callback);

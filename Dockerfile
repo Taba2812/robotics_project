@@ -30,7 +30,7 @@ ENV OpenCV_DIR=/root/OpenCV/build
 # Installing PCL
 WORKDIR /root/code
 
-RUN apt-get install -y libpcl-dev
+RUN apt-get install -y libpcl-dev --fix-missing
 RUN apt-get install -y ros-noetic-pcl-ros
 RUN apt-get install -y ros-noetic-pcl-conversions
 RUN apt-get install -y ros-noetic-cv-bridge
