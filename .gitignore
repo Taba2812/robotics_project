@@ -6,7 +6,9 @@
 catkin_ws/.catkin_tools/profiles/profiles.yaml
 
 catkin_ws/.catkin_tools/profiles/*
-!catkin_ws/.catkin_tools/profiles/default
+!catkin_ws/.catkin_tools/profiles/default/build.yaml
+!catkin_ws/.catkin_tools/profiles/default/config.yaml
+
 !catkin_ws/.catkin_tools/profiles/custom_profile
 
 /catkin_ws/src/output_renders/*
