@@ -4,9 +4,9 @@
     <include file="$(find pkg__position_control)/launch/ur5main.launch" />
     <include file="$(find pkg__motion_planning)/launch/motion_planning.launch" />
 
-    <param name="X" value="6" />
-    <param name="Y" value="6" />
-    <param name="Z" value="6" />
+    <param name="X" value="0.5" />
+    <param name="Y" value="0.3" />
+    <param name="Z" value="0.2" />
 
     <node pkg="pkg__dummy_nodes" type="Detection-Core_Dummy" name="DetectionCore_Dummy" output="screen" />
 

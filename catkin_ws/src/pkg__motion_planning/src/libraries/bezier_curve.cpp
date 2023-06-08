@@ -10,7 +10,7 @@ void Bezier::printNode(Bezier::Node node) {
 
 Bezier::Curve::Curve() {
     this->segment_quantity = 0;
-    this->step = 0;
+    this->step = 1;
 
     //Takes the starting position as [0,0,0] and recive Delta Position based on the robot
     this->nodes.push_back({0,0,0});
@@ -48,6 +48,9 @@ Bezier::Node Bezier::Curve::calculate(float t) {
 }
 
 Bezier::Node Bezier::Curve::getNext() {
+    if (this->step > this->segment_quantity) {
+        this->step = this->segment_quantity;
+    }
     Bezier::Node result = this->calculate((1/(float)this->segment_quantity) * this->step);
     this->step++;
     return result;
