@@ -1,6 +1,6 @@
 pkg__zed2_camera
 /root/code/catkin_ws/devel/.private/pkg__zed2_camera/cmake.lock /root/code/catkin_ws/devel/./cmake.lock
+/root/code/catkin_ws/devel/.private/pkg__zed2_camera/share/pkg__zed2_camera/cmake/pkg__zed2_cameraConfig.cmake /root/code/catkin_ws/devel/share/pkg__zed2_camera/cmake/pkg__zed2_cameraConfig.cmake
+/root/code/catkin_ws/devel/.private/pkg__zed2_camera/share/pkg__zed2_camera/cmake/pkg__zed2_cameraConfig-version.cmake /root/code/catkin_ws/devel/share/pkg__zed2_camera/cmake/pkg__zed2_cameraConfig-version.cmake
 /root/code/catkin_ws/devel/.private/pkg__zed2_camera/lib/pkgconfig/pkg__zed2_camera.pc /root/code/catkin_ws/devel/lib/pkgconfig/pkg__zed2_camera.pc
 /root/code/catkin_ws/devel/.private/pkg__zed2_camera/lib/pkg__zed2_camera/Docker_Proxy /root/code/catkin_ws/devel/lib/pkg__zed2_camera/Docker_Proxy
-/root/code/catkin_ws/devel/.private/pkg__zed2_camera/share/pkg__zed2_camera/cmake/pkg__zed2_cameraConfig-version.cmake /root/code/catkin_ws/devel/share/pkg__zed2_camera/cmake/pkg__zed2_cameraConfig-version.cmake
-/root/code/catkin_ws/devel/.private/pkg__zed2_camera/share/pkg__zed2_camera/cmake/pkg__zed2_cameraConfig.cmake /root/code/catkin_ws/devel/share/pkg__zed2_camera/cmake/pkg__zed2_cameraConfig.cmake
