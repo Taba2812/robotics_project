@@ -9,6 +9,7 @@ pkg__detection
 /root/code/catkin_ws/devel/.private/pkg__detection/lib/libsetting.so /root/code/catkin_ws/devel/lib/libsetting.so
 /root/code/catkin_ws/devel/.private/pkg__detection/lib/libtemp_file_handler_2.so /root/code/catkin_ws/devel/lib/libtemp_file_handler_2.so
 /root/code/catkin_ws/devel/.private/pkg__detection/lib/pkgconfig/pkg__detection.pc /root/code/catkin_ws/devel/lib/pkgconfig/pkg__detection.pc
+/root/code/catkin_ws/devel/.private/pkg__detection/lib/pkg__detection/Calibration_Node /root/code/catkin_ws/devel/lib/pkg__detection/Calibration_Node
 /root/code/catkin_ws/devel/.private/pkg__detection/lib/pkg__detection/Detection_Node /root/code/catkin_ws/devel/lib/pkg__detection/Detection_Node
 /root/code/catkin_ws/devel/.private/pkg__detection/share/pkg__detection/cmake/pkg__detectionConfig-version.cmake /root/code/catkin_ws/devel/share/pkg__detection/cmake/pkg__detectionConfig-version.cmake
 /root/code/catkin_ws/devel/.private/pkg__detection/share/pkg__detection/cmake/pkg__detectionConfig.cmake /root/code/catkin_ws/devel/share/pkg__detection/cmake/pkg__detectionConfig.cmake

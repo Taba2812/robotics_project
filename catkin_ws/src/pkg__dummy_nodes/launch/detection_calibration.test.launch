@@ -1,0 +1,11 @@
+<launch>
+
+    <include file="src/launch/global.launch" />
+    <include file="$(find pkg__detection)/launch/calibration.launch" />
+
+    <param name="IMG_PATH" value="/root/code/catkin_ws/src/images_database/complete_data_examples/SimulatedZed2_img.png" />
+    <param name="RAW_PATH" value="/root/code/catkin_ws/src/images_database/complete_data_examples/SimulatedZed2_raw.txt" />
+
+    <node pkg="pkg__dummy_nodes" type="SimulatedCapture_Dummy" name="SimulatedCapture_Dummy" output="screen" />
+
+</launch>

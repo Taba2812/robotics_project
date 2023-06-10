@@ -1,0 +1,7 @@
+<launch>
+
+    <include file="src/launch/global.launch" />
+
+    <node pkg="pkg__detection" type="Calibration_Node" name="Calibration_Node" output="screen" />
+
+</launch>
