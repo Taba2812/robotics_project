@@ -5,16 +5,15 @@
             "includePath": [
                 "${workspaceFolder}/**",
                 "/opt/ros/noetic/include",
-                "/usr/include/eigen3",
-                "/usr/include/opencv4",
                 "/root/OpenCV/build",
-                "/usr/include/opencv4",
-                "/usr/include/x86_64-linux-gnu/c++/7",
-                "/usr/include/x86_64-linux-gnu/c++/9"
+                "/usr/local/include/opencv4",
+                "/usr/include",
+                "/usr/include/pcl-1.10",
+                "/usr/include/eigen3"
             ],
             "defines": [],
             "compilerPath": "/usr/bin/gcc",
-            "cStandard": "gnu17",
+            "cStandard": "c17",
             "cppStandard": "gnu++14",
             "intelliSenseMode": "linux-gcc-x64",
             "configurationProvider": "ms-vscode.cmake-tools"

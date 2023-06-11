@@ -23,6 +23,7 @@ WORKDIR /root/OpenCV/build
 
 RUN cmake ../opencv
 RUN make -j4
+RUN make install
 
 ENV OpenCV_DIR=/root/OpenCV/build
 

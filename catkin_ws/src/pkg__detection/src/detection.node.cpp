@@ -17,7 +17,7 @@ int main (int argc, char **argv) {
 
     ros::init(argc, argv, "Detection_Node");
     ros::NodeHandle nh;
-
+    
     //Setting launch parameters
     std::string camera_ch_send, pointcloud_ch_rcve, image_ch_rcve, core_ch_send, core_ch_rcve;
     int image_height, image_width, queue;
