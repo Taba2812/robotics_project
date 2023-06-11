@@ -30,7 +30,6 @@ int main (int argc, char **argv) {
     nh.getParam("IMAGE_WIDTH", image_width);
     nh.getParam("Q_Size", queue);
 
-
     bool pcl_available = false;
     cv::Mat pcl_mat (image_height, image_width, CV_32FC3, cv::Scalar(0));
 

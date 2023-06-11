@@ -3,6 +3,7 @@
 
 #include <vector>
 #include <opencv2/core.hpp>
+#include <string>
 
 namespace setting {
     
@@ -58,9 +59,11 @@ namespace setting {
             //Image
             int EROSION_SIZE;
             int DILATION_SIZE;
+
+            Container();
     };
 
-    Container access();
+    Container access;
 
     const std::string location = "/home/dawwo/Documents/Repositories/robotics_project/computer_vision/images_database/complete_data_examples/";
 
