@@ -3,20 +3,21 @@
     <!-- <param name="" value="" /> -->
 
     <!-- TABLE CROPPING -->
-    <param name="LEFT_CROP" value="0" />
-    <param name="RIGHT_CROP" value="0" />
-    <param name="TOP_CROP" value="0" />
-    <param name="BOT_CROP" value="0" />
+    <param name="LEFT_CROP"  value="672" />
+    <param name="RIGHT_CROP" value="881" />
+    <param name="TOP_CROP"   value="60" />
+    <param name="BOT_CROP"   value="855" />
 
     <!-- PIPELINE -->
-    <param name="EROSION_SIZE" value="0" />
-    <param name="DILATION_SIZE" value="0" />
-    <param name="LOWER_HUE" value="0" />
-    <param name="LOWER_SATURATION" value="0" />
-    <param name="LOWER_BRIGHTNESS" value="0" />
-    <param name="HIGHER_HUE" value="0" />
-    <param name="HIGHER_SATURATION" value="0" />
-    <param name="HIGHER_BRIGHTNESS" value="0" />
+    <param name="EROSION_SIZE"  value="4" />
+    <param name="DILATION_SIZE" value="4" />
+
+    <param name="LOWER_HUE"         value="55" />
+    <param name="LOWER_SATURATION"  value="30" />
+    <param name="LOWER_BRIGHTNESS"  value="10" />
+    <param name="HIGHER_HUE"        value="193" />
+    <param name="HIGHER_SATURATION" value="110" />
+    <param name="HIGHER_BRIGHTNESS" value="91" />
 
     <!-- DETECTION -->
     <param name="INTERSECTION_TRESHOLD" value="0.5" />
