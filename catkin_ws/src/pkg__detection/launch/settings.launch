@@ -1,0 +1,62 @@
+<launch>
+
+    <!-- <param name="" value="" /> -->
+
+    <!-- TABLE CROPPING -->
+    <param name="LEFT_CROP" value="0" />
+    <param name="RIGHT_CROP" value="0" />
+    <param name="TOP_CROP" value="0" />
+    <param name="BOT_CROP" value="0" />
+
+    <!-- PIPELINE -->
+    <param name="EROSION_SIZE" value="0" />
+    <param name="DILATION_SIZE" value="0" />
+    <param name="LOWER_HUE" value="0" />
+    <param name="LOWER_SATURATION" value="0" />
+    <param name="LOWER_BRIGHTNESS" value="0" />
+    <param name="HIGHER_HUE" value="0" />
+    <param name="HIGHER_SATURATION" value="0" />
+    <param name="HIGHER_BRIGHTNESS" value="0" />
+
+    <!-- DETECTION -->
+    <param name="INTERSECTION_TRESHOLD" value="0.5" />
+
+    <param name="GUIL_MIN-DIST"        value="10" />
+    <param name="GUIL_LEVELS"          value="360" />
+    <param name="GUIL_DP"              value="3" />
+    <param name="GUIL_MAX-BUFFER-SIZE" value="1000" />
+
+    <param name="GUIL_MIN-ANGLE"    value="0" />
+    <param name="GUIL_MAX-ANGLE"    value="360" />
+    <param name="GUIL_STEP-ANGLE"   value="1" />
+    <param name="GUIL_THRESH-ANGLE" value="1500" />
+
+    <param name="GUIL_MIN-SCALE"    value="0.5" />
+    <param name="GUIL_MAX-SCALE"    value="2.0" />
+    <param name="GUIL_STEP-SCALE"   value="0.05" />
+    <param name="GUIL_THRESH-SCALE" value="50" />
+
+    <param name="GUIL_THRESH-POS"        value="10" />
+    <param name="GUIL_CANNY-THRESH-LOW"  value="30" />
+    <param name="GUIL_CANNY-THRESH-HIGH" value="110" />
+
+    <!-- IMAGE DATASET -->
+    <param name="BLUE"   value="1" />
+    <param name="ORANGE" value="1" />
+    <param name="YELLOW" value="1" />
+    <param name="RED"    value="1" />
+    <param name="VIOLET" value="1" />
+
+    <param name="X1_Y1_Z2"            value="1" />
+    <param name="X1_Y2_Z1"            value="1" />
+    <param name="X1_Y2_Z2"            value="1" />
+    <param name="X1_Y2_Z2_CHAMFER"    value="1" />
+    <param name="X1_Y2_Z2_TWINFILLET" value="1" />
+    <param name="X1_Y3_Z2"            value="1" />
+    <param name="X1_Y3_Z2_FILLET"     value="1" />
+    <param name="X1_Y4_Z1"            value="1" />
+    <param name="X1_Y4_Z2"            value="1" />
+    <param name="X2_Y2_Z2"            value="1" />
+    <param name="X2_Y2_Z2_FILLET"     value="1" />
+
+</launch>
