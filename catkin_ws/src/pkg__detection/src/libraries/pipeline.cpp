@@ -14,16 +14,16 @@ void pipeline::generateMask(cv::Mat src, cv::Mat *mask) {
     *mask = cv::Mat((int)src.rows, (int)src.cols, CV_8UC1, cv::Scalar(0));
 
     //Mask for all colors that we are looking for then mix them
-    for (setting::Boundry bound : setting::lookup_colors()) {
+    for (setting::Boundry bound : setting::access.lookup_colors()) {
         cv::inRange(HSVCamera, cv::Scalar(bound.lower.hue, bound.lower.saturation, bound.lower.brightness), 
                                cv::Scalar(bound.upper.hue, bound.upper.saturation, bound.upper.brightness), HSVRange);
 
         //Mask Correction
-        cv::Mat erosion_kernel = cv::getStructuringElement( cv::MORPH_ELLIPSE, cv::Size( 2* EROSION_SIZE + 1, 2* EROSION_SIZE +1 ), 
-                                                                               cv::Point( EROSION_SIZE, EROSION_SIZE ) );
+        cv::Mat erosion_kernel = cv::getStructuringElement( cv::MORPH_ELLIPSE, cv::Size( 2* setting::access.EROSION_SIZE + 1, 2* setting::access.EROSION_SIZE +1 ), 
+                                                                               cv::Point( setting::access.EROSION_SIZE, setting::access.EROSION_SIZE ) );
         
-        cv::Mat dilation_kernel = cv::getStructuringElement( cv::MORPH_ELLIPSE, cv::Size( 2* DILATION_SIZE + 1, 2* DILATION_SIZE +1 ), 
-                                                                                cv::Point( DILATION_SIZE, DILATION_SIZE ) );
+        cv::Mat dilation_kernel = cv::getStructuringElement( cv::MORPH_ELLIPSE, cv::Size( 2* setting::access.DILATION_SIZE + 1, 2* setting::access.DILATION_SIZE +1 ), 
+                                                                                cv::Point( setting::access.DILATION_SIZE, setting::access.DILATION_SIZE ) );
 
         cv::dilate(HSVRange, dilation, dilation_kernel);
         cv::erode(dilation, closing, erosion_kernel);

@@ -15,8 +15,8 @@ cv::Vec3f Detection::Detect(cv::Mat pcl, cv::Mat png) {
 
 cv::Vec3f Detection::detectGripper(cv::Mat pcl, cv::Mat png) {
     //Crop Images
-    cv::Mat src_image  (png, setting::getCropRect(png));
-    cv::Mat data_image (pcl, setting::getCropRect(pcl));
+    cv::Mat src_image  (png, setting::access.getCropRect(png));
+    cv::Mat data_image (pcl, setting::access.getCropRect(pcl));
 
     if(src_image.empty() or data_image.empty()){
         exit(EXIT_FAILURE);
@@ -55,8 +55,8 @@ cv::Vec3f Detection::detectGripper(cv::Mat pcl, cv::Mat png) {
 
 cv::Vec3f Detection::detectBlocks(cv::Mat pcl, cv::Mat png) {
     //Crop Images
-    cv::Mat src_image  (png, setting::getCropRect(png));
-    cv::Mat data_image (pcl, setting::getCropRect(pcl));
+    cv::Mat src_image  (png, setting::access.getCropRect(png));
+    cv::Mat data_image (pcl, setting::access.getCropRect(pcl));
 
     if(src_image.empty() or data_image.empty()){
         exit(EXIT_FAILURE);

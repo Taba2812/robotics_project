@@ -13,79 +13,79 @@ std::vector<cv::Vec4f> recognition::runRecognition(cv::InputOutputArray img) {
 }
 
 void recognition::setParameters(cv::Ptr<cv::GeneralizedHoughGuil> guil) {
-    guil->setMinDist(10);
-    guil->setLevels(360);
-    guil->setDp(3);
-    guil->setMaxBufferSize(1000);
+    guil->setMinDist(setting::access.guil.min_dist);
+    guil->setLevels(setting::access.guil.levels);
+    guil->setDp(setting::access.guil.dp);
+    guil->setMaxBufferSize(setting::access.guil.max_buffer_size);
 
-    guil->setMinAngle(0);
-    guil->setMaxAngle(360);
-    guil->setAngleStep(1);
-    guil->setAngleThresh(1500);
+    guil->setMinAngle(setting::access.guil.min_angle);
+    guil->setMaxAngle(setting::access.guil.max_angle);
+    guil->setAngleStep(setting::access.guil.step_angle);
+    guil->setAngleThresh(setting::access.guil.thresh_angle);
 
-    guil->setMinScale(0.5);
-    guil->setMaxScale(2.0);
-    guil->setScaleStep(0.05);
-    guil->setScaleThresh(50);
+    guil->setMinScale(setting::access.guil.min_scale);
+    guil->setMaxScale(setting::access.guil.max_scale);
+    guil->setScaleStep(setting::access.guil.step_scale);
+    guil->setScaleThresh(setting::access.guil.thresh_scale);
 
-    guil->setPosThresh(10);
+    guil->setPosThresh(setting::access.guil.thersh_pos);
 
-    guil->setCannyLowThresh(30);
-    guil->setCannyHighThresh(110);
+    guil->setCannyLowThresh(setting::access.guil.canny_thresh_low);
+    guil->setCannyHighThresh(setting::access.guil.canny_thresh_high);
 }
 
 void recognition::setDataset(cv::Ptr<cv::GeneralizedHoughGuil> guil, std::list<cv::Mat> *buffer) {
     //Generate the array of images
     
-    if (X1_Y1_Z2)
+    if (setting::access.X1_Y1_Z2)
         recognition::getImagesWithRightColors(buffer, "X1-Y1-Z2");
     
-    if (X1_Y2_Z1)
+    if (setting::access.X1_Y2_Z1)
         recognition::getImagesWithRightColors(buffer, "X1-Y2-Z1");
 
-    if (X1_Y2_Z2)
+    if (setting::access.X1_Y2_Z2)
         recognition::getImagesWithRightColors(buffer, "X1-Y2-Z2");
 
-    if (X1_Y2_Z2_CHAMFER)
+    if (setting::access.X1_Y2_Z2_CHAMFER)
         recognition::getImagesWithRightColors(buffer, "X1-Y2-Z2-CHAMFER");
 
-    if (X1_Y2_Z2_TWINFILLET)
+    if (setting::access.X1_Y2_Z2_TWINFILLET)
         recognition::getImagesWithRightColors(buffer, "X1-Y2-Z2-TWINFILLET");
 
-    if (X1_Y3_Z2)
+    if (setting::access.X1_Y3_Z2)
         recognition::getImagesWithRightColors(buffer, "X1-Y3-Z2");
 
-    if (X1_Y3_Z2_FILLET)
+    if (setting::access.X1_Y3_Z2_FILLET)
         recognition::getImagesWithRightColors(buffer, "X1-Y3-Z2-FILLET");
 
-    if (X1_Y4_Z1)
+    if (setting::access.X1_Y4_Z1)
         recognition::getImagesWithRightColors(buffer, "X1-Y4-Z1");
 
-    if (X1_Y4_Z2)
+    if (setting::access.X1_Y4_Z2)
         recognition::getImagesWithRightColors(buffer, "X1-Y4-Z2");
 
-    if (X2_Y2_Z2)
+    if (setting::access.X2_Y2_Z2)
         recognition::getImagesWithRightColors(buffer, "X2-Y2-Z2");
 
-    if (X2_Y2_Z2_FILLET)
+    if (setting::access.X2_Y2_Z2_FILLET)
         recognition::getImagesWithRightColors(buffer, "X2-Y2-Z2-FILLET");
 }
 
 void recognition::getImagesWithRightColors(std::list<cv::Mat> *buffer, std::string block) {
     
-    if (BLUE)
+    if (setting::access.BLUE)
         recognition::getImages(buffer, block, "Blue");
 
-    if (ORANGE)
+    if (setting::access.ORANGE)
         recognition::getImages(buffer, block, "Orange");
 
-    if (YELLOW)
+    if (setting::access.YELLOW)
         recognition::getImages(buffer, block, "Yellow");
 
-    if (RED)
+    if (setting::access.RED)
         recognition::getImages(buffer, block, "Red");
 
-    if (VIOLET)
+    if (setting::access.VIOLET)
         recognition::getImages(buffer, block, "Violet");
 }
 
@@ -210,14 +210,14 @@ void recognition::scrapOvelappingDetections(std::vector<cv::Vec4f> *detections, 
             if (cv::rotatedRectangleIntersection(element_rect, comparison_rect, out)) {
                 int intersection_area = cv::contourArea(out);
                 if (element_rect_area > comparison_rect_area) {
-                    if ((double)intersection_area / (double)comparison_rect_area > AREA_INTERSECTION_TRESHOLD) {
+                    if ((double)intersection_area / (double)comparison_rect_area > setting::access.intersection_threshold) {
                         inner_pos_iter = detections->erase(inner_pos_iter);
                         inner_temp_iter = pTemplate->erase(inner_temp_iter);
                         inner_counter++;
                         continue;
                     }
                 } else {
-                    if ((double)intersection_area / (double)element_rect_area > AREA_INTERSECTION_TRESHOLD) {
+                    if ((double)intersection_area / (double)element_rect_area > setting::access.intersection_threshold) {
                         outer_pos_iter = detections->erase(outer_pos_iter);
                         outer_temp_iter = pTemplate->erase(outer_temp_iter);
                         outer_counter++;
