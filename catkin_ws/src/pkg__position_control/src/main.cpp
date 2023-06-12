@@ -50,6 +50,9 @@ int main(int argc, char **argv){
     msgMotion.data = {0,0,0,0};
     msgJS.data = true;
 
+    //user interactio
+    char c;
+
     // curve generation steps
     Eigen::Vector3d curveSteps[noSteps];
     std_msgs::Float32MultiArray curveJoints[noSteps];
@@ -139,23 +142,15 @@ int main(int argc, char **argv){
 
     #pragma endregion callbacks
     
-    // std::cout << "[Main] requesting home joint states\n";
-
-    //get default position
-    // jointStatus = false;
-    // requestPub.publish(msgJS);
-    // while(!jointStatus) ros::spinOnce();
-    // ee.computeDirect(q);
-    // home.setPosition(ee.getPosition());
-
     int currentState = WAITING;
 
     #pragma region stateMachine
     while(ros::ok()){
         switch(currentState){
             case WAITING:
-                std::cout << "\n[Waiting] press enter to advance: ";
-                std::cin.get();
+                std::cout << "\n";
+                std::cout << "[Waiting] press any key to advance: ";
+                std::cin >> c;
 
                 currentState = JS;
             break;
