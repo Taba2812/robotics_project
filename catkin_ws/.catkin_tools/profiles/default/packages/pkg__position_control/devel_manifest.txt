@@ -1,6 +1,0 @@
-pkg__position_control
-/root/code/catkin_ws/devel/.private/pkg__position_control/cmake.lock /root/code/catkin_ws/devel/./cmake.lock
-/root/code/catkin_ws/devel/.private/pkg__position_control/lib/pkgconfig/pkg__position_control.pc /root/code/catkin_ws/devel/lib/pkgconfig/pkg__position_control.pc
-/root/code/catkin_ws/devel/.private/pkg__position_control/lib/pkg__position_control/ur5Main /root/code/catkin_ws/devel/lib/pkg__position_control/ur5Main
-/root/code/catkin_ws/devel/.private/pkg__position_control/share/pkg__position_control/cmake/pkg__position_controlConfig-version.cmake /root/code/catkin_ws/devel/share/pkg__position_control/cmake/pkg__position_controlConfig-version.cmake
-/root/code/catkin_ws/devel/.private/pkg__position_control/share/pkg__position_control/cmake/pkg__position_controlConfig.cmake /root/code/catkin_ws/devel/share/pkg__position_control/cmake/pkg__position_controlConfig.cmake

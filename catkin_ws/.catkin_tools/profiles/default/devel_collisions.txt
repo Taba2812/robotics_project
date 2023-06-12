@@ -1,4 +1,0 @@
-/home/dawwo/Documents/Repositories/robotics_project/catkin_ws/devel/./cmake.lock 15
-/home/taba/trento_lab_home/ros_ws/src/catkin_ws/devel/./cmake.lock 2
-/root/code/catkin_ws/devel/./cmake.lock 1534
-/home/taba/robotics_project/catkin_ws/devel/./cmake.lock 20

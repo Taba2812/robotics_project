@@ -17,7 +17,7 @@ int main (int argc, char **argv) {
 
     ros::init(argc, argv, "Detection_Node");
     ros::NodeHandle nh;
-
+    
     //Setting launch parameters
     std::string camera_ch_send, pointcloud_ch_rcve, image_ch_rcve, core_ch_send, core_ch_rcve;
     int image_height, image_width, queue;
@@ -29,7 +29,6 @@ int main (int argc, char **argv) {
     nh.getParam("IMAGE_HEIGHT", image_height);
     nh.getParam("IMAGE_WIDTH", image_width);
     nh.getParam("Q_Size", queue);
-
 
     bool pcl_available = false;
     cv::Mat pcl_mat (image_height, image_width, CV_32FC3, cv::Scalar(0));

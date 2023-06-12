@@ -23,6 +23,7 @@ WORKDIR /root/OpenCV/build
 
 RUN cmake ../opencv
 RUN make -j4
+RUN make install
 
 ENV OpenCV_DIR=/root/OpenCV/build
 
@@ -38,7 +39,7 @@ RUN apt-get install -y ros-noetic-cv-bridge
 
 # Final Setup
 ENV CMAKE_PREFIX_PATH=/opt/ros/noetic
-
+ENV DISPLAY=:1
 
 #CMD ["cd", catkin_ws]
 

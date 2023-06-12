@@ -6,3 +6,4 @@ services:
     network_mode: "host"
     volumes:
       - .:/root/code
+      - /tmp/.X11-unix/:/tmp/.X11-unix/
