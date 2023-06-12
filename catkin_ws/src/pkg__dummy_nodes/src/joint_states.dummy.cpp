@@ -25,7 +25,7 @@ int main(int argc, char** argv) {
   ros::Publisher jointStatePub = nh.advertise<sensor_msgs::JointState>(js_data, queue_size);
 
   auto jointStateCallback = [&] (const sensor_msgs::JointState::ConstPtr &msg) {
-    std::cout << "\n[JointStates] received new values\n";
+    // std::cout << "\n[JointStates] received new values\n";
 
     for(int i=0; i<JOINTS; i++){
       jointStateMsg.position[i] = msg->position[i];
@@ -33,10 +33,10 @@ int main(int argc, char** argv) {
   };
 
   auto requestCallback = [&] (const std_msgs::Bool::ConstPtr &req) {
-    std::cout << "[Joint States] Received request - sending joint states:\n";
-    for(int i=0; i<JOINTS; i++){
-      std::cout << jointStateMsg.position.at(i) << "\n";
-    }
+    // std::cout << "[Joint States] Received request - sending joint states:\n";
+    // for(int i=0; i<JOINTS; i++){
+    //   std::cout << jointStateMsg.position.at(i) << "\n";
+    // }
     jointStatePub.publish(jointStateMsg);
   };
 
