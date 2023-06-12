@@ -19,6 +19,7 @@ namespace Bezier {
             Node calculate(float t);
         public:
             Curve();
+            Curve(Bezier::Node init, Bezier::Node dest, int seg);
             Curve(Node dest, int seg);
             Node getNext();
     };
