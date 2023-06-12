@@ -19,7 +19,7 @@ public:
     std_msgs::Float32MultiArray getMessage() const;
     void computeInverse(const EndEffector& ee);
     std_msgs::Float32MultiArray getDestination();
-    std_msgs::Float64MultiArray getMessage();
+    std_msgs::Float32MultiArray getMessage();
     void setPosition(Eigen::Vector3d p);
 };
 
@@ -281,8 +281,8 @@ std_msgs::Float32MultiArray Destination::getDestination(){
     return destination;
 }
 
-std_msgs::Float64MultiArray Destination::getMessage(){
-    std_msgs::Float64MultiArray msg;
+std_msgs::Float32MultiArray Destination::getMessage(){
+    std_msgs::Float32MultiArray msg;
 
     for(int i=0; i<JOINTS; i++){
         msg.data[i] = jc(i);

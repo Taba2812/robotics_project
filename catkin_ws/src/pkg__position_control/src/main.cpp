@@ -1,6 +1,7 @@
 #include "headers/direct_kinematics.h"
 #include "headers/inverse_kinematics.h"
 #include "std_msgs/Float32MultiArray.h"
+#include "std_msgs/Float64.h"
 
 int main(int argc, char **argv){
     sleep(1);
@@ -33,7 +34,9 @@ int main(int argc, char **argv){
     EndEffector ee;
     Destination d, home;
     FinalDestination fd;
+    Eigen::Vector3d initialStep;
     Eigen::Vector3d finalStep;
+    Eigen::Vector3d currentPosition;
     BlockPosition bp;
 
     //ros messages
@@ -46,15 +49,18 @@ int main(int argc, char **argv){
     bool positionStatus = false;
     bool motionStatus = false;
     bool gripper = false;
+    bool defaultPosition = true;
+
     bp = BlockPosition::Zero();
     msgMotion.data = {0,0,0,0};
     msgJS.data = true;
 
-    //user interactio
+    //user interaction
     char c;
 
     // curve generation steps
     Eigen::Vector3d curveSteps[noSteps];
+    Eigen::Vector3d curvePositions[noSteps];
     std_msgs::Float32MultiArray curveJoints[noSteps];
 
     //publishers
@@ -147,6 +153,7 @@ int main(int argc, char **argv){
     #pragma region stateMachine
     while(ros::ok()){
         switch(currentState){
+
             case WAITING:
                 std::cout << "\n";
                 std::cout << "[Waiting] press any key to advance: ";
@@ -164,7 +171,12 @@ int main(int argc, char **argv){
                 while(!jointStatus) ros::spinOnce();
                 ee.computeDirect(q);
 
-                std::cout << "\nDestination: \n" << ee.getPosition() << "\n";
+                if(defaultPosition){
+                    home.setPosition(ee.getPosition());
+                    defaultPosition = false;
+                }
+
+                std::cout << "\nHome: \n" << home.getPosition() << "\n";
                 
                 currentState = VISION;
                 msgVision.data = true;
@@ -198,6 +210,7 @@ int main(int argc, char **argv){
 
             case MOTION:
                 std::cout << "\n[Motion] computing path planning...\n";
+                initialStep << ee.getPosition();
                 finalStep << d.getPosition();
 
                 for(int i=0; i<3; i++){
@@ -210,12 +223,20 @@ int main(int argc, char **argv){
 
                 while(!motionStatus) ros::spinOnce();
 
-                // for(int i=0; i<noSteps; i++){
-                //     ee.setPosition(curveSteps[i]);
-                //     d.computeInverse(ee);
-                //     //std::cout << d.getJointAngles() << "\n\n";
-                //     // curveJoints[i] = d.getDestination();
-                // }
+                currentPosition << initialStep;
+
+                for(int i=0; i<noSteps; i++) {
+                    curvePositions[i] << currentPosition + curveSteps[i];
+                    currentPosition << curvePositions[i];
+
+                    ee.setPosition(curvePositions[i]);
+                    d.computeInverse(ee);
+                    
+                    curveJoints[i].data.resize(JOINTS);
+                    for(int j=0; j<JOINTS; j++) {
+                        curveJoints[i].data.at(j) = d.getJointAngles()(j);
+                    }
+                }
 
                 if(!gripper) currentState = TO_BLOCK;
                 else currentState = TO_FINAL;

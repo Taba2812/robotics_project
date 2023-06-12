@@ -33,7 +33,7 @@ int main(int argc, char** argv) {
   };
 
   auto requestCallback = [&] (const std_msgs::Bool::ConstPtr &req) {
-    std::cout << "[Joint States] Received request - sending home joint states:\n";
+    std::cout << "[Joint States] Received request - sending joint states:\n";
     for(int i=0; i<JOINTS; i++){
       std::cout << jointStateMsg.position.at(i) << "\n";
     }

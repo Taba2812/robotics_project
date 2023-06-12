@@ -39,7 +39,7 @@ int main (int argc, char **argv) {
 
     auto motion_planning_callback = [&] (const std_msgs::Float32MultiArrayConstPtr &destination) {
         //First call, generate the curve
-        std::cout << "[Motion Planning] Destination recieved as: x-" << (float)destination->data[0] << " y-" << (float)destination->data[1] << " z-" << (float)destination->data[2] << std::endl;
+        std::cout << "[Motion Planning] Destination received as: x-" << (float)destination->data[0] << " y-" << (float)destination->data[1] << " z-" << (float)destination->data[2] << std::endl;
         Bezier::Node dest = {(float)destination->data[0],(float)destination->data[1],(float)destination->data[2]};
         previous = {0.0f,0.0f,0.0f}; 
         curve = Bezier::Curve(dest, destination->data[3]);
