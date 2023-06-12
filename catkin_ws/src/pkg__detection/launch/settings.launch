@@ -3,10 +3,10 @@
     <!-- <param name="" value="" /> -->
 
     <!-- TABLE CROPPING -->
-    <param name="LEFT_CROP"  value="672" />
-    <param name="RIGHT_CROP" value="881" />
-    <param name="TOP_CROP"   value="60" />
-    <param name="BOT_CROP"   value="855" />
+    <param name="LEFT_CROP"  value="673" />
+    <param name="RIGHT_CROP" value="874" />
+    <param name="TOP_CROP"   value="95" />
+    <param name="BOT_CROP"   value="817" />
 
     <!-- PIPELINE -->
     <param name="EROSION_SIZE"  value="4" />
@@ -18,6 +18,13 @@
     <param name="HIGHER_HUE"        value="194" />
     <param name="HIGHER_SATURATION" value="192" />
     <param name="HIGHER_BRIGHTNESS" value="206" />
+
+    <!--<param name="LOWER_HUE"         value="103" />
+    <param name="LOWER_SATURATION"  value="80" />
+    <param name="LOWER_BRIGHTNESS"  value="110" />
+    <param name="HIGHER_HUE"        value="116" />
+    <param name="HIGHER_SATURATION" value="244" />
+    <param name="HIGHER_BRIGHTNESS" value="229" />-->
 
     <!-- DETECTION -->
     <param name="INTERSECTION_TRESHOLD" value="0.5" />
@@ -34,7 +41,7 @@
 
     <param name="GUIL_MIN_SCALE"    value="0.5" />
     <param name="GUIL_MAX_SCALE"    value="4.0" />
-    <param name="GUIL_STEP_SCALE"   value="0.05" />
+    <param name="GUIL_STEP_SCALE"   value="0.5" />
     <param name="GUIL_THRESH_SCALE" value="50" />
 
     <param name="GUIL_THRESH_POS"        value="10" />
@@ -42,7 +49,7 @@
     <param name="GUIL_CANNY_THRESH_HIGH" value="110" />
 
     <!-- IMAGE DATASET -->
-    <param name="BLUE"   value="0" />
+    <param name="BLUE"   value="1" />
     <param name="ORANGE" value="0" />
     <param name="YELLOW" value="0" />
     <param name="RED"    value="0" />

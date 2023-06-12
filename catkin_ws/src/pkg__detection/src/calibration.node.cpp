@@ -12,6 +12,9 @@
 
 #include "libraries/data_type_handler.h"
 #include "libraries/detection.h"
+#include "libraries/settings.h"
+
+setting::Container setting::access;
 
 void display_calibration(cv::Mat img, cv::Mat pcl) {
         //Color calibration...
@@ -92,7 +95,7 @@ int main (int argc, char **argv) {
     ros::NodeHandle nh;
 
     //Setting launch parameters
-
+    setting::access.SetParameters(nh);
     std::string camera_ch_send, pointcloud_ch_rcve, image_ch_rcve, core_ch_send, core_ch_rcve;
     int image_height, image_width, queue;
     nh.getParam("Det2Zed_Req", camera_ch_send);

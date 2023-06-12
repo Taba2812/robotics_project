@@ -18,6 +18,8 @@
 #include <pcl-1.10/pcl/PCLPointCloud2.h>
 #include <pcl_conversions/pcl_conversions.h>
 
+//#define IMAGE_WIDTH 1920
+//#define IMAGE_HEIGHT 1080
 #define IMAGE_WIDTH 1920
 #define IMAGE_HEIGHT 1080
 

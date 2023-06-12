@@ -10,8 +10,6 @@ namespace setting {
     
 
     #define RATIO 1000
-    #define IMAGE_WIDTH 1920
-    #define IMAGE_HEIGHT 1080
 
     //STRUCTS
     struct HSV_Colorspace {
@@ -77,6 +75,9 @@ namespace setting {
             //Image
             int EROSION_SIZE;
             int DILATION_SIZE;
+
+            int IMAGE_WIDTH;
+            int IMAGE_HEIGHT;
 
             //Detection
             setting::Boundry boundry;

@@ -8,10 +8,10 @@ cv::Mat DataTypeHandler::PointCloud2Mat(const sensor_msgs::PointCloud2ConstPtr &
     pcl::fromPCLPointCloud2(pcl_pc2,*temp_cloud);
 
     //matrice = pcl_to_Mat(temp_cloud);
-    cv::Mat pcm(IMAGE_HEIGHT, IMAGE_WIDTH, CV_32FC3, cv::Scalar(0));
+    cv::Mat pcm(setting::access.IMAGE_HEIGHT, setting::access.IMAGE_WIDTH, CV_32FC3, cv::Scalar(0));
     int i = 0; int valid_counter = 0;
-    for (int h = 0; h < IMAGE_HEIGHT; h++) {
-        for (int w = 0; w < IMAGE_WIDTH; w++) {
+    for (int h = 0; h < setting::access.IMAGE_HEIGHT; h++) {
+        for (int w = 0; w < setting::access.IMAGE_WIDTH; w++) {
             pcl::PointXYZ pcl_point = temp_cloud->points[i];
             cv::Vec3f point(pcl_point.x, pcl_point.y, pcl_point.z);
             
@@ -32,7 +32,7 @@ cv::Mat DataTypeHandler::PointCloud2Mat(const sensor_msgs::PointCloud2ConstPtr &
 sensor_msgs::PointCloud2 DataTypeHandler::File2PointCloud(std::string path) {
     std::cout << "Loading Matrix..." << std::endl;
     
-    PTL_PointCloud tmp(IMAGE_WIDTH, IMAGE_HEIGHT, pcl::PointXYZ());
+    PTL_PointCloud tmp(setting::access.IMAGE_WIDTH, setting::access.IMAGE_HEIGHT, pcl::PointXYZ());
     sensor_msgs::PointCloud2 pcl_msg;
     std::ifstream raw_file(path);
 
@@ -49,7 +49,7 @@ sensor_msgs::PointCloud2 DataTypeHandler::File2PointCloud(std::string path) {
 
         tmp.at(w,h)= pcl::PointXYZ(x,y,z);
 
-        if (w == IMAGE_WIDTH - 1) {w = 0;h++;} else {w++;}     
+        if (w == setting::access.IMAGE_WIDTH - 1) {w = 0;h++;} else {w++;}     
     }
 
     raw_file.close();

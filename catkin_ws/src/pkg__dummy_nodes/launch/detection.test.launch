@@ -4,6 +4,7 @@
     <include file="$(find pkg__detection)/launch/detection.launch" />
 
     <param name="IMG_PATH" value="/root/code/catkin_ws/src/images_database/complete_data_examples/SimulatedZed2_img.png" />
+    <!--<param name="IMG_PATH" value="/root/code/catkin_ws/src/images_database/official_placeholders/MultipleBlocks/blocks_group2_10.jpg" />-->
     <param name="RAW_PATH" value="/root/code/catkin_ws/src/images_database/complete_data_examples/SimulatedZed2_raw.txt" />
 
     <node pkg="pkg__dummy_nodes" type="Core-Detection_Dummy" name="Detection_Dummy" output="screen" /> 

@@ -12,6 +12,9 @@ std::vector<setting::Boundry> setting::Container::lookup_colors() {
 }
 
 setting::Container::Container() {
+        this->IMAGE_HEIGHT = 0;
+        this->IMAGE_WIDTH = 0;
+
         this->X1_Y1_Z2 = 0;
         this->X1_Y2_Z1 = 0;
         this->X1_Y2_Z2 = 0;
@@ -67,6 +70,9 @@ setting::Container::Container() {
 }
 
 void setting::Container::SetParameters(ros::NodeHandle nh) {
+        nh.getParam("IMAGE_HEIGHT", this->IMAGE_HEIGHT);
+        nh.getParam("IMAGE_WIDTH", this->IMAGE_WIDTH);
+        
         nh.getParam("X1_Y1_Z2",this->X1_Y1_Z2);
         nh.getParam("X1_Y2_Z1",this->X1_Y2_Z1);
         nh.getParam("X1_Y2_Z2",this->X1_Y2_Z2);

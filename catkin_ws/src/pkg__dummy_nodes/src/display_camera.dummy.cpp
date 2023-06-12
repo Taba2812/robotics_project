@@ -17,6 +17,8 @@
 #define RATIO 1000
 #define IMAGE_WIDTH 1920
 #define IMAGE_HEIGHT 1080
+//#define IMAGE_WIDTH 1080
+//#define IMAGE_HEIGHT 720
 
 typedef pcl::PointCloud<pcl::PointXYZ> PTL_PointCloud;
 typedef pcl::PointCloud<pcl::PointXYZ>::Ptr PTL_PointCloudPtr;
