@@ -1,6 +1,6 @@
 #include "settings.h"
 
-cv::Rect setting::Container::getCropRect(cv::Mat mat) {
+cv::Rect setting::Container::getCropRect() {
         return cv::Rect (this->LEFT_CROP, 
                          this->TOP_CROP, 
                          this->RIGHT_CROP, 
@@ -8,9 +8,7 @@ cv::Rect setting::Container::getCropRect(cv::Mat mat) {
 }
 
 std::vector<setting::Boundry> setting::Container::lookup_colors() {
-        return {{{170,230,185},{108,125,66 }},  //Blocchetti Blu
-                {{218,147,111},{140,51 ,50 }},  //Blocchetti Viola
-                {{40 ,255,255},{0  ,130,115}}}; //Blocchetti Rossi
+        return {this->boundry};
 }
 
 setting::Container::Container() {
@@ -64,6 +62,7 @@ setting::Container::Container() {
         this->guil.canny_thresh_high = 0;
 
         this->intersection_threshold = 0;
+        this->DATASET_PATH = "";
         
 }
 
@@ -101,21 +100,22 @@ void setting::Container::SetParameters(ros::NodeHandle nh) {
         nh.getParam("HIGHER_SATURATION",this->boundry.upper.saturation);
         nh.getParam("HIGHER_BRIGHTNESS",this->boundry.upper.brightness);
 
-        nh.getParam("GUIL_MIN-DIST",this->guil.min_dist);
+        nh.getParam("GUIL_MIN_DIST",this->guil.min_dist);
         nh.getParam("GUIL_LEVELS",this->guil.levels);
         nh.getParam("GUIL_DP",this->guil.dp);
-        nh.getParam("GUIL_MAX-BUFFER-SIZE",this->guil.max_buffer_size);
-        nh.getParam("GUIL_MIN-ANGLE",this->guil.min_angle);
-        nh.getParam("GUIL_MAX-ANGLE",this->guil.max_angle);
-        nh.getParam("GUIL_STEP-ANGLE",this->guil.step_angle);
-        nh.getParam("GUIL_THRESH-ANGLE",this->guil.thresh_angle);
-        nh.getParam("GUIL_MIN-SCALE",this->guil.min_scale);
-        nh.getParam("GUIL_MAX-SCALE",this->guil.max_scale);
-        nh.getParam("GUIL_STEP-SCALE",this->guil.step_scale);
-        nh.getParam("GUIL_THRESH-SCALE",this->guil.thresh_scale);
-        nh.getParam("GUIL_THRESH-POS",this->guil.thersh_pos);
-        nh.getParam("GUIL_CANNY-THRESH-LOW",this->guil.canny_thresh_low);
-        nh.getParam("GUIL_CANNY-THRESH-HIGH",this->guil.canny_thresh_high);
+        nh.getParam("GUIL_MAX_BUFFER_SIZE",this->guil.max_buffer_size);
+        nh.getParam("GUIL_MIN_ANGLE",this->guil.min_angle);
+        nh.getParam("GUIL_MAX_ANGLE",this->guil.max_angle);
+        nh.getParam("GUIL_STEP_ANGLE",this->guil.step_angle);
+        nh.getParam("GUIL_THRESH_ANGLE",this->guil.thresh_angle);
+        nh.getParam("GUIL_MIN_SCALE",this->guil.min_scale);
+        nh.getParam("GUIL_MAX_SCALE",this->guil.max_scale);
+        nh.getParam("GUIL_STEP_SCALE",this->guil.step_scale);
+        nh.getParam("GUIL_THRESH_SCALE",this->guil.thresh_scale);
+        nh.getParam("GUIL_THRESH_POS",this->guil.thersh_pos);
+        nh.getParam("GUIL_CANNY_THRESH_LOW",this->guil.canny_thresh_low);
+        nh.getParam("GUIL_CANNY_THRESH_HIGH",this->guil.canny_thresh_high);
 
         nh.getParam("INTERSECTION_TRESHOLD", this->intersection_threshold);
+        nh.getParam("BLOCK_DATASET_PATH", this->DATASET_PATH);
 }

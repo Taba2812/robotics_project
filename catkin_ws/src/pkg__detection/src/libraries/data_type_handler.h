@@ -29,6 +29,8 @@ namespace DataTypeHandler {
     cv::Mat Image2Mat(const sensor_msgs::ImageConstPtr &image);
     sensor_msgs::ImagePtr Mat2Image(cv::Mat cvMat);
 
+    cv::Mat ExpensiveCrop(cv::Mat cvMat, cv::Rect rect);
+
 }
 
 #endif

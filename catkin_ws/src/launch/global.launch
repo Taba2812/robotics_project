@@ -26,6 +26,7 @@
         <param name="Det2Zed_Req"  value="Camera_Request" />    <!--Bool-->
         <param name="Zed2Det_Data" value="Camera_Data" />       <!--PointCloud2-->
         <param name="Zed2Det_Img"  value="Camera_Image" />      <!--Image-->
+        <param name="Det2Deb_Img"  value="Detection_Debug" />   <!--Image-->
 
         <!--DOCKER MITM-->
         <param name="Docker_Data"  value="/ur5/zed_node/point_cloud/cloud_registered" />  <!--PointCloud2-->

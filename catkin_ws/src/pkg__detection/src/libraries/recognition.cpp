@@ -7,7 +7,7 @@ std::vector<cv::Vec4f> recognition::runRecognition(cv::InputOutputArray img) {
 
     recognition::setParameters(guil); 
 
-    recognition::setDataset(guil, &buffer); 
+    recognition::setDataset(guil, &buffer);
 
     return recognition::detection(guil, &buffer, img, guilPosition);
 }
@@ -96,7 +96,7 @@ void recognition::getImages(std::list<cv::Mat> *buffer, std::string block, std::
     for (int i = 0; i < 9; i++) {
         for (int j = 0; j < 4; j++) {
             std::string filename = "/" + block + "/" + "Blocco_" + block + "_" + color + "_" + std::to_string(latitude[i]) + "-" + std::to_string(longitude[j]) + ".png";
-            buffer->push_front(cv::imread(DATASET_PATH + filename, cv::IMREAD_GRAYSCALE));
+            buffer->push_front(cv::imread(setting::access.DATASET_PATH + filename, cv::IMREAD_GRAYSCALE));
         }
     }
 }
@@ -106,7 +106,6 @@ std::vector<cv::Vec4f> recognition::detection(cv::Ptr<cv::GeneralizedHoughGuil> 
     cv::cvtColor(img, grayscale, cv::COLOR_RGB2GRAY);
     int total_detections = 0;
     std::vector<cv::Mat> pTemplate;
-
     for (cv::Mat temp : *buffer) {
         std::vector<cv::Vec4f> partial_detections;
         guil->setTemplate(temp);

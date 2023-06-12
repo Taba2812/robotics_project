@@ -51,6 +51,9 @@ target_link_libraries(DisplayCamera_Dummy ${catkin_LIBRARIES})
 add_executable(Detection-Core_Dummy src/core_detection.dummy.cpp)
 target_link_libraries(Detection-Core_Dummy ${catkin_LIBRARIES})
 
+add_executable(DetectionDebug_Dummy src/debug_detection.dummy.cpp)
+target_link_libraries(DetectionDebug_Dummy ${catkin_LIBRARIES})
+
 add_executable(JointStates_Dummy src/joint_states.dummy.cpp)
 target_link_libraries(JointStates_Dummy ${catkin_LIBRARIES})
 

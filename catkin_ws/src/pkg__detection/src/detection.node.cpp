@@ -13,22 +13,27 @@
 #include "libraries/data_type_handler.h"
 #include "libraries/detection.h"
 
+setting::Container setting::access;
+
 int main (int argc, char **argv) {
 
     ros::init(argc, argv, "Detection_Node");
     ros::NodeHandle nh;
     
     //Setting launch parameters
-    std::string camera_ch_send, pointcloud_ch_rcve, image_ch_rcve, core_ch_send, core_ch_rcve;
+    std::string camera_ch_send, pointcloud_ch_rcve, image_ch_rcve, core_ch_send, core_ch_rcve, img_debug;
     int image_height, image_width, queue;
     nh.getParam("Det2Zed_Req", camera_ch_send);
     nh.getParam("Zed2Det_Data", pointcloud_ch_rcve);
     nh.getParam("Zed2Det_Img", image_ch_rcve);
     nh.getParam("Det2Core_Res", core_ch_send);
     nh.getParam("Core2Det_Req", core_ch_rcve);
+    nh.getParam("Det2Deb_Img", img_debug);
     nh.getParam("IMAGE_HEIGHT", image_height);
     nh.getParam("IMAGE_WIDTH", image_width);
     nh.getParam("Q_Size", queue);
+
+    setting::access.SetParameters(nh);
 
     bool pcl_available = false;
     cv::Mat pcl_mat (image_height, image_width, CV_32FC3, cv::Scalar(0));
@@ -38,11 +43,13 @@ int main (int argc, char **argv) {
 
     ros::Publisher camera_pub = nh.advertise<std_msgs::Bool>(camera_ch_send, queue);
     ros::Publisher main_pub = nh.advertise<std_msgs::Float32MultiArray>(core_ch_send, queue);
+    ros::Publisher debug_pub = nh.advertise<sensor_msgs::Image>(img_debug, queue);
 
     auto detection = [&] () {
         std::cout << "[Detection] Running Detection..." << std::endl;
-        //return Detection::Detect(pcl_mat, img_mat);
-        return cv::Vec3f(7,8,9);
+        Detection::DetectionResults det = Detection::Detect(pcl_mat, img_mat);
+        debug_pub.publish(DataTypeHandler::Mat2Image(det.image));
+        return det.position;
     };
     
     auto pcl_callback = [&] (const sensor_msgs::PointCloud2ConstPtr &point_cloud) {
@@ -65,6 +72,7 @@ int main (int argc, char **argv) {
         std::cout << "[Detection] Received Image..." << std::endl;
 
         img_mat = DataTypeHandler::Image2Mat(image);
+        std::cout << "Mat -> rows:" << img_mat.rows << " cols:" << img_mat.cols << std::endl;
         img_available = true;
 
         if (pcl_available && img_available) {

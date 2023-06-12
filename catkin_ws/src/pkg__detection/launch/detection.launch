@@ -1,6 +1,7 @@
 <launch>
 
     <include file="src/launch/global.launch" />
+    <include file="$(find pkg__detection)/launch/settings.launch" />
     
     <node pkg="pkg__detection" type="Detection_Node" name="Detection_Node" output="screen" />
 

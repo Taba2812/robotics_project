@@ -88,3 +88,15 @@ sensor_msgs::ImagePtr DataTypeHandler::Mat2Image(cv::Mat cvMat) {
 
     return img_bridge.toImageMsg();
 }
+
+cv::Mat DataTypeHandler::ExpensiveCrop(cv::Mat cvMat, cv::Rect rect) {
+    cv::Mat pcm(rect.height, rect.width, CV_32FC3, cv::Scalar(0));
+
+    for (int h = 0; h < pcm.rows; h++) {
+        for (int w = 0; w < pcm.cols; w++) {          
+            //pcm.at<cv::Vec3f>(h,w) = cvMat.at<cv::Vec3f>(rect.y+h, rect.x+w);
+        }
+    }
+
+    return pcm;
+}

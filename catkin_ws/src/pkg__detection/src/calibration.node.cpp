@@ -27,10 +27,12 @@ void display_calibration(cv::Mat img, cv::Mat pcl) {
         cv::resizeWindow("Mask Calibration", new_size.width, new_size.height);
 
         int x_start, y_start, x_end, y_end;
+        int crop;
         cv::createTrackbar("x_start", "Crop Calibration", &x_start, img.cols);
         cv::createTrackbar("x_end", "Crop Calibration", &x_end, img.cols);
         cv::createTrackbar("y_start", "Crop Calibration", &y_start, img.rows);
         cv::createTrackbar("y_end", "Crop Calibration", &y_end, img.rows);
+        cv::createTrackbar("crop", "Crop Calibration", &crop, 2);
 
         int upper_h, upper_s, upper_b;
         int lower_h, lower_s, lower_b;
@@ -53,6 +55,7 @@ void display_calibration(cv::Mat img, cv::Mat pcl) {
             cv::imshow("Crop Calibration", tmp_rect);
 
             cv::Mat tmp_color = img.clone();
+            cv::cvtColor(tmp_color, tmp_color, cv::COLOR_BGR2HSV);
             cv::inRange(tmp_color, cv::Scalar(lower_h, lower_s, lower_b), cv::Scalar(upper_h, upper_s, upper_b), tmp_color);
             cv::imshow("Color Calibration", tmp_color);
 
@@ -67,7 +70,12 @@ void display_calibration(cv::Mat img, cv::Mat pcl) {
             cv::erode(tmp_mask, tmp_mask_2, erosion_kernel);
             cv::dilate(tmp_mask_2, tmp_mask, dilation_kernel);
             
-            cv::imshow("Mask Calibration", tmp_mask);
+            if (crop == 1) {
+                cv::imshow("Mask Calibration", tmp_mask(edges));
+            } else {
+                cv::imshow("Mask Calibration", tmp_mask);
+            }
+            
 
             int c = cv::waitKey(10);
             if (c == 'k') {

@@ -12,41 +12,41 @@
     <param name="EROSION_SIZE"  value="4" />
     <param name="DILATION_SIZE" value="4" />
 
-    <param name="LOWER_HUE"         value="55" />
-    <param name="LOWER_SATURATION"  value="30" />
-    <param name="LOWER_BRIGHTNESS"  value="10" />
-    <param name="HIGHER_HUE"        value="193" />
-    <param name="HIGHER_SATURATION" value="110" />
-    <param name="HIGHER_BRIGHTNESS" value="91" />
+    <param name="LOWER_HUE"         value="110" />
+    <param name="LOWER_SATURATION"  value="20" />
+    <param name="LOWER_BRIGHTNESS"  value="50" />
+    <param name="HIGHER_HUE"        value="194" />
+    <param name="HIGHER_SATURATION" value="192" />
+    <param name="HIGHER_BRIGHTNESS" value="206" />
 
     <!-- DETECTION -->
     <param name="INTERSECTION_TRESHOLD" value="0.5" />
 
-    <param name="GUIL_MIN-DIST"        value="10" />
+    <param name="GUIL_MIN_DIST"        value="10" />
     <param name="GUIL_LEVELS"          value="360" />
     <param name="GUIL_DP"              value="3" />
-    <param name="GUIL_MAX-BUFFER-SIZE" value="1000" />
+    <param name="GUIL_MAX_BUFFER_SIZE" value="1000" />
 
-    <param name="GUIL_MIN-ANGLE"    value="0" />
-    <param name="GUIL_MAX-ANGLE"    value="360" />
-    <param name="GUIL_STEP-ANGLE"   value="1" />
-    <param name="GUIL_THRESH-ANGLE" value="1500" />
+    <param name="GUIL_MIN_ANGLE"    value="0" />
+    <param name="GUIL_MAX_ANGLE"    value="360" />
+    <param name="GUIL_STEP_ANGLE"   value="1" />
+    <param name="GUIL_THRESH_ANGLE" value="1500" />
 
-    <param name="GUIL_MIN-SCALE"    value="0.5" />
-    <param name="GUIL_MAX-SCALE"    value="2.0" />
-    <param name="GUIL_STEP-SCALE"   value="0.05" />
-    <param name="GUIL_THRESH-SCALE" value="50" />
+    <param name="GUIL_MIN_SCALE"    value="0.5" />
+    <param name="GUIL_MAX_SCALE"    value="4.0" />
+    <param name="GUIL_STEP_SCALE"   value="0.05" />
+    <param name="GUIL_THRESH_SCALE" value="50" />
 
-    <param name="GUIL_THRESH-POS"        value="10" />
-    <param name="GUIL_CANNY-THRESH-LOW"  value="30" />
-    <param name="GUIL_CANNY-THRESH-HIGH" value="110" />
+    <param name="GUIL_THRESH_POS"        value="10" />
+    <param name="GUIL_CANNY_THRESH_LOW"  value="30" />
+    <param name="GUIL_CANNY_THRESH_HIGH" value="110" />
 
     <!-- IMAGE DATASET -->
-    <param name="BLUE"   value="1" />
-    <param name="ORANGE" value="1" />
-    <param name="YELLOW" value="1" />
-    <param name="RED"    value="1" />
-    <param name="VIOLET" value="1" />
+    <param name="BLUE"   value="0" />
+    <param name="ORANGE" value="0" />
+    <param name="YELLOW" value="0" />
+    <param name="RED"    value="0" />
+    <param name="VIOLET" value="0" />
 
     <param name="X1_Y1_Z2"            value="1" />
     <param name="X1_Y2_Z1"            value="1" />
@@ -59,5 +59,7 @@
     <param name="X1_Y4_Z2"            value="1" />
     <param name="X2_Y2_Z2"            value="1" />
     <param name="X2_Y2_Z2_FILLET"     value="1" />
+
+    <param name="BLOCK_DATASET_PATH"  value="/root/code/catkin_ws/src/images_database/blocks_dataset" />
 
 </launch>

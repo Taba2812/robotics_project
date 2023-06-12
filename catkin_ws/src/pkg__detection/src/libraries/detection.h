@@ -6,12 +6,18 @@
 #include "pipeline.h"
 #include "recognition.h"
 #include "location_handler.h"
+#include "data_type_handler.h"
 
 namespace Detection {
 
-    cv::Vec3f detectBlocks(cv::Mat pcl, cv::Mat Png);
-    cv::Vec3f detectGripper(cv::Mat pcl, cv::Mat png);
-    cv::Vec3f Detect(cv::Mat pcl, cv::Mat png);
+    struct DetectionResults {
+        cv::Vec3f position;
+        cv::Mat image;
+    };
+
+    DetectionResults detectBlocks(cv::Mat pcl, cv::Mat Png);
+    DetectionResults detectGripper(cv::Mat pcl, cv::Mat png);
+    DetectionResults Detect(cv::Mat pcl, cv::Mat png);
 
 }
 

@@ -1,6 +1,8 @@
 #include "location_handler.h"
 
 cv::Vec4f LocationHandler::selectDetection(std::vector<cv::Vec4f> detections, int width, int height) {
+    if (detections.empty()) {return cv::Vec4f(0.0f, 0.0f, 0.0f, 0.0f);}
+    
     // Select the detection that is cloasest to the center
     int mid_x = (float)width / 2;
     int mid_y = (float)height / 2;

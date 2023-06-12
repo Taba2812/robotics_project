@@ -82,10 +82,11 @@ namespace setting {
             setting::Boundry boundry;
             setting::GuilParams guil;
             int intersection_threshold;
+            std::string DATASET_PATH;
 
             Container();
             void SetParameters(ros::NodeHandle nh);
-            cv::Rect getCropRect(cv::Mat mat);
+            cv::Rect getCropRect();
             std::vector<Boundry> lookup_colors();
 
     };

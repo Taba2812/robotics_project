@@ -1,6 +1,7 @@
 #include "detection.h"
 
-cv::Vec3f Detection::Detect(cv::Mat pcl, cv::Mat png) {
+Detection::DetectionResults Detection::Detect(cv::Mat pcl, cv::Mat png) {
+
     /*
     cv::Vec3f gripper_position = Detection::detectGripper(pcl, png);
     cv::Vec3f block_position = Detection::detectBlocks(pcl, png);
@@ -10,13 +11,14 @@ cv::Vec3f Detection::Detect(cv::Mat pcl, cv::Mat png) {
     result[1] = abs(gripper_position[1] - block_position[1]);
     result[2] = abs(gripper_position[2] - block_position[2]);
     */
+
     return Detection::detectBlocks(pcl, png);
 }
 
-cv::Vec3f Detection::detectGripper(cv::Mat pcl, cv::Mat png) {
+Detection::DetectionResults Detection::detectGripper(cv::Mat pcl, cv::Mat png) {
     //Crop Images
-    cv::Mat src_image  (png, setting::access.getCropRect(png));
-    cv::Mat data_image (pcl, setting::access.getCropRect(pcl));
+    cv::Mat src_image  (png, setting::access.getCropRect());
+    cv::Mat data_image (pcl, setting::access.getCropRect());
 
     if(src_image.empty() or data_image.empty()){
         exit(EXIT_FAILURE);
@@ -50,19 +52,21 @@ cv::Vec3f Detection::detectGripper(cv::Mat pcl, cv::Mat png) {
         cv::Vec3f detection_position;
         detection_position = LocationHandler::extrapolateDetectionPosition(selected_block, pcd, pcd.size());
 
-    return detection_position;
+    Detection::DetectionResults extrapolate;
+    extrapolate.position = detection_position;
+    extrapolate.image = result;
+
+    return extrapolate;
 }
 
-cv::Vec3f Detection::detectBlocks(cv::Mat pcl, cv::Mat png) {
-    //Crop Images
-    cv::Mat src_image  (png, setting::access.getCropRect(png));
-    cv::Mat data_image (pcl, setting::access.getCropRect(pcl));
-
-    if(src_image.empty() or data_image.empty()){
+Detection::DetectionResults Detection::detectBlocks(cv::Mat pcl, cv::Mat png) {
+    if(png.empty() or pcl.empty()){
         exit(EXIT_FAILURE);
     }
-
-    cv::Size src_size = cv::Size((int)src_image.cols, (int)src_image.rows);
+    
+    //Crop Images
+    cv::Mat src_image = png(setting::access.getCropRect());
+    cv::Mat data_image = pcl(setting::access.getCropRect());
 
     //IMAGE PROCESSING PIPELINE-------------------------------------
         cv::Mat blurred;
@@ -81,13 +85,19 @@ cv::Vec3f Detection::detectBlocks(cv::Mat pcl, cv::Mat png) {
     //OBJECT RECOGNITION -------------------------------------------
         std::vector<cv::Vec4f> detections;
         detections = recognition::runRecognition(result);
+        std::cout << "TMP: Passed detection" << std::endl;
 
     //CALCULATION OBJECT POSITION
         cv::Vec4f selected_block;
         selected_block = LocationHandler::selectDetection(detections, result.cols, result.rows);
+        std::cout << "TMP: Passed Select Detection" << std::endl;
 
         cv::Vec3f detection_position;
         detection_position = LocationHandler::extrapolateDetectionPosition(selected_block, pcd, pcd.size());
 
-    return detection_position;
+    Detection::DetectionResults extrapolate;
+    extrapolate.position = detection_position;
+    extrapolate.image = result;
+
+    return extrapolate;
 }
