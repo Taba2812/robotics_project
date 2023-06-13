@@ -12,8 +12,8 @@ int main(int argc, char** argv) {
   ros::Rate loopRate(LOOP_RATE);
 
   sensor_msgs::JointState jointStateMsg;
-  jointStateMsg.name = {"elbow_joint", "shoulder_lift_joint", "shoulder_pan_joint", "wrist_1_joint", "wrist_2_joint", "wrist_3_joint"};
-  jointStateMsg.position = {-2.56006, -0.780023, -0.320003, -1.63004, -1.57004, 3.49009};
+  jointStateMsg.name = {"shoulder_pan_joint", "shoulder_lift_joint", "elbow_joint", "wrist_1_joint", "wrist_2_joint", "wrist_3_joint"};
+  jointStateMsg.position = {-0.320003, -0.780023, -2.56006, -1.63004, -1.57004, 3.49009};
 
   std::string js_data, js_new, js_req;
   int queue_size;

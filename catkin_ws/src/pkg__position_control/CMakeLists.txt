@@ -11,7 +11,7 @@ catkin_package()
 ## Build talker and listener
 include_directories(include ${catkin_INCLUDE_DIRS} ${EIGEN3_INCLUDE_DIR})
 
-add_executable(ur5Main src/main.cpp src/state_machine/process.cpp src/state_machine/concrete_states.cpp)
+add_executable(ur5Main src/main.cpp)
 target_link_libraries(ur5Main ${catkin_LIBRARIES})
 install(TARGETS ur5Main
   ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}

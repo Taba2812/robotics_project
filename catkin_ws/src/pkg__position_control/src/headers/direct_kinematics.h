@@ -32,7 +32,7 @@ public:
     Eigen::Matrix3d getOrientation() const;
 
     void setPosition(Eigen::Vector3d p);
-    void setOrientation(Eigen::Matrix3d& o);
+    void setOrientation(Eigen::Matrix3d o);
 
     Matrix4d computeDirect(const JointAngles& q);
 
@@ -65,7 +65,7 @@ Eigen::Matrix3d EndEffector::getOrientation() const{
     return this->orientation;
 }
 
-void EndEffector::setOrientation(Eigen::Matrix3d& o){
+void EndEffector::setOrientation(Eigen::Matrix3d o){
     orientation = o;
 }
 
