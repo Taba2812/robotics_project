@@ -1,7 +1,24 @@
 #ifndef __DIRECT_KINEMATICS_H__
 #define __DIRECT_KINEMATICS_H__
 
-#include "ur5.h"
+#include <Eigen/Dense>
+
+//geometry constants
+#define D1 0.089159
+#define A2 -0.425
+#define A3 -0.39225
+#define D4 0.10915
+#define D5 0.09465
+#define D6 0.0823
+#define JOINTS 6
+const double d[JOINTS] = {D1, 0, 0, D4, D5, D6};
+const double cn[JOINTS] = {0, -A2, -A3, 0, 0, 0};
+const double alpha[JOINTS] = {M_PI_2, 0, 0, M_PI_2, -M_PI_2, 0};
+
+typedef Eigen::Matrix<double, 4, 4> Matrix4d;
+typedef Eigen::Matrix<double, JOINTS, 1> JointAngles;
+typedef Eigen::Vector3d Position;
+typedef Eigen::Matrix3d Orientation;
 
 class EndEffector{
 private:
@@ -9,11 +26,16 @@ private:
     Eigen::Matrix3d orientation;
 public:
     EndEffector();
+    EndEffector(const Position &p, const Orientation &o);
+
     Eigen::Vector3d getPosition() const;
     Eigen::Matrix3d getOrientation() const;
+
     void setPosition(Eigen::Vector3d p);
     void setOrientation(Eigen::Matrix3d& o);
-    void computeDirect(const Eigen::VectorXd& q);
+
+    Matrix4d computeDirect(const JointAngles& q);
+
     friend std::ostream& operator<<(std::ostream& os, const EndEffector& ef);
 };
 
@@ -21,16 +43,14 @@ std::ostream& operator<<(std::ostream& os, const EndEffector& ee){
     return os << ee.position;
 }
 
-void T(Matrix4d& m, double q, int index){
-    m << cos(q), -sin(q)*cos(alpha[index]), sin(q)*sin(alpha[index]) , cn[index]*cos(q),
-         sin(q), cos(q)*cos(alpha[index]) , -cos(q)*sin(alpha[index]), cn[index]*sin(q),
-         0     , sin(alpha[index])        , cos(alpha[index])        , d[index],
-         0     , 0                        , 0                        , 1;
-}
-
 EndEffector::EndEffector(){
     position << Eigen::Vector3d::Zero();
     orientation << Eigen::Matrix3d::Zero();
+}
+
+EndEffector::EndEffector(const Position &p, const Orientation &o) {
+    position = p;
+    orientation = o;
 }
 
 Eigen::Vector3d EndEffector::getPosition() const{
@@ -49,27 +69,36 @@ void EndEffector::setOrientation(Eigen::Matrix3d& o){
     orientation = o;
 }
 
-void EndEffector::computeDirect(const Eigen::VectorXd &q){
-    Matrix4d T1, T2, T3, T4, T5, T6, T60;
+Matrix4d T(double q, int index){
+    Matrix4d m;
+    m << cos(q), -sin(q)*cos(alpha[index]), sin(q)*sin(alpha[index]) , cn[index]*cos(q),
+         sin(q), cos(q)*cos(alpha[index]) , -cos(q)*sin(alpha[index]), cn[index]*sin(q),
+         0     , sin(alpha[index])        , cos(alpha[index])        , d[index],
+         0     , 0                        , 0                        , 1;
 
-    T(T1, q(0), 0);
-    T(T2, q(1), 1);
-    T(T3, q(2), 2);
-    T(T4, q(3), 3);
-    T(T5, q(4), 4);
-    T(T6, q(5), 5);
-
-    T60 = T1*T2*T3*T4*T5*T6;
-
-    this->orientation = T60.block<3,3>(0,0);
-    this->position = T60.block<3,1>(0,3);
+    return m;
 }
 
-#endif
+Matrix4d EndEffector::computeDirect(const JointAngles &q){
+    Matrix4d T0, T1, T2, T3, T4, T5, TM;
 
+    T0 = T(q(0), 0);
+    T1 = T(q(1), 1);
+    T2 = T(q(2), 2);
+    T3 = T(q(3), 3);
+    T4 = T(q(4), 4);
+    T5 = T(q(5), 5);
 
+    TM = T0*T1*T2*T3*T4*T5;
+
+    this->orientation = TM.block<3,3>(0,0);
+    this->position = TM.block<3,1>(0,3);
+
+    return TM;
+}
+
+#pragma region comment
 /*
-
 Eigen::Matrix4d computeDirect(const Eigen::VectorXd& jointAngles)
 {
 
@@ -121,3 +150,6 @@ Eigen::Matrix4d computeDirect(const Eigen::VectorXd& jointAngles)
 }
 
 */
+#pragma endregion comment
+
+#endif

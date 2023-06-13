@@ -1,13 +1,39 @@
-#include "headers/direct_kinematics.h"
 #include "headers/inverse_kinematics.h"
-#include "std_msgs/Float32MultiArray.h"
+
+#include <cmath>
+#include <eigen3/Eigen/Geometry>
+#include <iostream>
+#include <vector>
+
+#include "geometry_msgs/Pose.h"
+#include "ros/ros.h"
+#include "sensor_msgs/JointState.h"
+#include "std_msgs/Bool.h"
 #include "std_msgs/Float64MultiArray.h"
-#include "std_msgs/Float64.h"
+
+#define _USE_MATH_DEFINES
+
+//"configurationProvider": "ms-vscode.cmake-tools"
+
+#define WAITING  0
+#define JS       1
+#define VISION   2
+#define POSITION 3
+#define MOTION   4
+#define TO_BLOCK 5
+#define TO_FINAL 6
+#define HOMING   7
+
+#define LOOP_RATE 100
+
+typedef Eigen::Vector3d FinalDestination;
+
+const ros::V_string jointNames = {"shoulder_pan_joint", "shoulder_lift_joint", "elbow_joint", "wrist_1_joint", "wrist_2_joint", "wrist_3_joint"};
+
+JointAngles q;
 
 int main(int argc, char **argv){
     sleep(1);
-
-    #pragma region environment
 
     //initialize node
     ros::init(argc, argv, "ur5Main");
@@ -39,7 +65,7 @@ int main(int argc, char **argv){
     Eigen::Vector3d finalStep;
     Eigen::Vector3d currentPosition;
     Eigen::Vector3d baseLink;
-    BlockPosition bp;
+    Position blockPosition;
 
     Eigen::Vector3d ev3d;
     Eigen::Matrix3d em3d;
@@ -67,7 +93,7 @@ int main(int argc, char **argv){
     bool defaultPosition = true;
     bool goingHome = false;
 
-    bp = BlockPosition::Zero();
+    blockPosition = Position::Zero();
     msgMotion.data = {0,0,0,0,0,0,0};
     msgJS.data = true;
     baseLink << 0.5, 0.35, 1.75;
@@ -89,7 +115,6 @@ int main(int argc, char **argv){
     ros::Publisher dataPub = nh.advertise<std_msgs::Float32MultiArray>(motion_data, queue_size);
     ros::Publisher requestPub = nh.advertise<std_msgs::Bool>(js_req, queue_size);
 
-    #pragma endregion environment
 
     #pragma region callbacks
     //lambda callbacks
@@ -145,12 +170,12 @@ int main(int argc, char **argv){
     auto getPosition = [&] (const std_msgs::Float32MultiArray::ConstPtr &xyz) {
         std::cout << "\n[Core] received Detection results data\n";
 
-        bp(0) = baseLink(0) - xyz->data[0];
-        bp(1) = baseLink(1) - xyz->data[1];
-        bp(2) = baseLink(2) - xyz->data[2];
+        blockPosition(0) = baseLink(0) - xyz->data[0];
+        blockPosition(1) = baseLink(1) - xyz->data[1];
+        blockPosition(2) = baseLink(2) - xyz->data[2];
 
         for(int i=0; i<3; i++){
-            std::cout << "bp(" << i << ") = " << bp(i) << "\n";
+            std::cout << "bp(" << i << ") = " << blockPosition(i) << "\n";
         }
 
         positionStatus = true;
@@ -234,7 +259,7 @@ int main(int argc, char **argv){
                     d.setOrientation(em3d);
                 } else {
                     std::cout << "going from home to block\n";
-                    d.setPosition(bp);
+                    d.setPosition(blockPosition);
                     d.setOrientation(em3d);
                 }
 
@@ -251,7 +276,7 @@ int main(int argc, char **argv){
             case MOTION:
                 std::cout << "\n[Motion] computing path planning...\n";
                 initialStep << ee.getPosition();
-                d.setPosition(bp);
+                d.setPosition(blockPosition);
                 finalStep << d.getPosition();
 
                 // std::cout << "Initial step: " << initialStep << "\n";

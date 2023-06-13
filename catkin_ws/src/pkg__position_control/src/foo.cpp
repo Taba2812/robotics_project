@@ -1,5 +1,6 @@
 #include "headers/direct_kinematics.h"
 #include "headers/inverse_kinematics.h"
+#include <ros/ros.h>>
 
 int main(int argc, char **argv){
     JointConfiguration q;
