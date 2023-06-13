@@ -5,8 +5,8 @@
 
 //geometry constants
 #define D1 0.089159
-#define A2 -0.425
-#define A3 -0.39225
+#define A2 0.425
+#define A3 0.39225
 #define D4 0.10915
 #define D5 0.09465
 #define D6 0.0823
