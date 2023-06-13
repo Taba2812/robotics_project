@@ -57,7 +57,9 @@ Vector4d P(double th1, double th5, double th6, const Eigen::MatrixXd& T60){
 }
 
 void Destination::computeInverse(const EndEffector &ee) {
-    Eigen::VectorXd th(6);
+    Eigen::VectorXd th(JOINTS);
+
+    std::cout << "\nPosition for inverse: \n" << ee.getPosition() << "\n";
 
     // std::cout << "IK Position: " << ee.getPosition() << "\n\n";
     // std::cout << "Orientation: " << ee.getOrientation() << "\n\n";

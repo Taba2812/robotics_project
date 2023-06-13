@@ -52,12 +52,12 @@ void EndEffector::setOrientation(Eigen::Matrix3d& o){
 void EndEffector::computeDirect(const Eigen::VectorXd &q){
     Matrix4d T1, T2, T3, T4, T5, T6, T60;
 
-    T(T1, q[0], 0);
-    T(T2, q[1], 1);
-    T(T3, q[2], 2);
-    T(T4, q[3], 3);
-    T(T5, q[4], 4);
-    T(T6, q[5], 5);
+    T(T1, q(0), 0);
+    T(T2, q(1), 1);
+    T(T3, q(2), 2);
+    T(T4, q(3), 3);
+    T(T5, q(4), 4);
+    T(T6, q(5), 5);
 
     T60 = T1*T2*T3*T4*T5*T6;
 
@@ -66,3 +66,58 @@ void EndEffector::computeDirect(const Eigen::VectorXd &q){
 }
 
 #endif
+
+
+/*
+
+Eigen::Matrix4d computeDirect(const Eigen::VectorXd& jointAngles)
+{
+
+    // Extract joint angles
+    double q1 = jointAngles(0);
+    double q2 = jointAngles(1);
+    double q3 = jointAngles(2);
+    double q4 = jointAngles(3);
+    double q5 = jointAngles(4);
+    double q6 = jointAngles(5);
+
+    // Compute the individual transformation matrices
+    Eigen::Matrix4d T1, T2, T3, T4, T5, T6, transformationMatrix;
+    
+    T1 << std::cos(q1), -std::sin(q1), 0, 0,
+        std::sin(q1), std::cos(q1), 0, 0,
+        0, 0, 1, d1,
+        0, 0, 0, 1;
+
+    T2 << std::cos(q2), -std::sin(q2), 0, 0,
+        0, 0, -1, 0,
+        std::sin(q2), std::cos(q2), 0, 0,
+        0, 0, 0, 1;
+
+    T3 << std::cos(q3), -std::sin(q3), 0, a2,
+        std::sin(q3), std::cos(q3), 0, 0,
+        0, 0, 1, 0,
+        0, 0, 0, 1;
+
+    T4 << std::cos(q4), -std::sin(q4), 0, a3,
+        0, 0, -1, -d4,
+        std::sin(q4), std::cos(q4), 0, 0,
+        0, 0, 0, 1;
+
+    T5 << std::cos(q5), -std::sin(q5), 0, 0,
+        0, 0, 1, -d5,
+        -std::sin(q5), -std::cos(q5), 0, 0,
+        0, 0, 0, 1;
+
+    T6 << std::cos(q6), -std::sin(q6), 0, 0,
+        0, 0, -1, -d6,
+        std::sin(q6), std::cos(q6), 0, 0,
+        0, 0, 0, 1;
+
+    // Compute the transformation matrix from the base to the end-effector
+    transformationMatrix = T1 * T2 * T3 * T4 * T5 * T6;
+
+    return transformationMatrix;
+}
+
+*/
