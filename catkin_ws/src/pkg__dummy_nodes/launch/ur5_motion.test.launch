@@ -14,10 +14,11 @@
         <param name="Topic" value="JointStates_Dummy" />
     </node>
 
+    <!--
     <node pkg="pkg__dummy_nodes" type="JointState_Listener" name="JointState_Listener" output="screen">
         <param name="Topic" value="/ur5/joint_states" />
     </node>
-
+    -->
     <node pkg="pkg__dummy_nodes" type="Float64MultiArray_Listener" name="Float64MultiArray_Listener" output="screen">
         <param name="Topic" value="/ur5/joint_group_pos_controller/command" />
     </node>

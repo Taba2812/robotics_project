@@ -65,8 +65,8 @@ int main(int argc, char **argv){
     sensor_msgs::JointState curveJoints[noSteps];
 
     //publishers
-    //ros::Publisher jointPub = nh.advertise<std_msgs::Float64MultiArray>(joint_docker_out, QUEUE_SIZE);
-    ros::Publisher jointPub = nh.advertise<sensor_msgs::JointState>(js_new, queue_size);
+    ros::Publisher jointPub = nh.advertise<std_msgs::Float64MultiArray>(joint_docker_out, queue_size);
+    // ros::Publisher jointPub = nh.advertise<sensor_msgs::JointState>(js_new, queue_size);
     ros::Publisher visionPub = nh.advertise<std_msgs::Bool>(detection_req, queue_size);
     ros::Publisher motionPub = nh.advertise<std_msgs::Bool>(motion_req, queue_size);
     ros::Publisher dataPub = nh.advertise<std_msgs::Float32MultiArray>(motion_data, queue_size);
@@ -110,6 +110,7 @@ int main(int argc, char **argv){
     };
 
     auto getJoint = [&] (const sensor_msgs::JointState::ConstPtr &js) {
+        if (jointStatus) {return;}
         std::cout << "\n[Main] received joint states\n";
         for(int i=0; i<JOINTS; i++){
             for(int j=0; j<JOINTS; j++){
@@ -139,8 +140,8 @@ int main(int argc, char **argv){
 
     //subscribers
     ros::Subscriber motionSub = nh.subscribe<std_msgs::Float32MultiArray>(motion_res, queue_size, getMotion);
-    //ros::Subscriber jointSub = nh.subscribe<sensor_msgs::JointState>(joint_docker_in, queue_size, getJoint);
-    ros::Subscriber jointSub = nh.subscribe<sensor_msgs::JointState>(js_data, queue_size, getJoint);
+    ros::Subscriber jointSub = nh.subscribe<sensor_msgs::JointState>(joint_docker_in, queue_size, getJoint);
+    // ros::Subscriber jointSub = nh.subscribe<sensor_msgs::JointState>(js_data, queue_size, getJoint);
     ros::Subscriber visionSub = nh.subscribe<std_msgs::Float32MultiArray>(detection_res, queue_size, getPosition);
 
     #pragma endregion callbacks
@@ -162,8 +163,10 @@ int main(int argc, char **argv){
             case JS:
                 std::cout << "\n[JointStates] retrieving joint states\n";
 
+                // jointStatus = false;
+                // requestPub.publish(msgJS);
+
                 jointStatus = false;
-                requestPub.publish(msgJS);
 
                 while(!jointStatus) ros::spinOnce();
                 ee.computeDirect(q);
@@ -178,6 +181,8 @@ int main(int argc, char **argv){
                 currentState = VISION;
                 msgVision.data = true;
                 visionPub.publish(msgVision);
+
+                currentState = WAITING;
             break;
 
             case VISION:
