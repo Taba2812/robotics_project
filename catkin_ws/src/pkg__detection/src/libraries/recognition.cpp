@@ -8,6 +8,7 @@ std::vector<cv::Vec4f> recognition::runRecognition(cv::InputOutputArray img) {
     recognition::setParameters(guil); 
 
     recognition::setDataset(guil, &buffer);
+    std::cout << "Number of images used as templates: " << buffer.size() << std::endl;
 
     return recognition::detection(guil, &buffer, img, guilPosition);
 }
