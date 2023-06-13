@@ -11,8 +11,8 @@ public:
     EndEffector();
     Eigen::Vector3d getPosition() const;
     Eigen::Matrix3d getOrientation() const;
-    void setPosition(Eigen::Vector3d& pos);
-    void setOrientation(Eigen::Matrix3d& angle);
+    void setPosition(Eigen::Vector3d p);
+    void setOrientation(Eigen::Matrix3d& o);
     void computeDirect(const Eigen::VectorXd& q);
     friend std::ostream& operator<<(std::ostream& os, const EndEffector& ef);
 };
@@ -37,7 +37,7 @@ Eigen::Vector3d EndEffector::getPosition() const{
     return this->position;
 }
 
-void EndEffector::setPosition(Eigen::Vector3d& p){
+void EndEffector::setPosition(Eigen::Vector3d p){
     position = p;
 }
 

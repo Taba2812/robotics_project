@@ -63,7 +63,7 @@ const double cn[JOINTS] = {0, -A2, -A3, 0, 0, 0};                 //common norma
 const double alpha[JOINTS] = {M_PI_2, 0, 0, M_PI_2, -M_PI_2, 0};  //angles
 static bool processStatus;
 
-const ros::V_string jointNames = {"elbow_joint", "shoulder_lift_joint", "shoulder_pan_joint", "wrist_1_joint", "wrist_2_joint", "wrist_3_joint"};
+const ros::V_string jointNames = {"shoulder_pan_joint", "shoulder_lift_joint", "elbow_joint", "wrist_1_joint", "wrist_2_joint", "wrist_3_joint"};
 static JointConfiguration q;
 
 #endif
