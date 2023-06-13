@@ -9,7 +9,7 @@
     <param name="BOT_CROP"   value="817" />
 
     <!-- PIPELINE -->
-    <param name="EROSION_SIZE"  value="4" />
+    <param name="EROSION_SIZE"  value="2" />
     <param name="DILATION_SIZE" value="4" />
 
     <param name="LOWER_HUE"         value="110" />
@@ -40,7 +40,7 @@
     <param name="GUIL_THRESH_ANGLE" value="1500" />
 
     <param name="GUIL_MIN_SCALE"    value="0.5" />
-    <param name="GUIL_MAX_SCALE"    value="4.0" />
+    <param name="GUIL_MAX_SCALE"    value="2.5" />
     <param name="GUIL_STEP_SCALE"   value="0.5" />
     <param name="GUIL_THRESH_SCALE" value="50" />
 
@@ -55,18 +55,18 @@
     <param name="RED"    value="0" />
     <param name="VIOLET" value="0" />
 
-    <param name="X1_Y1_Z2"            value="1" />
-    <param name="X1_Y2_Z1"            value="1" />
+    <param name="X1_Y1_Z2"            value="0" />
+    <param name="X1_Y2_Z1"            value="0" />
     <param name="X1_Y2_Z2"            value="1" />
-    <param name="X1_Y2_Z2_CHAMFER"    value="1" />
-    <param name="X1_Y2_Z2_TWINFILLET" value="1" />
-    <param name="X1_Y3_Z2"            value="1" />
-    <param name="X1_Y3_Z2_FILLET"     value="1" />
-    <param name="X1_Y4_Z1"            value="1" />
-    <param name="X1_Y4_Z2"            value="1" />
-    <param name="X2_Y2_Z2"            value="1" />
-    <param name="X2_Y2_Z2_FILLET"     value="1" />
+    <param name="X1_Y2_Z2_CHAMFER"    value="0" />
+    <param name="X1_Y2_Z2_TWINFILLET" value="0" />
+    <param name="X1_Y3_Z2"            value="0" />
+    <param name="X1_Y3_Z2_FILLET"     value="0" />
+    <param name="X1_Y4_Z1"            value="0" />
+    <param name="X1_Y4_Z2"            value="0" />
+    <param name="X2_Y2_Z2"            value="0" />
+    <param name="X2_Y2_Z2_FILLET"     value="0" />
 
-    <param name="BLOCK_DATASET_PATH"  value="/root/code/catkin_ws/src/images_database/blocks_dataset" />
+    <param name="BLOCK_DATASET_PATH"  value="/root/code/catkin_ws/src/images_database/block_dataset_simulation" />
 
 </launch>
