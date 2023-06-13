@@ -1,6 +1,7 @@
 #include "headers/direct_kinematics.h"
 #include "headers/inverse_kinematics.h"
 #include "std_msgs/Float32MultiArray.h"
+#include "std_msgs/Float64MultiArray.h"
 #include "std_msgs/Float64.h"
 
 int main(int argc, char **argv){
@@ -37,12 +38,26 @@ int main(int argc, char **argv){
     Eigen::Vector3d initialStep;
     Eigen::Vector3d finalStep;
     Eigen::Vector3d currentPosition;
+    Eigen::Vector3d baseLink;
     BlockPosition bp;
+
+    Eigen::Vector3d ev3d;
+    Eigen::Matrix3d em3d;
 
     //ros messages
     std_msgs::Bool msgVision;
     std_msgs::Bool msgJS;
     std_msgs::Float32MultiArray msgMotion;
+
+    std_msgs::Float64MultiArray gazeboHome;
+    gazeboHome.data.resize(JOINTS);
+
+    gazeboHome.data.at(0) = -0.32;
+    gazeboHome.data.at(1) = -0.78;
+    gazeboHome.data.at(2) = -2.6;
+    gazeboHome.data.at(3) = -1.63;
+    gazeboHome.data.at(4) = -1.57;
+    gazeboHome.data.at(5) = 3.49;
 
     //default values
     bool jointStatus = false;
@@ -55,6 +70,7 @@ int main(int argc, char **argv){
     bp = BlockPosition::Zero();
     msgMotion.data = {0,0,0,0,0,0,0};
     msgJS.data = true;
+    baseLink << 0.5, 0.35, 1.75;
 
     //user interaction
     char c;
@@ -62,11 +78,12 @@ int main(int argc, char **argv){
     // curve generation steps
     Eigen::Vector3d curveSteps[noSteps];
     Eigen::Vector3d curvePositions[noSteps];
-    sensor_msgs::JointState curveJoints[noSteps];
+    std_msgs::Float64MultiArray curveJoints[noSteps];
+    
 
     //publishers
-    //ros::Publisher jointPub = nh.advertise<std_msgs::Float64MultiArray>(joint_docker_out, QUEUE_SIZE);
-    ros::Publisher jointPub = nh.advertise<sensor_msgs::JointState>(js_new, queue_size);
+    ros::Publisher jointPub = nh.advertise<std_msgs::Float64MultiArray>(joint_docker_out, queue_size);
+    // ros::Publisher jointPub = nh.advertise<sensor_msgs::JointState>(js_new, queue_size);
     ros::Publisher visionPub = nh.advertise<std_msgs::Bool>(detection_req, queue_size);
     ros::Publisher motionPub = nh.advertise<std_msgs::Bool>(motion_req, queue_size);
     ros::Publisher dataPub = nh.advertise<std_msgs::Float32MultiArray>(motion_data, queue_size);
@@ -110,10 +127,12 @@ int main(int argc, char **argv){
     };
 
     auto getJoint = [&] (const sensor_msgs::JointState::ConstPtr &js) {
+        if (jointStatus) {return;}
         std::cout << "\n[Main] received joint states\n";
         for(int i=0; i<JOINTS; i++){
             for(int j=0; j<JOINTS; j++){
                 if(jointNames[j] == js->name.at(i)){
+                    // std::cout << "[" << i << "] jsName = " << js->name.at(i) << " jointName = " << jointNames[j];
                     q(i) = js->position[i];
                     std::cout << q(i) << " "; 
                 }
@@ -126,9 +145,9 @@ int main(int argc, char **argv){
     auto getPosition = [&] (const std_msgs::Float32MultiArray::ConstPtr &xyz) {
         std::cout << "\n[Core] received Detection results data\n";
 
-        bp(0) = xyz->data[0];
-        bp(1) = xyz->data[1];
-        bp(2) = xyz->data[2];
+        bp(0) = baseLink(0) - xyz->data[0];
+        bp(1) = baseLink(1) - xyz->data[1];
+        bp(2) = baseLink(2) - xyz->data[2];
 
         for(int i=0; i<3; i++){
             std::cout << "bp(" << i << ") = " << bp(i) << "\n";
@@ -139,8 +158,8 @@ int main(int argc, char **argv){
 
     //subscribers
     ros::Subscriber motionSub = nh.subscribe<std_msgs::Float32MultiArray>(motion_res, queue_size, getMotion);
-    //ros::Subscriber jointSub = nh.subscribe<sensor_msgs::JointState>(joint_docker_in, queue_size, getJoint);
-    ros::Subscriber jointSub = nh.subscribe<sensor_msgs::JointState>(js_data, queue_size, getJoint);
+    ros::Subscriber jointSub = nh.subscribe<sensor_msgs::JointState>(joint_docker_in, queue_size, getJoint);
+    // ros::Subscriber jointSub = nh.subscribe<sensor_msgs::JointState>(js_data, queue_size, getJoint);
     ros::Subscriber visionSub = nh.subscribe<std_msgs::Float32MultiArray>(detection_res, queue_size, getPosition);
 
     #pragma endregion callbacks
@@ -152,32 +171,45 @@ int main(int argc, char **argv){
         switch(currentState){
 
             case WAITING:
+                // jointPub.publish(gazeboHome);
                 std::cout << "\n";
                 std::cout << "[Waiting] press any key to advance: ";
                 std::cin >> c;
 
                 currentState = JS;
+
+                // currentState = WAITING;
             break;
 
             case JS:
                 std::cout << "\n[JointStates] retrieving joint states\n";
 
+                // jointStatus = false;
+                // requestPub.publish(msgJS);
+
                 jointStatus = false;
-                requestPub.publish(msgJS);
 
                 while(!jointStatus) ros::spinOnce();
                 ee.computeDirect(q);
 
                 if(defaultPosition){
                     home.setPosition(ee.getPosition());
+                    home.setOrientation(ee.getOrientation());
                     defaultPosition = false;
                 }
 
+                home.setPosition({-0.207579, 0.063110, -0.630587});
+                ee.setPosition({-0.207579, 0.063110, -0.630587});
+
                 std::cout << "\nHome: \n" << home.getPosition() << "\n";
+                std::cout << "\n" << home.getOrientation() << "\n\n";
                 
                 currentState = VISION;
                 msgVision.data = true;
                 visionPub.publish(msgVision);
+
+                // currentState = WAITING;
+
             break;
 
             case VISION:
@@ -185,6 +217,8 @@ int main(int argc, char **argv){
 
                 while(!positionStatus) ros::spinOnce();
                 currentState = POSITION;
+
+                // currentState = WAITING;
             break;
 
             case POSITION:
@@ -193,20 +227,23 @@ int main(int argc, char **argv){
                 if(gripper) {
                     std::cout << "going from block to destination\n";
                     d.setPosition(fd);
+                    d.setOrientation(em3d);
                 } else if(goingHome) {
                     std::cout << "homing\n";
                     d.setPosition(home.getPosition());
+                    d.setOrientation(em3d);
                 } else {
                     std::cout << "going from home to block\n";
                     d.setPosition(bp);
+                    d.setOrientation(em3d);
                 }
 
                 d.computeInverse(ee);
 
                 std::cout << "\nDestination: \n" << d.getJointAngles() << "\n";
 
-                if(d.isWithinJointLimits(d.getJointAngles())) std::cout << "\n[Position] Destination reachable!\n";
-                else std::cout << "\n[Error] Destination not reachable!\n";
+                // if(d.isWithinJointLimits(d.getJointAngles())) std::cout << "\n[Position] Destination reachable!\n";
+                // else std::cout << "\n[Error] Destination not reachable!\n";
 
                 currentState = MOTION;
             break;
@@ -214,6 +251,7 @@ int main(int argc, char **argv){
             case MOTION:
                 std::cout << "\n[Motion] computing path planning...\n";
                 initialStep << ee.getPosition();
+                d.setPosition(bp);
                 finalStep << d.getPosition();
 
                 // std::cout << "Initial step: " << initialStep << "\n";
@@ -243,9 +281,9 @@ int main(int argc, char **argv){
                     ee.setPosition(curvePositions[i]);
                     d.computeInverse(ee);
                     
-                    curveJoints[i].position.resize(JOINTS);
+                    curveJoints[i].data.resize(JOINTS);
                     for(int j=0; j<JOINTS; j++) {
-                        curveJoints[i].position.at(j) = d.getJointAngles()(j);
+                        curveJoints[i].data.at(j) = d.getJointAngles()(j);
                     }
                 }
 
@@ -253,17 +291,21 @@ int main(int argc, char **argv){
                 else if(goingHome) currentState = HOMING;
                 else currentState = TO_BLOCK;
 
-                currentState = WAITING;
+                // currentState = WAITING;
 
             break;
 
             case TO_BLOCK:
                 std::cout << "\n[ToBlock] Moving to detected block\n";
+                sleep(1);
 
                 for(int i=0; i<noSteps; i++){
+                    // float tmp = curveJoints[i].data.at(0);
+                    // curveJoints[i].data.at(0) = curveJoints[i].data.at(2);
+                    // curveJoints[i].data.at(2) = tmp;
                     jointPub.publish(curveJoints[i]);
                     jointStatus = false;
-                    requestPub.publish(msgJS);
+                    // requestPub.publish(msgJS);
                     while(!jointStatus) ros::spinOnce();
                 }
 
@@ -273,6 +315,25 @@ int main(int argc, char **argv){
                 //attach dynamic link for block
                 gripper = true;
                 currentState = POSITION;
+
+                // ev3d << -0.36646, -0.110244, -0.505492;
+                // em3d << -0.441507, -0.693412, -0.569431,
+                //         -0.826269, 0.0668009, 0.5593,
+                //         -0.349787, 0.717439 , -0.602438;
+
+                // ee.setPosition(ev3d);
+                // ee.setOrientation(em3d);
+                // d.computeInverse(ee);
+
+                // for(int i=0; i<JOINTS; i++){
+                //     curveJoints[0].data.at(i) = d.getJointAngles()[i];
+                // }
+
+                // std::cout << "\nHERE IT COMES\n";
+                // sleep(3);
+                // jointPub.publish(curveJoints[0]);
+
+                currentState = WAITING;
             break;
 
             case TO_FINAL:
