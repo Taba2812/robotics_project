@@ -3,17 +3,32 @@
 
 #include <Eigen/Dense>
 
-//geometry constants
-#define D1 0.089159
-#define A2 0.425
-#define A3 0.39225
-#define D4 0.10915
-#define D5 0.09465
-#define D6 0.0823
 #define JOINTS 6
-const double d[JOINTS] = {D1, 0, 0, D4, D5, D6};
-const double cn[JOINTS] = {0, -A2, -A3, 0, 0, 0};
-const double alpha[JOINTS] = {M_PI_2, 0, 0, M_PI_2, -M_PI_2, 0};
+
+//geometry constants
+const float d1 = 0.089159;
+const float a2 = -0.425;
+const float a3 = -0.39225;
+const float d4 = 0.10915;
+const float d5 = 0.09465;
+const float d6 = 0.0823;
+const float d[JOINTS] = {d1, 0.0f, 0.0f, d4, d5, d6};
+const float cn[JOINTS] = {0.0f, a2, a3, 0.0f, 0.0f, 0.0f};
+const float alpha[JOINTS] = {M_PI_2, 0.0f, 0.0f, M_PI_2, -M_PI_2, 0.0f};
+
+//joint limits for the UR5 arm
+static constexpr double joint1_min = -2.9671;
+static constexpr double joint1_max = 2.9671;
+static constexpr double joint2_min = -1.8326;
+static constexpr double joint2_max = -0.1;
+static constexpr double joint3_min = -2.617;
+static constexpr double joint3_max = -0.1;
+static constexpr double joint4_min = -3.1416;
+static constexpr double joint4_max = 0.1;
+static constexpr double joint5_min = -2.094;
+static constexpr double joint5_max = 2.094;
+static constexpr double joint6_min = -6.2832;
+static constexpr double joint6_max = 6.2832;
 
 typedef Eigen::Matrix<double, 4, 4> Matrix4d;
 typedef Eigen::Matrix<double, JOINTS, 1> JointAngles;
@@ -81,7 +96,6 @@ Matrix4d T(double q, int index){
 
 Matrix4d EndEffector::computeDirect(const JointAngles &q){
     Matrix4d T0, T1, T2, T3, T4, T5, TM;
-
     T0 = T(q(0), 0);
     T1 = T(q(1), 1);
     T2 = T(q(2), 2);

@@ -135,7 +135,7 @@ int main(int argc, char **argv){
             }
         }
 
-        std::swap(q(0), q(2));
+        // std::swap(q(0), q(2));
 
         for(int i=0; i<JOINTS; i++) {
             std::cout << q(i) << " ";
@@ -186,10 +186,13 @@ int main(int argc, char **argv){
                 std::cout << "\n[Main][JointStates] retrieving joint states\n";
 
                 jointStatus = false;
-                // requestPub.publish(msgJS);
+                requestPub.publish(msgJS);
 
                 while(!jointStatus) ros::spinOnce();
                 ee.computeDirect(q);
+
+                // std::cout << "\nJoints before:\n" << q << "\n\n";
+                // std::cout << "\nPosition before: " << ee.getPosition() << "\n\n";
 
                 if(defaultPosition){
                     home.setPosition(ee.getPosition());
@@ -197,14 +200,20 @@ int main(int argc, char **argv){
                     defaultPosition = false;
                 }
 
-                std::cout << "\nHome: \n" << home.getPosition() << "\n";
-                std::cout << "\n" << home.getOrientation() << "\n\n";
+                // std::cout << "\nHome: \n" << home.getPosition() << "\n";
+                // std::cout << "\n" << home.getOrientation() << "\n\n";
+
+                // home.computeInverse(ee);
+                // std::cout << "\nJoints after:\n" << home.getJointAngles();
+
+                // ee.computeDirect(home.getJointAngles());
+                // std::cout << "\nPosition after:\n" << ee.getPosition();
                 
                 currentState = VISION;
                 msgVision.data = true;
-                visionPub.publish(msgVision);
+                // visionPub.publish(msgVision);
 
-                currentState = WAITING;
+                // currentState = WAITING;
 
             break;
 
