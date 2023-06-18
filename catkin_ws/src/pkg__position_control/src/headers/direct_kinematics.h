@@ -84,26 +84,65 @@ void EndEffector::setOrientation(Eigen::Matrix3d o){
     orientation = o;
 }
 
-Matrix4d T(double q, int index){
+Matrix4d tMatrix(float q, int index) {
     Matrix4d m;
-    m << cos(q), -sin(q)*cos(alpha[index]), sin(q)*sin(alpha[index]) , cn[index]*cos(q),
-         sin(q), cos(q)*cos(alpha[index]) , -cos(q)*sin(alpha[index]), cn[index]*sin(q),
-         0     , sin(alpha[index])        , cos(alpha[index])        , d[index],
-         0     , 0                        , 0                        , 1;
+
+    switch(index) {
+        case 0 :
+        m << cos(q), -sin(q), 0, 0,
+              sin(q), cos(q), 0, 0,
+              0, 0, 1, d1,
+              0, 0, 0, 1;
+        break;
+
+        case 1:
+        m << cos(q), -sin(q), 0, 0,
+            0, 0, -1, 0,
+            sin(q), cos(q), 0, 0,
+            0, 0, 0, 1;
+        break;
+
+        case 2:
+        m << cos(q), -sin(q), 0, a2,
+            sin(q), cos(q), 0, 0,
+            0, 0, 1, 0,
+            0, 0, 0, 1;
+        break;
+
+        case 3:
+        m << cos(q), -sin(q), 0, a3,
+            sin(q), cos(q), 0, 0,
+            0, 0, 1, d4,
+            0, 0, 0, 1;
+        break;
+
+        case 4:
+        m << cos(q), -sin(q), 0, 0,
+            0, 0, -1, -d5,
+            sin(q), cos(q), 0, 0,
+            0, 0, 0, 1;
+        break;
+
+        case 5:
+        m << cos(q), -sin(q), 0, 0,
+            0, 0, 1, d6,
+            -sin(q), -cos(q), 0, 0,
+            0, 0, 0, 1;
+        break;
+    }
 
     return m;
 }
 
 Matrix4d EndEffector::computeDirect(const JointAngles &q){
-    Matrix4d T0, T1, T2, T3, T4, T5, TM;
-    T0 = T(q(0), 0);
-    T1 = T(q(1), 1);
-    T2 = T(q(2), 2);
-    T3 = T(q(3), 3);
-    T4 = T(q(4), 4);
-    T5 = T(q(5), 5);
+    Matrix4d TM;
+    Matrix4d T[JOINTS];
 
-    TM = T0*T1*T2*T3*T4*T5;
+    for(int i=0; i<JOINTS; i++) {
+        T[i] = tMatrix(q(i), i);
+    }
+
+    TM = T[0] * T[1] * T[2] * T[3] * T[4] * T[5];
 
     this->orientation = TM.block<3,3>(0,0);
     this->position = TM.block<3,1>(0,3);

@@ -67,9 +67,9 @@ Vector4d P(double th1, double th5, double th6, const Eigen::MatrixXd& T60){
     Eigen::MatrixXd T61, T41;
     Eigen::Vector4d tmp, P31;
 
-    T65 = T(th6, 5);
-    T54 = T(th5, 4);
-    T10 = T(th1, 0);
+    T65 = tMatrix(th6, 5);
+    T54 = tMatrix(th5, 4);
+    T10 = tMatrix(th1, 0);
     
     T61 = T10.inverse() * T60;
     T41 = T61 * T54.inverse() * T65.inverse();
@@ -155,67 +155,75 @@ JointAngles Destination::computeInverse(const EndEffector  &ee){
     th2[7] = -atan2(P31[3](1),-P31[3](0)) + asin(cn[2]*sin(th3[7]) / P31[3].norm());
 
     //th4
-    T65 = T(th6[0], 5);
-    T54 = T(th5[0], 4);
-    T32 = T(th3[0], 2);
-    T21 = T(th2[0], 1);
-    T10 = T(th1[0], 0);
+    T65 = tMatrix(th6[0], 5);
+    T54 = tMatrix(th5[0], 4);
+    T32 = tMatrix(th3[0], 2);
+    T21 = tMatrix(th2[0], 1);
+    T10 = tMatrix(th1[0], 0);
     T43 = T32.inverse() * T21.inverse() * T10.inverse() * T60 * T65.inverse() * T54.inverse();
-    th4[0] = atan2(T43(1,0), T43(0,0));
+    Eigen::Vector3d v0(T43(0,0), T43(1,0), T43(2,0));
+    th4[0] = atan2(v0(1), v0(0));
 
-    T65 = T(th6[1], 5);
-    T54 = T(th5[1], 4);
-    T32 = T(th3[1], 2);
-    T21 = T(th2[1], 1);
+    T65 = tMatrix(th6[1], 5);
+    T54 = tMatrix(th5[1], 4);
+    T32 = tMatrix(th3[1], 2);
+    T21 = tMatrix(th2[1], 1);
     T43 = T32.inverse() * T21.inverse() * T10.inverse() * T60 * T65.inverse() * T54.inverse();
-    th4[1] = atan2(T43(1,0), T43(0,0));
+    Eigen::Vector3d v1(T43(0,0), T43(1,0), T43(2,0));
+    th4[1] = atan2(v1(1), v1(0));
 
-    T65 = T(th6[0], 5);
-    T54 = T(th5[0], 4);
-    T32 = T(th3[0], 2);
-    T21 = T(th2[0], 1);
-    T10 = T(th1[0], 0);
+    T65 = tMatrix(th6[2], 5);
+    T54 = tMatrix(th5[2], 4);
+    T32 = tMatrix(th3[2], 2);
+    T21 = tMatrix(th2[2], 1);
+    T10 = tMatrix(th1[1], 0);
     T43 = T32.inverse() * T21.inverse() * T10.inverse() * T60 * T65.inverse() * T54.inverse();
-    th4[2] = atan2(T43(1,0), T43(0,0));
+    Eigen::Vector3d v2(T43(0,0), T43(1,0), T43(2,0));
+    th4[2] = atan2(v2(1), v2(0));
 
-    T65 = T(th6[0], 5);
-    T54 = T(th5[0], 4);
-    T32 = T(th3[0], 2);
-    T21 = T(th2[0], 1);
+    T65 = tMatrix(th6[3], 5);
+    T54 = tMatrix(th5[3], 4);
+    T32 = tMatrix(th3[3], 2);
+    T21 = tMatrix(th2[3], 1);
     T43 = T32.inverse() * T21.inverse() * T10.inverse() * T60 * T65.inverse() * T54.inverse();
-    th4[3] = atan2(T43(1,0), T43(0,0));
+    Eigen::Vector3d v3(T43(0,0), T43(1,0), T43(2,0));
+    th4[3] = atan2(v3(1), v3(0));
 
-    T65 = T(th6[0], 5);
-    T54 = T(th5[0], 4);
-    T32 = T(th3[0], 2);
-    T21 = T(th2[0], 1);
-    T10 = T(th1[0], 0);
+    T65 = tMatrix(th6[0], 5);
+    T54 = tMatrix(th5[0], 4);
+    T32 = tMatrix(th3[4], 2);
+    T21 = tMatrix(th2[4], 1);
+    T10 = tMatrix(th1[0], 0);
     T43 = T32.inverse() * T21.inverse() * T10.inverse() * T60 * T65.inverse() * T54.inverse();
-    th4[4] = atan2(T43(1,0), T43(0,0));
+    Eigen::Vector3d v4(T43(0,0), T43(1,0), T43(2,0));
+    th4[4] = atan2(v4(1), v4(0));
 
-    T65 = T(th6[0], 5);
-    T54 = T(th5[0], 4);
-    T32 = T(th3[0], 2);
-    T21 = T(th2[0], 1);
+    T65 = tMatrix(th6[1], 5);
+    T54 = tMatrix(th5[1], 4);
+    T32 = tMatrix(th3[5], 2);
+    T21 = tMatrix(th2[5], 1);
     T43 = T32.inverse() * T21.inverse() * T10.inverse() * T60 * T65.inverse() * T54.inverse();
-    th4[5] = atan2(T43(1,0), T43(0,0));
+    Eigen::Vector3d v5(T43(0,0), T43(1,0), T43(2,0));
+    th4[5] = atan2(v5(1), v5(0));
 
-    T65 = T(th6[0], 5);
-    T54 = T(th5[0], 4);
-    T32 = T(th3[0], 2);
-    T21 = T(th2[0], 1);
-    T10 = T(th1[0], 0);
+    T65 = tMatrix(th6[2], 5);
+    T54 = tMatrix(th5[2], 4);
+    T32 = tMatrix(th3[6], 2);
+    T21 = tMatrix(th2[6], 1);
+    T10 = tMatrix(th1[1], 0);
     T43 = T32.inverse() * T21.inverse() * T10.inverse() * T60 * T65.inverse() * T54.inverse();
-    th4[6] = atan2(T43(1,0), T43(0,0));
+    Eigen::Vector3d v6(T43(0,0), T43(1,0), T43(2,0));
+    th4[6] = atan2(v6(1), v6(0));
 
-    T65 = T(th6[0], 5);
-    T54 = T(th5[0], 4);
-    T32 = T(th3[0], 2);
-    T21 = T(th2[0], 1);
+    T65 = tMatrix(th6[3], 5);
+    T54 = tMatrix(th5[3], 4);
+    T32 = tMatrix(th3[7], 2);
+    T21 = tMatrix(th2[7], 1);
     T43 = T32.inverse() * T21.inverse() * T10.inverse() * T60 * T65.inverse() * T54.inverse();
-    th4[7] = atan2(T43(1,0), T43(0,0));
+    Eigen::Vector3d v7(T43(0,0), T43(1,0), T43(2,0));
+    th4[7] = atan2(v7(1), v7(0));
 
-    this->jointAngles << th1[1], th2[1], th3[1], th4[1], th5[1], th6[1];
+    this->jointAngles << th1[1], th2[7], th3[7], th4[7], th5[3], th6[3];
 
     return this -> jointAngles;
 }
