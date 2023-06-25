@@ -30,6 +30,7 @@ Destination blockDest, finalDest, home, toMotion;
 EndEffector ee;
 Position baseLink, blockPosition, worldOrigin, fromMotion, initialStep, finalStep, currentStep;
 
+Eigen::Vector3d dummyVector;
 double roll, pitch, yaw;
 
 // ros messages
@@ -83,8 +84,8 @@ int main(int argc, char **argv){
     gazeboHome.data.at(5) = 3.49;
 
     //publishers
-    // ros::Publisher jointPub = nh.advertise<std_msgs::Float64MultiArray>(joint_docker_out, queue_size);
-    ros::Publisher jointPub = nh.advertise<sensor_msgs::JointState>(js_new, queue_size);
+    ros::Publisher jointPub = nh.advertise<std_msgs::Float64MultiArray>(joint_docker_out, queue_size);
+    // ros::Publisher jointPub = nh.advertise<sensor_msgs::JointState>(js_new, queue_size);
     ros::Publisher visionPub = nh.advertise<std_msgs::Bool>(detection_req, queue_size);
     ros::Publisher motionPub = nh.advertise<std_msgs::Bool>(motion_req, queue_size);
     ros::Publisher dataPub = nh.advertise<std_msgs::Float32MultiArray>(motion_data, queue_size);
@@ -137,7 +138,7 @@ int main(int argc, char **argv){
             }
         }
 
-        // std::swap(q(0), q(2));
+        std::swap(q(0), q(2));
 
         for(int i=0; i<JOINTS; i++) {
             std::cout << q(i) << " ";
@@ -162,8 +163,8 @@ int main(int argc, char **argv){
 
     //subscribers
     ros::Subscriber motionSub = nh.subscribe<std_msgs::Float32MultiArray>(motion_res, queue_size, getMotion);
-    // ros::Subscriber jointSub = nh.subscribe<sensor_msgs::JointState>(joint_docker_in, queue_size, getJoint);
-    ros::Subscriber jointSub = nh.subscribe<sensor_msgs::JointState>(js_data, queue_size, getJoint);
+    ros::Subscriber jointSub = nh.subscribe<sensor_msgs::JointState>(joint_docker_in, queue_size, getJoint);
+    // ros::Subscriber jointSub = nh.subscribe<sensor_msgs::JointState>(js_data, queue_size, getJoint);
     ros::Subscriber visionSub = nh.subscribe<std_msgs::Float32MultiArray>(detection_res, queue_size, getPosition);
 
     baseLink = {0,0,0};
@@ -231,7 +232,7 @@ int main(int argc, char **argv){
 
                 currentState = POSITION;
 
-                currentState = WAITING;
+                // currentState = WAITING;
             break;
 
             case POSITION:
@@ -253,7 +254,19 @@ int main(int argc, char **argv){
 
                 std::cout << "\nFrom: " << fromMotion << "\n";
                 std::cout << "\nTo: " << toMotion.getPosition() << "\n\n";
+                toMotion.setPosition(ee.getPosition());
 
+                // std::cout << "x: ";
+                // std::cin >> dummyVector(0);
+
+                // std::cout << "y: ";
+                // std::cin >> dummyVector(1);
+
+                // std::cout << "z: ";
+                // std::cin >> dummyVector(2);
+
+                dummyVector = home.getPosition();
+                ee.setPosition(dummyVector);
                 toMotion.computeInverse(ee);
 
                 std::cout << "\nFinal destination: \n" << toMotion.getJointAngles() << "\n";

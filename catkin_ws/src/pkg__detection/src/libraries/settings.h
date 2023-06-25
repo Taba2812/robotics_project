@@ -82,7 +82,7 @@ namespace setting {
             //Detection
             setting::Boundry boundry;
             setting::GuilParams guil;
-            int intersection_threshold;
+            float intersection_threshold;
             std::string DATASET_PATH;
 
             Container();

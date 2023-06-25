@@ -162,6 +162,9 @@ void recognition::scrapOvelappingDetections(std::vector<cv::Vec4f> *detections, 
     if (detections->empty() || pTemplate->empty()) {return;}
     if (detections->size()  != pTemplate->size())  {return;}
 
+    std::cout << "[Detection][ScrapOverlyingDetections] Function Barrier Checks Passed!" << std::endl;
+    std::cout << "[Detection][ScrapOverlyingDetections] inter_tresh=" << setting::access.intersection_threshold << std::endl;
+
     std::vector<cv::Vec4f>::iterator outer_pos_iter = detections->begin();
     std::vector<cv::Mat>::iterator outer_temp_iter = pTemplate->begin();
     bool need_to_increment = true;
@@ -170,6 +173,7 @@ void recognition::scrapOvelappingDetections(std::vector<cv::Vec4f> *detections, 
     int outer_counter = 0;
     while (outer_pos_iter != std::prev(detections->end()) and outer_pos_iter != detections->end()) {
         
+        //std::cout << "[Detection][ScrapOverlyingDetections][Outer Loop #" << outer_counter << "]" <<std::endl;
         need_to_increment = true;
 
         cv::Vec4f element = *outer_pos_iter;
@@ -188,6 +192,7 @@ void recognition::scrapOvelappingDetections(std::vector<cv::Vec4f> *detections, 
 
         while (inner_pos_iter != detections->end() and inner_temp_iter != pTemplate->end()) {
 
+            //std::cout << "[Detection][ScrapOverlyingDetections] [Inner Loop #" << inner_counter << "]" <<std::endl;
             if (outer_pos_iter == detections->end() and outer_temp_iter == pTemplate->end()) {
                 need_to_increment = false;
                 break;
@@ -203,8 +208,6 @@ void recognition::scrapOvelappingDetections(std::vector<cv::Vec4f> *detections, 
                                                                 cv::Size2f(comparison_temp.cols * comparison[2], comparison_temp.rows * comparison[2]), 
                                                                 comparison[3]);
             int comparison_rect_area = comparison_temp.cols * comparison_temp.rows * comparison[2] * comparison[2];
-            
-            
 
             std::vector<cv::Point2f> out;
             if (cv::rotatedRectangleIntersection(element_rect, comparison_rect, out)) {
