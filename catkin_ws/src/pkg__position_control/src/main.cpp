@@ -28,7 +28,9 @@ const ros::V_string jointNames = {"shoulder_pan_joint", "shoulder_lift_joint", "
 // environment components
 Destination blockDest, finalDest, home, toMotion;
 EndEffector ee;
-Position baseLink, blockPosition, blockPositionWorld, fromMotion, initialStep, finalStep, currentStep;
+Position baseLink, blockPosition, worldOrigin, fromMotion, initialStep, finalStep, currentStep;
+
+double roll, pitch, yaw;
 
 // ros messages
 std_msgs::Bool msgVision, msgJS;
@@ -147,12 +149,12 @@ int main(int argc, char **argv){
     auto getPosition = [&] (const std_msgs::Float32MultiArray::ConstPtr &xyz) {
         std::cout << "\n[Position][Core] received Detection results data\n";
 
-        blockPositionWorld(0) = xyz->data[0];
-        blockPositionWorld(1) = xyz->data[1];
-        blockPositionWorld(2) = xyz->data[2];
+        blockPosition(0) = xyz->data[0];
+        blockPosition(1) = xyz->data[1];
+        blockPosition(2) = xyz->data[2];
 
         for(int i=0; i<3; i++){
-            std::cout << "bp(" << i << ") = " << blockPositionWorld(i) << "\n";
+            std::cout << "bp(" << i << ") = " << blockPosition(i) << "\n";
         }
 
         positionStatus = true;
@@ -165,6 +167,7 @@ int main(int argc, char **argv){
     ros::Subscriber visionSub = nh.subscribe<std_msgs::Float32MultiArray>(detection_res, queue_size, getPosition);
 
     baseLink = {0,0,0};
+    worldOrigin = {0,0,0};
     finalDest.setPosition({0.134202, 0.986868, 0.848062});
     msgMotion.data.resize(7);
     
@@ -211,9 +214,9 @@ int main(int argc, char **argv){
                 
                 currentState = VISION;
                 msgVision.data = true;
-                // visionPub.publish(msgVision);
+                visionPub.publish(msgVision);
 
-                currentState = WAITING;
+                // currentState = WAITING;
 
             break;
 
@@ -221,14 +224,14 @@ int main(int argc, char **argv){
                 std::cout << "\n[Vision] Waiting for detection\n";
 
                 while(!positionStatus) ros::spinOnce();
-                for(int i=0; i<3; i++) blockPosition(i) = baseLink(i) + ee.getPosition()(i) + blockPositionWorld(i);               
-                blockDest.setPosition(blockPosition);
+
+                blockDest.transformCoordinates(blockPosition, ee.getPosition(), baseLink, roll, pitch, yaw);
 
                 std::cout << "\nPosition to reach: " << blockPosition << "\n\n";
 
                 currentState = POSITION;
 
-                // currentState = WAITING;
+                currentState = WAITING;
             break;
 
             case POSITION:

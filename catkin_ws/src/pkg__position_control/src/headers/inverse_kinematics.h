@@ -25,6 +25,7 @@ public:
     
     bool isWithinJointLimits(const Eigen::VectorXd& joints);
     Eigen::VectorXd applyJointLimits(const Eigen::VectorXd& joints);
+    Eigen::Vector3d transformCoordinates(const Eigen::Vector3d &pointA, const Eigen::Vector3d &originA, const Eigen::Vector3d &originB, double roll, double pitch, double yaw);
 
     JointAngles computeInverse(const EndEffector& ee);
 };
@@ -79,7 +80,37 @@ Vector4d P(double th1, double th5, double th6, const Eigen::MatrixXd& T60){
     return P31;   
 }
 
+Eigen::Matrix3d rotationMatrix(double roll, double pitch, double yaw) {
+    Eigen::Matrix3d rm;
+    rm << cos(yaw) * cos(pitch),
+          cos(yaw) * sin(pitch) * sin(roll) - sin(yaw) * cos(roll),
+          cos(yaw) * sin(pitch) * cos(roll) + sin(yaw) * sin(roll),
+
+          sin(yaw) * cos(pitch),
+          sin(yaw) * sin(pitch) * sin(roll) + cos(yaw) * cos(roll),
+          sin(yaw) * sin(pitch) * sin(roll) - cos(yaw) * sin(roll),
+
+          -sin(pitch),
+          cos(pitch) * sin(roll),
+          cos(pitch) * cos(roll);
+
+    return rm;
+}
+
+Eigen::Vector3d Destination::transformCoordinates(const Eigen::Vector3d &pointA, const Eigen::Vector3d &originA, const Eigen::Vector3d &originB, double roll, double pitch, double yaw) {
+    Eigen::Matrix3d transformation = rotationMatrix(roll, pitch, yaw);
+    
+    Eigen::Vector3d p = pointA - originA;
+    Eigen::Vector3d q = transformation * p;
+    Eigen::Vector3d pointB = q + originB;
+
+    this -> position = pointB;
+
+    return pointB;
+}
+
 JointAngles Destination::computeInverse(const EndEffector  &ee){
+    JointAngles ja;
     Eigen::MatrixXd T60, T06;
     Eigen::Matrix3d ori;
     Matrix4d T65, T54, T43, T32, T21, T10;
@@ -91,7 +122,6 @@ JointAngles Destination::computeInverse(const EndEffector  &ee){
     pos = ee.getPosition();
     ori = ee.getOrientation();
 
-    //T60(th1,th2,th3,th4,th5,th6) = T10(th1)*T21(th2)*T32(th3)*T43(th4)*T54(th5)*T65(th6)
     cmp << 0,0,0,1;
     T60.resize(3,3);
     T60 << ee.getOrientation();
@@ -121,10 +151,10 @@ JointAngles Destination::computeInverse(const EndEffector  &ee){
     T06 = T60.inverse();
     X06 << T06(0,0), T06(1,0), T06(2,0);
     Y06 << T06(0,1), T06(1,1), T06(2,1);
-    th6[0] = atan2( ( (-X06(1)*sin(th1[0]) + Y06[1]*cos(th1[0])) / sin(th5[0]) ) , ( (X06(0)*sin(th1[0]) - Y06(0)*cos(th1[0])) / sin(th5[0]) ) );
-    th6[1] = atan2( ( (-X06(1)*sin(th1[0]) + Y06[1]*cos(th1[0])) / sin(th5[1]) ) , ( (X06(0)*sin(th1[0]) - Y06(0)*cos(th1[0])) / sin(th5[1]) ) );
-    th6[2] = atan2( ( (-X06(1)*sin(th1[1]) + Y06[1]*cos(th1[1])) / sin(th5[2]) ) , ( (X06(0)*sin(th1[1]) - Y06(0)*cos(th1[1])) / sin(th5[2]) ) );
-    th6[3] = atan2( ( (-X06(1)*sin(th1[1]) + Y06[1]*cos(th1[1])) / sin(th5[3]) ) , ( (X06(0)*sin(th1[1]) - Y06(0)*cos(th1[1])) / sin(th5[3]) ) );
+    th6[0] = atan2( (-X06(1)*sin(th1[0]) + Y06(1)*cos(th1[0])) / sin(th5[0]) , (X06(0)*sin(th1[0]) - Y06(0)*cos(th1[0])) / sin(th5[0]) );
+    th6[1] = atan2( (-X06(1)*sin(th1[0]) + Y06(1)*cos(th1[0])) / sin(th5[1]) , (X06(0)*sin(th1[0]) - Y06(0)*cos(th1[0])) / sin(th5[1]) );
+    th6[2] = atan2( (-X06(1)*sin(th1[1]) + Y06(1)*cos(th1[1])) / sin(th5[2]) , (X06(0)*sin(th1[1]) - Y06(0)*cos(th1[1])) / sin(th5[2]) );
+    th6[3] = atan2( (-X06(1)*sin(th1[1]) + Y06(1)*cos(th1[1])) / sin(th5[3]) , (X06(0)*sin(th1[1]) - Y06(0)*cos(th1[1])) / sin(th5[3]) );
 
     //theta3
     P31[0] = P(th1[0], th5[0], th6[0], T60);
@@ -223,11 +253,11 @@ JointAngles Destination::computeInverse(const EndEffector  &ee){
     Eigen::Vector3d v7(T43(0,0), T43(1,0), T43(2,0));
     th4[7] = atan2(v7(1), v7(0));
 
-    this->jointAngles << th1[1], th2[7], th3[7], th4[7], th5[3], th6[3];
+    ja << th1[1], th2[0], th3[0], th4[0], th5[3], th6[3];
+    this -> jointAngles = ja;
 
-    return this -> jointAngles;
+    return ja;
 }
-
 
 bool Destination::isWithinJointLimits(const Eigen::VectorXd &joints){
   // Check joint limits for each joint
