@@ -15,6 +15,7 @@ include_directories(include ${catkin_INCLUDE_DIRS} ${EIGEN3_INCLUDE_DIR})
 
 set( OWN_LIB_SOURCES
   gazebo_interpreter
+  robot
 )
 
 add_executable(UR5_Node src/ur5.node.cpp)

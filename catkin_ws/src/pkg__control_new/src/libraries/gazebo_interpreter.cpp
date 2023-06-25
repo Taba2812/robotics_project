@@ -1,9 +1,47 @@
 #include "gazebo_interpreter.h"
 
-Gazebo::Interpreter::Interpreter() {
-    this->n = 5;
+Gazebo::Interpreter::Interpreter() {}
+
+ur5::JointAngles Gazebo::Interpreter::parseJointState(const sensor_msgs::JointState::ConstPtr &ja) {
+    ur5::JointAngles _ja;
+
+    for(int i=0; i<ur5::noJoints; i++){
+        for(int j=0; j<ur5::noJoints; j++){
+            if(ur5::jointNames[j] == ja->name.at(i)){
+                _ja(i) = ja->position[i];
+            }
+        }
+    }
+
+    correct(_ja); 
+    this->jointAngles = _ja;
+
+    return _ja;
 }
 
-void Gazebo::Interpreter::print(std::string str) {
-    std::cout << str << " " << n << std::endl;
+std_msgs::Float64MultiArray Gazebo::Interpreter::createJointMessage(const ur5::JointAngles &ja) {
+    std_msgs::Float64MultiArray msg;
+    msg.data.resize(ur5::noJoints);
+
+    ur5::JointAngles _ja = ja;
+
+    correct(_ja);
+
+    for(int i=0; i<ur5::noJoints; i++) {
+        msg.data.at(i) = ja(i);
+    }
+
+    return msg;
+}
+
+void Gazebo::Interpreter::correct(ur5::JointAngles &ja) {
+    std::swap(ja(0), ja(2));
+}
+
+ur5::JointAngles Gazebo::Interpreter::getJointAngles() {
+    return this->jointAngles;
+}
+
+Gazebo::JointMessage Gazebo::Interpreter::getJointMessage() {
+    return this->jointMessage;
 }

@@ -13,5 +13,6 @@ include_directories( include
 )
 
 add_library(gazebo_interpreter gazebo_interpreter.cpp)
+add_library(robot robot.cpp)
 
 # target_link_libraries(data_type_handler ${catkin_LIBRARIES})
