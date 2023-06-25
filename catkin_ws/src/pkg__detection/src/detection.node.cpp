@@ -48,6 +48,7 @@ int main (int argc, char **argv) {
     auto detection = [&] () {
         std::cout << "[Detection] Running Detection..." << std::endl;
         Detection::DetectionResults det = Detection::Detect(pcl_mat, img_mat);
+        
         debug_pub.publish(DataTypeHandler::Mat2Image(det.image));
         return det.position;
     };

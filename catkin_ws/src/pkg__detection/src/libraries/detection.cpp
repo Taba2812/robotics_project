@@ -90,14 +90,18 @@ Detection::DetectionResults Detection::detectBlocks(cv::Mat pcl, cv::Mat png) {
     //CALCULATION OBJECT POSITION
         cv::Vec4f selected_block;
         selected_block = LocationHandler::selectDetection(detections, result.cols, result.rows);
-        std::cout << "TMP: Passed Select Detection" << std::endl;
+
+        //recognition::drawSelected(result, selected_block);
+        recognition::drawSelected(result, detections[2]);
 
         cv::Vec3f detection_position;
-        detection_position = LocationHandler::extrapolateDetectionPosition(selected_block, pcd, pcd.size());
-
+        //detection_position = LocationHandler::extrapolateDetectionPosition(selected_block, pcd, pcd.size());
+        detection_position = LocationHandler::extrapolateDetectionPosition(result, detections[2], pcd, pcd.size());
+        
     Detection::DetectionResults extrapolate;
     extrapolate.position = detection_position;
     extrapolate.image = result;
 
+    std::cout << "exited" << std::endl;
     return extrapolate;
 }
