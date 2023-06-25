@@ -128,6 +128,8 @@ std::vector<cv::Vec4f> recognition::detection(cv::Ptr<cv::GeneralizedHoughGuil> 
 
     recognition::drawResults(img, position, buffer, pTemplate);
 
+    std::cout << "pos_0: " << position[0][0] << " pos_1: " << position[0][1] << std::endl;
+
     return position;
 
 }
@@ -139,6 +141,7 @@ void recognition::drawResults(cv::InputOutputArray img, std::vector<cv::Vec4f> p
     std::vector<cv::Vec4f>::iterator pos_iter = position.begin();
     std::vector<cv::Mat>::iterator temp_iter = pTemplate.begin();
     
+    int i = 0;
     for (; pos_iter != position.end();) {
         cv::RotatedRect rRect = cv::RotatedRect(cv::Point2f((*pos_iter)[0], (*pos_iter)[1]),
                                                 cv::Size2f((*temp_iter).cols * (*pos_iter)[2], (*temp_iter).rows * (*pos_iter)[2]),
@@ -155,6 +158,18 @@ void recognition::drawResults(cv::InputOutputArray img, std::vector<cv::Vec4f> p
         ++pos_iter;
         ++temp_iter;
     }
+}
+
+void recognition::drawSelected(cv::Mat img, cv::Vec4f selection) {
+    int size = 10;
+    cv::RotatedRect rRect = cv::RotatedRect(cv::Point2f(selection[0], selection[1]),
+                                            cv::Size2f(size * selection[2], size * selection[2]),
+                                            selection[3]);
+
+    cv::Point2f vertices[4];
+    rRect.points(vertices);
+    for (int i = 0; i < 4; i++)
+            cv::line(img, vertices[i], vertices[(i + 1) % 4], cv::Scalar(0, 0, 255), 2);
 }
 
 void recognition::scrapOvelappingDetections(std::vector<cv::Vec4f> *detections, std::vector<cv::Mat> *pTemplate) {

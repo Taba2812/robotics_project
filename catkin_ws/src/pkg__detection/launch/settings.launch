@@ -27,11 +27,11 @@
     <param name="HIGHER_BRIGHTNESS" value="229" />-->
 
     <!-- DETECTION -->
-    <param name="INTERSECTION_TRESHOLD" value="0.5" />
+    <param name="INTERSECTION_TRESHOLD" value="0.4" />
 
-    <param name="GUIL_MIN_DIST"        value="10" />
+    <param name="GUIL_MIN_DIST"        value="50" />
     <param name="GUIL_LEVELS"          value="360" />
-    <param name="GUIL_DP"              value="3" />
+    <param name="GUIL_DP"              value="2" />
     <param name="GUIL_MAX_BUFFER_SIZE" value="1000" />
 
     <param name="GUIL_MIN_ANGLE"    value="0" />
@@ -40,7 +40,7 @@
     <param name="GUIL_THRESH_ANGLE" value="1500" />
 
     <param name="GUIL_MIN_SCALE"    value="0.5" />
-    <param name="GUIL_MAX_SCALE"    value="2.5" />
+    <param name="GUIL_MAX_SCALE"    value="2.0" />
     <param name="GUIL_STEP_SCALE"   value="0.5" />
     <param name="GUIL_THRESH_SCALE" value="50" />
 

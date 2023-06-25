@@ -8,6 +8,7 @@ namespace LocationHandler {
 
     cv::Vec4f selectDetection(std::vector<cv::Vec4f> detections, int width, int height);
     cv::Vec3f extrapolateDetectionPosition(cv::Vec4f selected, cv::InputArray point_cloud_array, cv::Size2i template_size);
+    cv::Vec3f extrapolateDetectionPosition(cv::Mat img, cv::Vec4f selected, cv::InputArray point_cloud_array, cv::Size2i template_size);
 
 }
 
