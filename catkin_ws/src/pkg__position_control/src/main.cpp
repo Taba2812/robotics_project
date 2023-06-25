@@ -28,7 +28,9 @@ const ros::V_string jointNames = {"shoulder_pan_joint", "shoulder_lift_joint", "
 // environment components
 Destination blockDest, finalDest, home, toMotion;
 EndEffector ee;
-Position baseLink, blockPosition, blockPositionWorld, fromMotion, initialStep, finalStep, currentStep;
+Position baseLink, blockPosition, blockPositionWorld, worldOrigin, fromMotion, initialStep, finalStep, currentStep;
+
+double roll, pitch, yaw;
 
 // ros messages
 std_msgs::Bool msgVision, msgJS;
@@ -165,6 +167,7 @@ int main(int argc, char **argv){
     ros::Subscriber visionSub = nh.subscribe<std_msgs::Float32MultiArray>(detection_res, queue_size, getPosition);
 
     baseLink = {0,0,0};
+    worldOrigin = {0,0,0};
     finalDest.setPosition({0.134202, 0.986868, 0.848062});
     msgMotion.data.resize(7);
     
@@ -221,8 +224,8 @@ int main(int argc, char **argv){
                 std::cout << "\n[Vision] Waiting for detection\n";
 
                 while(!positionStatus) ros::spinOnce();
-                for(int i=0; i<3; i++) blockPosition(i) = baseLink(i) + ee.getPosition()(i) + blockPositionWorld(i);               
-                blockDest.setPosition(blockPosition);
+
+                blockDest.transformCoordinates(blockPositionWorld, worldOrigin, baseLink, roll, pitch, yaw);
 
                 std::cout << "\nPosition to reach: " << blockPosition << "\n\n";
 
