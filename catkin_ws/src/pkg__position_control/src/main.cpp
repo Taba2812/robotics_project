@@ -28,7 +28,7 @@ const ros::V_string jointNames = {"shoulder_pan_joint", "shoulder_lift_joint", "
 // environment components
 Destination blockDest, finalDest, home, toMotion;
 EndEffector ee;
-Position baseLink, blockPosition, blockPositionWorld, worldOrigin, fromMotion, initialStep, finalStep, currentStep;
+Position baseLink, blockPosition, worldOrigin, fromMotion, initialStep, finalStep, currentStep;
 
 double roll, pitch, yaw;
 
@@ -149,12 +149,12 @@ int main(int argc, char **argv){
     auto getPosition = [&] (const std_msgs::Float32MultiArray::ConstPtr &xyz) {
         std::cout << "\n[Position][Core] received Detection results data\n";
 
-        blockPositionWorld(0) = xyz->data[0];
-        blockPositionWorld(1) = xyz->data[1];
-        blockPositionWorld(2) = xyz->data[2];
+        blockPosition(0) = xyz->data[0];
+        blockPosition(1) = xyz->data[1];
+        blockPosition(2) = xyz->data[2];
 
         for(int i=0; i<3; i++){
-            std::cout << "bp(" << i << ") = " << blockPositionWorld(i) << "\n";
+            std::cout << "bp(" << i << ") = " << blockPosition(i) << "\n";
         }
 
         positionStatus = true;
@@ -214,9 +214,9 @@ int main(int argc, char **argv){
                 
                 currentState = VISION;
                 msgVision.data = true;
-                // visionPub.publish(msgVision);
+                visionPub.publish(msgVision);
 
-                currentState = WAITING;
+                // currentState = WAITING;
 
             break;
 
@@ -225,13 +225,13 @@ int main(int argc, char **argv){
 
                 while(!positionStatus) ros::spinOnce();
 
-                blockDest.transformCoordinates(blockPositionWorld, worldOrigin, baseLink, roll, pitch, yaw);
+                blockDest.transformCoordinates(blockPosition, ee.getPosition(), baseLink, roll, pitch, yaw);
 
                 std::cout << "\nPosition to reach: " << blockPosition << "\n\n";
 
                 currentState = POSITION;
 
-                // currentState = WAITING;
+                currentState = WAITING;
             break;
 
             case POSITION:
