@@ -1,6 +1,6 @@
 #include "recognition.h"
 
-std::vector<cv::Vec4f> recognition::runRecognition(cv::InputOutputArray img) {
+std::vector<Types::RecognitionResult> recognition::runRecognition(cv::InputOutputArray img) {
     cv::Ptr<cv::GeneralizedHoughGuil> guil = cv::createGeneralizedHoughGuil();
     std::list<cv::Mat> buffer;
     std::vector<cv::Vec4f> guilPosition;
@@ -102,7 +102,7 @@ void recognition::getImages(std::list<cv::Mat> *buffer, std::string block, std::
     }
 }
 
-std::vector<cv::Vec4f> recognition::detection(cv::Ptr<cv::GeneralizedHoughGuil> guil, std::list<cv::Mat> *buffer, cv::InputOutputArray img, std::vector<cv::Vec4f> position) {
+std::vector<Types::RecognitionResult> recognition::detection(cv::Ptr<cv::GeneralizedHoughGuil> guil, std::list<cv::Mat> *buffer, cv::InputOutputArray img, std::vector<cv::Vec4f> position) {
     cv::Mat grayscale;
     cv::cvtColor(img, grayscale, cv::COLOR_RGB2GRAY);
     int total_detections = 0;
@@ -130,7 +130,16 @@ std::vector<cv::Vec4f> recognition::detection(cv::Ptr<cv::GeneralizedHoughGuil> 
 
     std::cout << "pos_0: " << position[0][0] << " pos_1: " << position[0][1] << std::endl;
 
-    return position;
+    std::vector<Types::RecognitionResult> results;
+
+    for (int i = 0; i < position.size(); i++) {
+        Types::RecognitionResult element;
+        element.detection_rect = position[i];
+        element.template_size = pTemplate[i].size();
+        results.push_back(element);
+    }
+
+    return results;
 
 }
 
@@ -160,11 +169,11 @@ void recognition::drawResults(cv::InputOutputArray img, std::vector<cv::Vec4f> p
     }
 }
 
-void recognition::drawSelected(cv::Mat img, cv::Vec4f selection) {
+void recognition::drawSelected(cv::Mat img, Types::RecognitionResult selection) {
     int size = 10;
-    cv::RotatedRect rRect = cv::RotatedRect(cv::Point2f(selection[0], selection[1]),
-                                            cv::Size2f(size * selection[2], size * selection[2]),
-                                            selection[3]);
+    cv::RotatedRect rRect = cv::RotatedRect(cv::Point2f(selection.detection_rect[0], selection.detection_rect[1]),
+                                            cv::Size2f(size * selection.detection_rect[2], size * selection.detection_rect[2]),
+                                            selection.detection_rect[3]);
 
     cv::Point2f vertices[4];
     rRect.points(vertices);

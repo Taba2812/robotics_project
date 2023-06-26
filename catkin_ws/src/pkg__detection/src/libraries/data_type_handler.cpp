@@ -9,22 +9,22 @@ cv::Mat DataTypeHandler::PointCloud2Mat(const sensor_msgs::PointCloud2ConstPtr &
 
     //matrice = pcl_to_Mat(temp_cloud);
     cv::Mat pcm(setting::access.IMAGE_HEIGHT, setting::access.IMAGE_WIDTH, CV_32FC3, cv::Scalar(0));
-    int i = 0; int valid_counter = 0;
-    for (int h = 0; h < setting::access.IMAGE_HEIGHT; h++) {
-        for (int w = 0; w < setting::access.IMAGE_WIDTH; w++) {
-            pcl::PointXYZ pcl_point = temp_cloud->points[i];
-            cv::Vec3f point(pcl_point.x, pcl_point.y, pcl_point.z);
-            
-            for (int c = 0; c < 3; c++) {
-                if (std::isnan(point[c])){
-                    point[c] = 0.0f;
-                }
+
+    auto lambda = [&] (f32_Pixel &pixel, const int *position) {
+        int i = (position[1] * position[0]) + position[1];
+        pcl::PointXYZ pcl_point = temp_cloud->points[i];
+        cv::Vec3f point(pcl_point.x, pcl_point.y, pcl_point.z);
+
+        for (int c = 0; c < 3; c++) {
+            if (std::isnan(point[c])){
+                point[c] = 0.0f;
             }
-            
-            pcm.at<cv::Vec3f>(h,w) = point;
-            i++;
         }
-    }
+
+        pixel = point;
+    };
+
+    pcm.forEach<f32_Pixel>(lambda);
 
     return pcm;
 }
@@ -94,7 +94,7 @@ cv::Mat DataTypeHandler::ExpensiveCrop(cv::Mat cvMat, cv::Rect rect) {
 
     for (int h = 0; h < pcm.rows; h++) {
         for (int w = 0; w < pcm.cols; w++) {          
-            //pcm.at<cv::Vec3f>(h,w) = cvMat.at<cv::Vec3f>(rect.y+h, rect.x+w);
+            
         }
     }
 

@@ -6,6 +6,7 @@
     <param name="IMG_PATH" value="/root/code/catkin_ws/src/images_database/complete_data_examples/SimulatedZed2_img.png" />
     <!--<param name="IMG_PATH" value="/root/code/catkin_ws/src/images_database/official_placeholders/MultipleBlocks/blocks_group2_10.jpg" />-->
     <param name="RAW_PATH" value="/root/code/catkin_ws/src/images_database/complete_data_examples/SimulatedZed2_raw.txt" />
+    <param name="OUT_PATH" value="/root/code/catkin_ws/src/images_database/tests_results/detection_debug.png" />
 
     <node pkg="pkg__dummy_nodes" type="Core-Detection_Dummy" name="Detection_Dummy" output="screen" /> 
     <node pkg="pkg__dummy_nodes" type="SimulatedCapture_Dummy" name="SimulatedCapture_Dummy" output="screen" />
