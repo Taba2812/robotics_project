@@ -7,6 +7,7 @@
 #include "recognition.h"
 #include "location_handler.h"
 #include "data_type_handler.h"
+#include "util_types.h"
 
 namespace Detection {
 

@@ -1,7 +1,7 @@
 #include "location_handler.h"
 
-cv::Vec4f LocationHandler::selectDetection(std::vector<cv::Vec4f> detections, int width, int height) {
-    if (detections.empty()) {return cv::Vec4f(0.0f, 0.0f, 0.0f, 0.0f);}
+Types::RecognitionResult LocationHandler::selectDetection(std::vector<Types::RecognitionResult> detections, int width, int height) {
+    if (detections.empty()) {return Types::RecognitionResult();}
     
     // Select the detection that is cloasest to the center
     int mid_x = (float)width / 2;
@@ -10,9 +10,9 @@ cv::Vec4f LocationHandler::selectDetection(std::vector<cv::Vec4f> detections, in
     int i = 0;
     int selected = 0;
     float dist = 0;
-    for (cv::Vec4f det : detections) {
+    for (Types::RecognitionResult det : detections) {
 
-        float distance = sqrt(pow(abs(mid_x - det[0]),2) + pow(abs(mid_y - det[1]),2));
+        float distance = sqrt(pow(abs(mid_x - det.detection_rect[0]),2) + pow(abs(mid_y - det.detection_rect[1]),2));
 
         if (i == 0) {
             dist = distance;
@@ -29,17 +29,17 @@ cv::Vec4f LocationHandler::selectDetection(std::vector<cv::Vec4f> detections, in
     return detections[selected];
 }
 
-std::vector<cv::Point2i> LocationHandler::RRect2Contour(cv::Vec4f data, cv::Size2i size) {
+std::vector<cv::Point2i> LocationHandler::RRect2Contour(Types::RecognitionResult selected) {
     std::vector<cv::Point2i> contour;
 
-    cv::RotatedRect rect = cv::RotatedRect (cv::Point2f(data[0], data[1]), 
-                                            cv::Size2f(size.width * data[2], size.height * data[2]), 
-                                            data[3]);
+    cv::RotatedRect rect = cv::RotatedRect (cv::Point2f(selected.detection_rect[0], selected.detection_rect[1]), 
+                                            cv::Size2f(selected.template_size.width * selected.detection_rect[2], selected.template_size.height * selected.detection_rect[2]), 
+                                            selected.detection_rect[3]);
 
     for (int i = 0; i < 4; i++) {
-        std::cout << "Vector#" << i << " " << data[i] << std::endl;
+        std::cout << "Vector#" << i << " " << selected.detection_rect[i] << std::endl;
     }
-    std::cout << "TWidth: " << size.width << " THeight: " << size.height << std::endl;
+    std::cout << "TWidth: " << selected.template_size.width << " THeight: " << selected.template_size.height << std::endl;
 
     cv::Point2f vertices[4];
     rect.points(vertices);
@@ -52,16 +52,16 @@ std::vector<cv::Point2i> LocationHandler::RRect2Contour(cv::Vec4f data, cv::Size
     return contour;
 }
 
-cv::Vec3f LocationHandler::extrapolateDetectionPosition(cv::Mat img, cv::Vec4f selected, cv::Mat point_cloud_array, cv::Size2i template_size) {
+cv::Vec3f LocationHandler::extrapolateDetectionPosition(cv::Mat img, Types::RecognitionResult selected, cv::Mat point_cloud_array) {
 
     
-    std::vector<cv::Point2i> contour = LocationHandler::RRect2Contour(selected, template_size); 
+    std::vector<cv::Point2i> contour = LocationHandler::RRect2Contour(selected); 
     for (int i = 0; i < contour.size(); i++) {
         std::cout << "ContPt#" << i << " [" << contour[i].x << "," << contour[i].y << "]" << std::endl;
     }
 
     //MIDPOINT STUFF
-    cv::Vec4f midpoint = point_cloud_array.at<cv::Vec4f>(selected[0], selected[1]);
+    cv::Vec4f midpoint = point_cloud_array.at<cv::Vec4f>(selected.detection_rect[0], selected.detection_rect[1]);
     float midpoint_distance = midpoint[3];
 
     //AVERAGE STUFF
@@ -77,10 +77,10 @@ cv::Vec3f LocationHandler::extrapolateDetectionPosition(cv::Mat img, cv::Vec4f s
     auto pcl_lambda = [&] (f32_Pixel &pixel, const int *position) {
         int row = position[0];
         int col = position[1];
-        if (!cv::pointPolygonTest(contour, cv::Point2f((float)col,(float)row), false)) {return;}
+        if (cv::pointPolygonTest(contour, cv::Point2f((float)col,(float)row), false) != 1) {return;}
 
         float distance = sqrt(pow(pixel.x,2) + pow(pixel.y,2) + pow(pixel.z,2));
-        if (distance < 0.01f) {return;}
+        if (distance < 0.001f) {return;}
 
         float abs_dist_form_midpoint = abs(midpoint_distance - distance);
         float weight = 1 / (1 + abs_dist_form_midpoint); //Karis weight
@@ -96,7 +96,7 @@ cv::Vec3f LocationHandler::extrapolateDetectionPosition(cv::Mat img, cv::Vec4f s
     auto img_lambda = [&] (ui8_Pixel &pixel, const int *position) {
         int row = position[0];
         int col = position[1];
-        if (cv::pointPolygonTest( contour, cv::Point2f((float)col, (float)row), false ) != 0) {return;}
+        if (cv::pointPolygonTest( contour, cv::Point2f((float)col, (float)row), false ) != 1) {return;}
         
         pixel.x = 150;
         pixel.y = 150;
