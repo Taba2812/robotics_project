@@ -50,7 +50,7 @@ Detection::DetectionResults Detection::detectGripper(cv::Mat pcl, cv::Mat png) {
         selected_block = LocationHandler::selectDetection(detections, result.cols, result.rows);
 
         cv::Vec3f detection_position;
-        detection_position = LocationHandler::extrapolateDetectionPosition(selected_block, pcd, pcd.size());
+        detection_position = LocationHandler::extrapolateDetectionPosition(result, selected_block, pcd, pcd.size());
 
     Detection::DetectionResults extrapolate;
     extrapolate.position = detection_position;
@@ -92,11 +92,11 @@ Detection::DetectionResults Detection::detectBlocks(cv::Mat pcl, cv::Mat png) {
         selected_block = LocationHandler::selectDetection(detections, result.cols, result.rows);
 
         //recognition::drawSelected(result, selected_block);
-        recognition::drawSelected(result, detections[2]);
+        recognition::drawSelected(result, detections[1]);
 
         cv::Vec3f detection_position;
         //detection_position = LocationHandler::extrapolateDetectionPosition(selected_block, pcd, pcd.size());
-        detection_position = LocationHandler::extrapolateDetectionPosition(result, detections[2], pcd, pcd.size());
+        detection_position = LocationHandler::extrapolateDetectionPosition(result, detections[1], pcd, pcd.size());
         
     Detection::DetectionResults extrapolate;
     extrapolate.position = detection_position;

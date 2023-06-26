@@ -24,6 +24,9 @@
 typedef pcl::PointCloud<pcl::PointXYZ> PTL_PointCloud;
 typedef pcl::PointCloud<pcl::PointXYZ>::Ptr PTL_PointCloudPtr;
 
+typedef cv::Point3_<uint8_t> ui8_Pixel;
+typedef cv::Point3_<float> f32_Pixel;
+
 void save_raw_matrix_to_txt (cv::Mat mat, std::string path) {
     std::cout << "Saving Matrix..." << std::endl;
 
@@ -71,18 +74,19 @@ cv::Mat load_raw_matrix_from_txt (std::string path) {
 cv::Mat adjust_raw_matrix (cv::Mat mat) {
     cv::Mat tmp(mat.rows, mat.cols, CV_32FC3, cv::Scalar(0));
     
-    for (int h = 0; h < mat.rows; h++) {
-        for (int w = 0; w < mat.cols; w++) {
-            for (int c = 0; c < mat.channels(); c++) {
-                float val = mat.at<cv::Vec3f>(h,w)[c];
-                if (std::isnan(val)){
-                    tmp.at<cv::Vec3f>(h,w)[c] = 0.0f;
-                } else {
-                    tmp.at<cv::Vec3f>(h,w)[c] = val;
-                }
-            }
-        }
-    }
+    auto lambda = [] (f32_Pixel &pixel, const int *position) {
+        //Channel 1
+        if (std::isnan(pixel.x))
+            pixel.x = 0.0f;
+        //Channel 2
+        if (std::isnan(pixel.y))
+            pixel.y = 0.0f;
+        //Chaneel 3
+        if (std::isnan(pixel.z))
+            pixel.z = 0.0f;
+    };
+
+    tmp.forEach<f32_Pixel>(lambda);
 
     return tmp;
 }
@@ -145,18 +149,17 @@ cv::Mat tonemap_matrix(cv::Mat original) {
 cv::Mat pcl_to_Mat(const PTL_PointCloudPtr point_cloud) {
     cv::Mat pcm(IMAGE_HEIGHT, IMAGE_WIDTH, CV_32FC3, cv::Scalar(0));
 
-    int i = 0;
-    int valid_counter = 0;
     std::cout << "width:" << IMAGE_WIDTH << " height: " << IMAGE_HEIGHT << std::endl;
-    for (int h = 0; h < IMAGE_HEIGHT; h++) {
-        for (int w = 0; w < IMAGE_WIDTH; w++) {
-            pcl::PointXYZ pcl_point = point_cloud->points[i];
-            cv::Vec3f point(pcl_point.x, pcl_point.y, pcl_point.z);
 
-            pcm.at<cv::Vec3f>(h,w) = point;
-            i++;
-        }
-    }
+    auto lambda = [&] (f32_Pixel &pixel, const int *position) {
+        int i = (position[1] * position[0]) + position[1];
+        pcl::PointXYZ pcl_point = point_cloud->points[i];
+        cv::Vec3f point(pcl_point.x, pcl_point.y, pcl_point.z);
+
+        pixel = point;
+    };
+
+    pcm.forEach<f32_Pixel>(lambda);
 
     return pcm;
 }

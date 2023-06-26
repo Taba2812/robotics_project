@@ -21,6 +21,9 @@
 typedef pcl::PointCloud<pcl::PointXYZ> PTL_PointCloud;
 typedef pcl::PointCloud<pcl::PointXYZ>::Ptr PTL_PointCloudPtr;
 
+typedef cv::Point3_<uint8_t> ui8_Pixel;
+typedef cv::Point3_<float> f32_Pixel;
+
 namespace DataTypeHandler {
 
     cv::Mat PointCloud2Mat(const sensor_msgs::PointCloud2ConstPtr &point_cloud);

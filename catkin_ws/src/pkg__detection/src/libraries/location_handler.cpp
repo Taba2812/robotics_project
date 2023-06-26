@@ -29,21 +29,39 @@ cv::Vec4f LocationHandler::selectDetection(std::vector<cv::Vec4f> detections, in
     return detections[selected];
 }
 
-cv::Vec3f LocationHandler::extrapolateDetectionPosition(cv::Vec4f selected, cv::InputArray point_cloud_array, cv::Size2i template_size) {
+std::vector<cv::Point2i> LocationHandler::RRect2Contour(cv::Vec4f data, cv::Size2i size) {
+    std::vector<cv::Point2i> contour;
 
-    cv::RotatedRect rect = cv::RotatedRect (cv::Point2f(selected[0], selected[1]), 
-                                            cv::Size2f(template_size.width * selected[2], template_size.height * selected[2]), 
-                                            selected[3]);
-    cv::Point2f corners[4];
-    rect.points(corners);
+    cv::RotatedRect rect = cv::RotatedRect (cv::Point2f(data[0], data[1]), 
+                                            cv::Size2f(size.width * data[2], size.height * data[2]), 
+                                            data[3]);
 
-    //Converting array to a vector
-    cv::Point2f* lastItemPointer = (corners + sizeof corners / sizeof corners[0]);
-    std::vector<cv::Point2f> contour(corners, lastItemPointer);
+    for (int i = 0; i < 4; i++) {
+        std::cout << "Vector#" << i << " " << data[i] << std::endl;
+    }
+    std::cout << "TWidth: " << size.width << " THeight: " << size.height << std::endl;
+
+    cv::Point2f vertices[4];
+    rect.points(vertices);
+
+    for (int i = 0; i < 4; i++) {
+        cv::Point2i point = {(int)vertices[i].x, (int)vertices[i].y};
+        contour.push_back(point);
+    }
+
+    return contour;
+}
+
+cv::Vec3f LocationHandler::extrapolateDetectionPosition(cv::Mat img, cv::Vec4f selected, cv::Mat point_cloud_array, cv::Size2i template_size) {
+
+    
+    std::vector<cv::Point2i> contour = LocationHandler::RRect2Contour(selected, template_size); 
+    for (int i = 0; i < contour.size(); i++) {
+        std::cout << "ContPt#" << i << " [" << contour[i].x << "," << contour[i].y << "]" << std::endl;
+    }
 
     //MIDPOINT STUFF
-    cv::Mat matrice = point_cloud_array.getMat();
-    cv::Vec4f midpoint = matrice.at<cv::Vec4f>(rect.center);
+    cv::Vec4f midpoint = point_cloud_array.at<cv::Vec4f>(selected[0], selected[1]);
     float midpoint_distance = midpoint[3];
 
     //AVERAGE STUFF
@@ -52,83 +70,47 @@ cv::Vec3f LocationHandler::extrapolateDetectionPosition(cv::Vec4f selected, cv::
     float value_y_tot = 0;
     float value_z_tot = 0;
 
-    for (int r = 0; r < point_cloud_array.rows(); r++) {
-        for (int c = 0; c < point_cloud_array.cols(); c++) {
-            
-            if (!cv::pointPolygonTest(contour, cv::Point2f((float)c,(float)r), false)) {continue;}
+    if (point_cloud_array.rows != img.rows || point_cloud_array.cols != img.cols) {return cv::Vec3f(0, 0, 0);}
+    std::cout << "Rows: " << img.rows << " Cols: " << img.cols << std::endl;
 
-            cv::Point2i location(c,r);
-            cv::Vec4f point = matrice.at<cv::Vec4f>(location);
+    int i = 0;
+    auto pcl_lambda = [&] (f32_Pixel &pixel, const int *position) {
+        int row = position[0];
+        int col = position[1];
+        if (!cv::pointPolygonTest(contour, cv::Point2f((float)col,(float)row), false)) {return;}
 
-            //Invalid inputs are set to 0.0f or close
-            if (point[3] < 0.01f) {continue;} 
-            if (point[3] >= 2.0f)
-                std::cout << "Point Distance: " << point[3] << std::endl;
+        float distance = sqrt(pow(pixel.x,2) + pow(pixel.y,2) + pow(pixel.z,2));
+        if (distance < 0.01f) {return;}
 
-            float abs_dist_form_midpoint = abs(midpoint_distance - point[3]);
-            float weight = 1 / (1 + abs_dist_form_midpoint); //Karis weight
-            
-            weight_tot += weight;
-            value_x_tot += weight * point[0];
-            value_y_tot += weight * point[1];
-            value_z_tot += weight * point[2];
-        }
-    }
+        float abs_dist_form_midpoint = abs(midpoint_distance - distance);
+        float weight = 1 / (1 + abs_dist_form_midpoint); //Karis weight
+
+        weight_tot += weight;
+        value_x_tot += weight * pixel.x;
+        value_y_tot += weight * pixel.y;
+        value_z_tot += weight * pixel.z;
+
+        i++;
+    };
+
+    auto img_lambda = [&] (ui8_Pixel &pixel, const int *position) {
+        int row = position[0];
+        int col = position[1];
+        if (cv::pointPolygonTest( contour, cv::Point2f((float)col, (float)row), false ) != 0) {return;}
+        
+        pixel.x = 150;
+        pixel.y = 150;
+        pixel.z = 150;
+    };
+
+    point_cloud_array.forEach<f32_Pixel>(pcl_lambda);
+    img.forEach<ui8_Pixel>(img_lambda);
 
     float final_x = value_x_tot / weight_tot;
     float final_y = value_y_tot / weight_tot;
     float final_z = value_z_tot / weight_tot;
-
-    return cv::Vec3f(final_x, final_y, final_z);
-}
-
-cv::Vec3f LocationHandler::extrapolateDetectionPosition(cv::Mat img, cv::Vec4f selected, cv::InputArray point_cloud_array, cv::Size2i template_size) {
-
-    cv::RotatedRect rect = cv::RotatedRect (cv::Point2f(selected[0], selected[1]), 
-                                            cv::Size2f(template_size.width * selected[2], template_size.height * selected[2]), 
-                                            selected[3]);
-    cv::Point2f corners[4];
-    rect.points(corners);
-
-    std::vector<cv::Point2f> contour;
-    for (int v = 0; v < 4; v++) {
-        contour.push_back(corners[v]);
-    }
-
-    //MIDPOINT STUFF
-    cv::Mat matrice = point_cloud_array.getMat();
-    cv::Vec4f midpoint = matrice.at<cv::Vec4f>(rect.center);
-    float midpoint_distance = midpoint[3];
-
-    //AVERAGE STUFF
-    float weight_tot = 0; 
-    float value_x_tot = 0;
-    float value_y_tot = 0;
-    float value_z_tot = 0;
-
-    if (point_cloud_array.rows() != img.rows || point_cloud_array.cols() != img.cols) {return cv::Vec3f(0, 0, 0);}
-    std::cout << "Rows: " << img.rows << " Cols: " << img.cols << std::endl;
-
-    int i = 0;
-    for (int r = 0; r < point_cloud_array.rows(); r++) {
-        for (int c = 0; c < point_cloud_array.cols(); c++) {
-            
-            if (cv::pointPolygonTest(contour, cv::Point2f((float)c,(float)r), false) == 1) {
-                cv::Point2i location(c,r);
-                //cv::Vec4f point = matrice.at<cv::Vec4f>(location);
-            
-                //Invalid inputs are set to 0.0f or close
-                //if (point[3] < 0.01f) {continue;}
-                img.at<cv::Vec3i>(location) = {150,150,150};
-                
-                i++;
-            }
-
-            
-        }
-    }
-
+    
     std::cout << "Total Pixels: " << img.rows * img.cols << " Eligible pixels: " << i << std::endl;
 
-    return cv::Vec3f(0, 0, 0);
+    return cv::Vec3f(final_x, final_y, final_z);
 }

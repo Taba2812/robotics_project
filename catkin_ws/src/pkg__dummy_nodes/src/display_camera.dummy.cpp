@@ -23,41 +23,24 @@
 typedef pcl::PointCloud<pcl::PointXYZ> PTL_PointCloud;
 typedef pcl::PointCloud<pcl::PointXYZ>::Ptr PTL_PointCloudPtr;
 
+typedef cv::Point3_<uint8_t> ui8_Pixel;
+typedef cv::Point3_<float> f32_Pixel;
+
 cv::Mat pcl_to_Mat(const PTL_PointCloudPtr point_cloud) {
     //cv::Mat pcm(IMAGE_HEIGHT, IMAGE_WIDTH, CV_32FC4, cv::Scalar(0));
     cv::Mat pcm(IMAGE_HEIGHT, IMAGE_WIDTH, CV_32FC3, cv::Scalar(0));
 
-    /*
-    for (int h = 0; h < IMAGE_HEIGHT; h++) {
-        for (int w = 0; w < IMAGE_WIDTH; w++) {
-            pcl::PointXYZ pcl_point = point_cloud->points[h + w];
-            float distance = sqrt(pow(pcl_point.x,2) + pow(pcl_point.y,2) + pow(pcl_point.z,2));
-            cv::Vec4f point(pcl_point.x, pcl_point.y, pcl_point.z, distance);
-            //std::cout << "h: " << h << " w: " << 2 << " Vx: " << point[0] << " Vy: " << point[1] << " Vz: " << point[2] << " Vd: " << point[3] << std::endl;
-            pcm.at<cv::Vec4f>(h,w) = point;
-        }
-    }
-    */
-    int i = 0;
-    int valid_counter = 0;
     std::cout << "width:" << IMAGE_WIDTH << " height: " << IMAGE_HEIGHT << std::endl;
-    for (int h = 0; h < IMAGE_HEIGHT; h++) {
-        for (int w = 0; w < IMAGE_WIDTH; w++) {
-            pcl::PointXYZ pcl_point = point_cloud->points[i];
-            //float distance = sqrt(pow(pcl_point.x,2) + pow(pcl_point.y,2) + pow(pcl_point.z,2));
-            cv::Vec3f point(pcl_point.x, pcl_point.y, pcl_point.z);
-            //std::cout << "h: " << h << " w: " << 2 << " Vx: " << point[0] << " Vy: " << point[1] << " Vz: " << point[2] << " Vd: " << point[3] << std::endl;
-            
-            /*
-            if (!std::isnan(point[0])) {
-                std::cout << "i: " << valid_counter << " h: " << h << " w: " << w << " x: " << point[0] << std::endl;
-                valid_counter++;
-            }
-            */
-            pcm.at<cv::Vec3f>(h,w) = point;
-            i++;
-        }
-    }
+
+    auto lambda = [&] (f32_Pixel &pixel, const int *position) {
+        int i = (position[1] * position[0]) + position[1];
+        pcl::PointXYZ pcl_point = point_cloud->points[i];
+        cv::Vec3f point(pcl_point.x, pcl_point.y, pcl_point.z);
+
+        pixel = point;
+    };
+
+    pcm.forEach<f32_Pixel>(lambda);
 
     return pcm;
 }

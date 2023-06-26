@@ -6,14 +6,17 @@
 #include <opencv2/imgcodecs.hpp>
 #include <opencv2/highgui.hpp>
 
+#define DISPLAY 0
+
 int main (int argc, char **argv) {
     ros::init(argc, argv, "DetectionDebug_Dummy");
 
     ros::NodeHandle handle;
     int RATIO;
-    std::string topic;
+    std::string topic, file_path;
     handle.getParam("Q_Size", RATIO);
     handle.getParam("Det2Deb_Img", topic);
+    handle.getParam("OUT_PATH", file_path);
 
     auto image_callback = [&] (const sensor_msgs::ImageConstPtr &result) {
         
@@ -27,14 +30,17 @@ int main (int argc, char **argv) {
             return;
         }
 
-        
+        #if DISPLAY
         while (true) {
             cv::imshow("Detection Output", ImgPtr->image);
             int c = cv::waitKey(10);
             if (c == 'k') {   
                 break;
             }
-        }        
+        } 
+        #else
+        cv::imwrite(file_path, ImgPtr->image);
+        #endif   
         
     };
 
