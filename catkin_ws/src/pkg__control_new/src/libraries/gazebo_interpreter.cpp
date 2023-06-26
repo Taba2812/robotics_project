@@ -13,8 +13,7 @@ ur5::JointAngles Gazebo::Interpreter::parseJointState(const sensor_msgs::JointSt
         }
     }
 
-    correct(_ja); 
-    this->jointAngles = _ja;
+    //correct(_ja); 
 
     return _ja;
 }
@@ -25,7 +24,7 @@ std_msgs::Float64MultiArray Gazebo::Interpreter::createJointMessage(const ur5::J
 
     ur5::JointAngles _ja = ja;
 
-    correct(_ja);
+    //correct(_ja);
 
     for(int i=0; i<ur5::noJoints; i++) {
         msg.data.at(i) = ja(i);
@@ -36,12 +35,4 @@ std_msgs::Float64MultiArray Gazebo::Interpreter::createJointMessage(const ur5::J
 
 void Gazebo::Interpreter::correct(ur5::JointAngles &ja) {
     std::swap(ja(0), ja(2));
-}
-
-ur5::JointAngles Gazebo::Interpreter::getJointAngles() {
-    return this->jointAngles;
-}
-
-Gazebo::JointMessage Gazebo::Interpreter::getJointMessage() {
-    return this->jointMessage;
 }

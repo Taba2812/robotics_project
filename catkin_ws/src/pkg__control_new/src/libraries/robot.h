@@ -5,6 +5,7 @@
 #include <iostream>
 #include <Eigen/Dense>
 #include "sensor_msgs/JointState.h"
+#include "std_msgs/Float32MultiArray.h"
 #include "std_msgs/Float64MultiArray.h"
 #include <math.h>
 
@@ -28,6 +29,7 @@ namespace ur5 {
 
     typedef Eigen::Vector3d Position;
     typedef Eigen::Matrix3d Orientation;
+    typedef Eigen::Vector3d EulerAngles;
     typedef Eigen::Matrix<double, 4, 4> Pose;
     typedef Eigen::Matrix<double, 4, 1> Vector4d;
 
@@ -56,7 +58,9 @@ namespace ur5 {
             JointAngles getJointAngles();
 
             Pose computeDirect(const JointAngles &ja);
-            JointAngles computeInverse(const Pose &p);
+            JointAngles computeInverse(const Position &p, const Orientation &o);
+            std_msgs::Float32MultiArray motionPlanningMessage(const Position &initial, const Position &final, const int &noSteps);
+            ur5::Orientation computeOrientation(const EulerAngles &p);
     };
 }
 

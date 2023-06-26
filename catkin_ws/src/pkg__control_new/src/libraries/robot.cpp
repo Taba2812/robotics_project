@@ -14,234 +14,240 @@ ur5::JointAngles ur5::Robot::getJointAngles() {
     return this->jointAngles;
 }
 
-ur5::Pose tMatrix(float q, int index) {
-    ur5::Pose m;
+// ur5::Pose tMatrix(float q, int index) {
+//     ur5::Pose m;
 
-    switch(index) {
-        case 0 :
-        m << cos(q), -sin(q), 0, 0,
-              sin(q), cos(q), 0, 0,
-              0, 0, 1, ur5::d1,
-              0, 0, 0, 1;
-        break;
+//     switch(index) {
+//         case 0 :
+//         m << cos(q), -sin(q), 0, 0,
+//              sin(q), cos(q), 0, 0,
+//              0, 0, 1, ur5::d1,
+//              0, 0, 0, 1;
+//         break;
 
-        case 1:
-        m << cos(q), -sin(q), 0, 0,
-            0, 0, -1, 0,
-            sin(q), cos(q), 0, 0,
-            0, 0, 0, 1;
-        break;
+//         case 1:
+//         m << cos(q), -sin(q), 0, ur5::a2 * cos(q),
+//              sin(q), cos(q), 0, ur5::a2 * sin(q),
+//              0, 0, 1, 0,
+//              0, 0, 0, 1;
+//         break;
 
-        case 2:
-        m << cos(q), -sin(q), 0, ur5::a2,
-            sin(q), cos(q), 0, 0,
-            0, 0, 1, 0,
-            0, 0, 0, 1;
-        break;
+//         case 2:
+//         m << cos(q), -sin(q), 0, ur5::a3 * cos(q),
+//              sin(q), cos(q), 0, ur5::a3 * sin(q),
+//              0, 0, 1, 0,
+//              0, 0, 0, 1;
+//         break;
 
-        case 3:
-        m << cos(q), -sin(q), 0, ur5::a3,
-            sin(q), cos(q), 0, 0,
-            0, 0, 1, ur5::d4,
-            0, 0, 0, 1;
-        break;
+//         case 3:
+//         m << cos(q), -sin(q), 0, 0,
+//              sin(q), cos(q), 0, 0,
+//              0, 0, 1, ur5::d4,
+//              0, 0, 0, 1;
+//         break;
 
-        case 4:
-        m << cos(q), -sin(q), 0, 0,
-            0, 0, -1, -ur5::d5,
-            sin(q), cos(q), 0, 0,
-            0, 0, 0, 1;
-        break;
+//         case 4:
+//         m << cos(q), -sin(q), 0, 0,
+//              sin(q), cos(q), 0, 0,
+//              0, 0, 1, ur5::d5,
+//              0, 0, 0, 1;
+//         break;
 
-        case 5:
-        m << cos(q), -sin(q), 0, 0,
-            0, 0, 1, ur5::d6,
-            -sin(q), -cos(q), 0, 0,
-            0, 0, 0, 1;
-        break;
-    }
+//         case 5:
+//         m << cos(q), -sin(q), 0, 0,
+//              sin(q), cos(q), 0, 0,
+//              0, 0, 1, ur5::d6,
+//              0, 0, 0, 1;
+//         break;
+//     }
 
-    return m;
-}
+//     return m;
+// }
 
 ur5::Pose ur5::Robot::computeDirect(const ur5::JointAngles &ja) {
-    ur5::Pose TM;
-    ur5::Pose T[ur5::noJoints];
+    // ur5::Pose TM;
+    // ur5::Pose T[ur5::noJoints];
 
-    for(int i=0; i<ur5::noJoints; i++) {
-        T[i] = tMatrix(ja(i), i);
-    }
+    // for(int i=0; i<ur5::noJoints; i++) {
+    //     T[i] = tMatrix(ja(i), i);
+    // }
 
-    TM = T[0] * T[1] * T[2] * T[3] * T[4] * T[5];
 
-    this->orientation = TM.block<3,3>(0,0);
-    this->position = TM.block<3,1>(0,3);
+    // TM = T[0] * T[1] * T[2] * T[3] * T[4] * T[5];
 
-    return TM;
-}
+    // this->orientation = TM.block<3,3>(0,0);
+    // this->position = TM.block<3,1>(0,3);
 
-ur5::Vector4d P(double th1, double th5, double th6, const Eigen::MatrixXd& T60){
-    Eigen::Matrix4d T65, T54, T10;
-    Eigen::MatrixXd T61, T41;
-    Eigen::Vector4d tmp, P31;
+    // return TM;
 
-    T65 = tMatrix(th6, 5);
-    T54 = tMatrix(th5, 4);
-    T10 = tMatrix(th1, 0);
+
+    // joint 1
+    ur5::JointAngles j1_1;
+    j1_1 << 0, -0.425, -0.3922, 0, 0, 0;
+
+    ur5::JointAngles j1_2;
+    j1_2 << 0.1625, 0, 0, 0.1333, 0.0997, 0.0996 + 0.14;
     
-    T61 = T10.inverse() * T60;
-    T41 = T61 * T54.inverse() * T65.inverse();
-    tmp << 0, -ur5::d[3], 0, 1;
-    P31 = T41 * tmp;
+    ur5::Pose j1_matrix;
+    j1_matrix << cos(ja(0)), -sin(ja(0)), 0, 0, sin(ja(0)), cos(ja(0)), 0, 0, 0, 0, 1, j1_2(0), 0, 0, 0, 1;
 
-    return P31;   
+    //joint 2
+    ur5::JointAngles j2_1;
+    j2_1 << 0, -0.425, -0.3922, 0, 0, 0;
+
+    ur5::JointAngles j2_2;
+    j2_2 << 0.1625, 0, 0, 0.1333, 0.0997, 0.0996 + 0.14;
+
+    ur5::Pose j2_matrix;
+    j2_matrix << cos(ja(1)), -sin(ja(1)), 0, 0, 0, 0, -1, 0, sin(ja(1)), cos(ja(1)), 0, 0, 0, 0, 0, 1;
+
+    // joint 3
+    ur5::JointAngles j3_1;
+    j3_1 << 0, -0.425, -0.3922, 0, 0, 0;
+
+    ur5::JointAngles j3_2;
+    j3_2 << 0.1625, 0, 0, 0.1333, 0.0997, 0.0996 + 0.14;
+
+    ur5::Pose j3_matrix;
+    j3_matrix << cos(ja(2)), -sin(ja(2)), 0, j3_1(1), sin(ja(2)), cos(ja(2)), 0, 0, 0, 0, 1, j3_2(2), 0, 0, 0, 1;
+
+    // joint 4
+    ur5::JointAngles j4_1;
+    j4_1 << 0, -0.425, -0.3922, 0, 0, 0;
+
+    ur5::JointAngles j4_2;
+    j4_2 << 0.1625, 0, 0, 0.1333, 0.0997, 0.0996 + 0.14;
+
+    ur5::Pose j4_matrix;
+    j4_matrix << cos(ja(3)), -sin(ja(3)), 0, j4_1(2), sin(ja(3)), cos(ja(3)), 0, 0, 0, 0, 1, j4_2(3), 0, 0, 0, 1;
+
+    // joint 5
+    ur5::JointAngles j5_1;
+    j5_1 << 0, -0.425, -0.3922, 0, 0, 0;
+
+    ur5::JointAngles j5_2;
+    j5_2 << 0.1625, 0, 0, 0.1333, 0.0997, 0.0996 + 0.14;
+
+    ur5::Pose j5_matrix;
+    j5_matrix << cos(ja(4)), -sin(ja(4)), 0, 0, 0, 0, -1, -j5_2(4), sin(ja(4)), cos(ja(4)), 0, 0, 0, 0, 0, 1;
+
+    // joint 6
+    ur5::JointAngles j6_1;
+    j6_1 << 0, -0.425, -0.3922, 0, 0, 0;
+
+    ur5::JointAngles j6_2;
+    j6_2 << 0.1625, 0, 0, 0.1333, 0.0997, 0.0996 + 0.14;
+
+    ur5::Pose j6_matrix;
+    j6_matrix << cos(ja(5)), -sin(ja(5)), 0, 0, 0, 0, 1, j6_2(5), -sin(ja(5)), -cos(ja(5)), 0, 0, 0, 0, 0, 1;
+
+    ur5::Pose retMatrix = j1_matrix * j2_matrix * j3_matrix * j4_matrix * j5_matrix * j6_matrix;
+
+    return retMatrix;
 }
 
-ur5::JointAngles ur5::Robot::computeInverse(const ur5::Pose &p) {
-    ur5::JointAngles ja;
-    Eigen::MatrixXd T60, T06;
-    Eigen::Matrix3d ori;
-    ur5::Pose T65, T54, T43, T32, T21, T10;
-    Eigen::Vector3d X06, Y06, pos;
-    Vector4d cmp, tmp, P50, P31[4];
-    double phi, psi, R, n;
-    double th1[2], th2[8], th3[8], th4[8], th5[4], th6[4];
+// ur5::Vector4d P(double th1, double th5, double th6, const Eigen::MatrixXd& T60){
+//     Eigen::Matrix4d T65, T54, T10;
+//     Eigen::MatrixXd T61, T41;
+//     Eigen::Vector4d tmp, P31;
 
-    orientation = p.block<3,3>(0,0);
-    position = p.block<3,1>(0,3);
+//     T65 = tMatrix(th6, 5);
+//     T54 = tMatrix(th5, 4);
+//     T10 = tMatrix(th1, 0);
+    
+//     T61 = T10.inverse() * T60;
+//     T41 = T61 * T54.inverse() * T65.inverse();
+//     tmp << 0, -ur5::d[3], 0, 1;
+//     P31 = T41 * tmp;
 
-    cmp << 0,0,0,1;
-    T60.resize(3,3);
-    T60 << orientation;
-    T60.conservativeResize(Eigen::NoChange, T60.cols()+1);
-    T60.col(T60.cols()-1) = position;
-    T60.conservativeResize(T60.rows()+1, Eigen::NoChange);
-    T60.row(T60.rows()-1) = cmp;
-    T60.conservativeResize(4,4);
+//     return P31;   
+// }
+
+ur5::JointAngles ur5::Robot::computeInverse(const ur5::Position &p, const ur5::Orientation &o) {
+    ur5::JointAngles th(ur5::noJoints);
+
+    // std::cout << "IK Position: " << ee.getPosition() << "\n\n";
+    // std::cout << "Orientation: " << ee.getOrientation() << "\n\n";
+
+    //position and orientation
+    const Eigen::Vector3d &translation = p;
+    const Eigen::Quaterniond orientation(o);
+    const Eigen::Matrix3d rotation = orientation.toRotationMatrix();
+
+    //wrist center position
+    const Eigen::Vector3d wristCenter = translation - ur5::d6 * rotation.col(2);
 
     //theta1
-    tmp << 0,0,-d[5],1;
-    P50 = T60 * tmp;
-    phi = atan2(P50(1), P50(0));
-    R = sqrt( pow(P50(0),2) + pow(P50(1),2) );
-    psi = acos( d[3] / R );
-    th1[0] = phi + psi + M_PI_2;
-    th1[1] = phi - psi + M_PI_2;
-
-    //theta5
-    th5[0] =  acos( ( pos(0)*sin(th1[0]) - pos(1)*cos(th1[0]) - d[3] ) / d[5] );
-    th5[1] = -acos( ( pos(0)*sin(th1[0]) - pos(1)*cos(th1[0]) - d[3] ) / d[5] );
-    th5[2] =  acos( ( pos(0)*sin(th1[1]) - pos(1)*cos(th1[1]) - d[3] ) / d[5] );
-    th5[3] = -acos( ( pos(0)*sin(th1[1]) - pos(1)*cos(th1[1]) - d[3] ) / d[5] );
-
-    //theta6
-    T06.resize(4,4);
-    T06 = T60.inverse();
-    X06 << T06(0,0), T06(1,0), T06(2,0);
-    Y06 << T06(0,1), T06(1,1), T06(2,1);
-    th6[0] = atan2( (-X06(1)*sin(th1[0]) + Y06(1)*cos(th1[0])) / sin(th5[0]) , (X06(0)*sin(th1[0]) - Y06(0)*cos(th1[0])) / sin(th5[0]) );
-    th6[1] = atan2( (-X06(1)*sin(th1[0]) + Y06(1)*cos(th1[0])) / sin(th5[1]) , (X06(0)*sin(th1[0]) - Y06(0)*cos(th1[0])) / sin(th5[1]) );
-    th6[2] = atan2( (-X06(1)*sin(th1[1]) + Y06(1)*cos(th1[1])) / sin(th5[2]) , (X06(0)*sin(th1[1]) - Y06(0)*cos(th1[1])) / sin(th5[2]) );
-    th6[3] = atan2( (-X06(1)*sin(th1[1]) + Y06(1)*cos(th1[1])) / sin(th5[3]) , (X06(0)*sin(th1[1]) - Y06(0)*cos(th1[1])) / sin(th5[3]) );
+    th(0) = std::atan2(wristCenter(1), wristCenter(0));
 
     //theta3
-    P31[0] = P(th1[0], th5[0], th6[0], T60);
-    P31[1] = P(th1[0], th5[1], th6[1], T60);
-    P31[2] = P(th1[1], th5[2], th6[2], T60);
-    P31[3] = P(th1[1], th5[3], th6[3], T60);
-    n = P31[0].norm();
-    th3[0] = acos((pow(n,2)-pow(cn[1],2)-pow(cn[2],2)) / 2*cn[1]*cn[2]);
-    n = P31[1].norm();
-    th3[1] = acos((pow(n,2)-pow(cn[1],2)-pow(cn[2],2)) / 2*cn[1]*cn[2]);
-    n = P31[2].norm();
-    th3[2] = acos((pow(n,2)-pow(cn[1],2)-pow(cn[2],2)) / 2*cn[1]*cn[2]);
-    n = P31[3].norm();
-    th3[3] = acos((pow(n,2)-pow(cn[1],2)-pow(cn[2],2)) / 2*cn[1]*cn[2]);
-    th3[4] = -th3[0];
-    th3[5] = -th3[1];
-    th3[6] = -th3[2];
-    th3[7] = -th3[3];
+    const double r = std::sqrt(std::pow(wristCenter(0), 2) + std::pow(wristCenter(1), 2));
+    const double s = wristCenter(2) - ur5::d1;
+    const double A = (std::pow(r, 2) + std::pow(s, 2) - std::pow(ur5::a2, 2) - std::pow(ur5::a3, 2)) / (2 * ur5::a2 * ur5::a3);
+
+    th(2) = std::atan2(-std::sqrt(1 - std::pow(A, 2)), A);
 
     //theta2
-    th2[0] = -atan2(P31[0](1),-P31[0](0)) + asin(cn[2]*sin(th3[0]) / P31[0].norm());
-    th2[1] = -atan2(P31[1](1),-P31[1](0)) + asin(cn[2]*sin(th3[1]) / P31[1].norm());
-    th2[2] = -atan2(P31[2](1),-P31[2](0)) + asin(cn[2]*sin(th3[2]) / P31[2].norm());
-    th2[3] = -atan2(P31[3](1),-P31[3](0)) + asin(cn[2]*sin(th3[3]) / P31[3].norm());
-    th2[4] = -atan2(P31[0](1),-P31[0](0)) + asin(cn[2]*sin(th3[4]) / P31[0].norm());
-    th2[5] = -atan2(P31[1](1),-P31[1](0)) + asin(cn[2]*sin(th3[5]) / P31[1].norm());
-    th2[6] = -atan2(P31[2](1),-P31[2](0)) + asin(cn[2]*sin(th3[6]) / P31[2].norm());
-    th2[7] = -atan2(P31[3](1),-P31[3](0)) + asin(cn[2]*sin(th3[7]) / P31[3].norm());
+    const double B = ur5::a3 * std::sin(th(2)) / std::sqrt(std::pow(r, 2) + std::pow(s, 2));
+    th(1) = std::atan2(s, r) - std::atan2(B, std::sqrt(1 - std::pow(B, 2)));
 
-    //th4
-    T65 = tMatrix(th6[0], 5);
-    T54 = tMatrix(th5[0], 4);
-    T32 = tMatrix(th3[0], 2);
-    T21 = tMatrix(th2[0], 1);
-    T10 = tMatrix(th1[0], 0);
-    T43 = T32.inverse() * T21.inverse() * T10.inverse() * T60 * T65.inverse() * T54.inverse();
-    Eigen::Vector3d v0(T43(0,0), T43(1,0), T43(2,0));
-    th4[0] = atan2(v0(1), v0(0));
+    //rotation matrix from base to end-effector
+    Eigen::AngleAxisd x = Eigen::AngleAxisd(th(2), Eigen::Vector3d::UnitX());
+    Eigen::AngleAxisd y = Eigen::AngleAxisd(th(1), Eigen::Vector3d::UnitY());
+    Eigen::AngleAxisd z = Eigen::AngleAxisd(th(0), Eigen::Vector3d::UnitZ());
+    const Eigen::Quaterniond Q0_3 = z * y * x;
+    const Eigen::Matrix3d R0_3 = Q0_3.toRotationMatrix();
+    const Eigen::Matrix3d R3_6 = R0_3.transpose() * rotation;
 
-    T65 = tMatrix(th6[1], 5);
-    T54 = tMatrix(th5[1], 4);
-    T32 = tMatrix(th3[1], 2);
-    T21 = tMatrix(th2[1], 1);
-    T43 = T32.inverse() * T21.inverse() * T10.inverse() * T60 * T65.inverse() * T54.inverse();
-    Eigen::Vector3d v1(T43(0,0), T43(1,0), T43(2,0));
-    th4[1] = atan2(v1(1), v1(0));
+    //theta4
+    th(3) = std::atan2(R3_6(2, 1), R3_6(2, 2));
 
-    T65 = tMatrix(th6[2], 5);
-    T54 = tMatrix(th5[2], 4);
-    T32 = tMatrix(th3[2], 2);
-    T21 = tMatrix(th2[2], 1);
-    T10 = tMatrix(th1[1], 0);
-    T43 = T32.inverse() * T21.inverse() * T10.inverse() * T60 * T65.inverse() * T54.inverse();
-    Eigen::Vector3d v2(T43(0,0), T43(1,0), T43(2,0));
-    th4[2] = atan2(v2(1), v2(0));
+    //theta5
+    th(4) = std::atan2(-R3_6(2, 0), std::sqrt(R3_6(2, 1) * R3_6(2, 1) + R3_6(2, 2) * R3_6(2, 2)));
 
-    T65 = tMatrix(th6[3], 5);
-    T54 = tMatrix(th5[3], 4);
-    T32 = tMatrix(th3[3], 2);
-    T21 = tMatrix(th2[3], 1);
-    T43 = T32.inverse() * T21.inverse() * T10.inverse() * T60 * T65.inverse() * T54.inverse();
-    Eigen::Vector3d v3(T43(0,0), T43(1,0), T43(2,0));
-    th4[3] = atan2(v3(1), v3(0));
+    //theta6
+    th(5) = std::atan2(R3_6(1, 0), R3_6(0, 0));
 
-    T65 = tMatrix(th6[0], 5);
-    T54 = tMatrix(th5[0], 4);
-    T32 = tMatrix(th3[4], 2);
-    T21 = tMatrix(th2[4], 1);
-    T10 = tMatrix(th1[0], 0);
-    T43 = T32.inverse() * T21.inverse() * T10.inverse() * T60 * T65.inverse() * T54.inverse();
-    Eigen::Vector3d v4(T43(0,0), T43(1,0), T43(2,0));
-    th4[4] = atan2(v4(1), v4(0));
+    //apply joint limits
+    // th = applyJointLimits(th);
 
-    T65 = tMatrix(th6[1], 5);
-    T54 = tMatrix(th5[1], 4);
-    T32 = tMatrix(th3[5], 2);
-    T21 = tMatrix(th2[5], 1);
-    T43 = T32.inverse() * T21.inverse() * T10.inverse() * T60 * T65.inverse() * T54.inverse();
-    Eigen::Vector3d v5(T43(0,0), T43(1,0), T43(2,0));
-    th4[5] = atan2(v5(1), v5(0));
+    return th;
+}
 
-    T65 = tMatrix(th6[2], 5);
-    T54 = tMatrix(th5[2], 4);
-    T32 = tMatrix(th3[6], 2);
-    T21 = tMatrix(th2[6], 1);
-    T10 = tMatrix(th1[1], 0);
-    T43 = T32.inverse() * T21.inverse() * T10.inverse() * T60 * T65.inverse() * T54.inverse();
-    Eigen::Vector3d v6(T43(0,0), T43(1,0), T43(2,0));
-    th4[6] = atan2(v6(1), v6(0));
+std_msgs::Float32MultiArray ur5::Robot::motionPlanningMessage(const Position &initial, const Position &final, const int &noSteps) {
+    std_msgs::Float32MultiArray motionMsg;
+    motionMsg.data.resize(7);
 
-    T65 = tMatrix(th6[3], 5);
-    T54 = tMatrix(th5[3], 4);
-    T32 = tMatrix(th3[7], 2);
-    T21 = tMatrix(th2[7], 1);
-    T43 = T32.inverse() * T21.inverse() * T10.inverse() * T60 * T65.inverse() * T54.inverse();
-    Eigen::Vector3d v7(T43(0,0), T43(1,0), T43(2,0));
-    th4[7] = atan2(v7(1), v7(0));
+    motionMsg.data.at(0) = initial(0);
+    motionMsg.data.at(1) = initial(1);
+    motionMsg.data.at(2) = initial(2);
+    motionMsg.data.at(3) = noSteps;
+    motionMsg.data.at(4) = final(0);
+    motionMsg.data.at(5) = final(1);
+    motionMsg.data.at(6) = final(2);
 
-    ja << th1[1], th2[0], th3[0], th4[0], th5[3], th6[3];
+    return motionMsg;
+}
 
-    return ja;
+ur5::Orientation ur5::Robot::computeOrientation(const ur5::EulerAngles &p) {
+    ur5::Orientation orientation;
+
+    const double roll = p(0);
+    const double pitch = p(1);
+    const double yaw = p(2);
+
+    orientation << cos(yaw) * cos(pitch),
+                   cos(yaw) * sin(roll) * sin(pitch) - cos(roll) * sin(yaw),
+                   cos(yaw) * cos(roll) * sin(pitch) + sin(yaw) * sin(roll),
+
+                   sin(yaw) * cos(pitch),
+                   sin(yaw) * sin(roll) * sin(pitch) + cos(roll) * cos(yaw),
+                   sin(yaw) * cos(roll) * sin(pitch) - sin(roll) * cos(yaw),
+
+                   -sin(pitch),
+                   cos(pitch) * sin(roll),
+                   cos(pitch) * cos(roll);
+
+    return orientation;
+
 }

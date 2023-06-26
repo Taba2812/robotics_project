@@ -8,9 +8,6 @@ namespace Gazebo {
     typedef std_msgs::Float64MultiArray JointMessage;
 
     class Interpreter {
-        private:
-           ur5::JointAngles jointAngles;
-           JointMessage jointMessage;
         public:
             Interpreter();
 
@@ -18,9 +15,6 @@ namespace Gazebo {
             std_msgs::Float64MultiArray createJointMessage(const ur5::JointAngles &ja);
 
             void correct(ur5::JointAngles &ja);
-
-            ur5::JointAngles getJointAngles();
-            JointMessage getJointMessage();
     };
 
 }
