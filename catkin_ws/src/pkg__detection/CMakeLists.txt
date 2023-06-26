@@ -44,6 +44,9 @@ target_link_libraries(Detection_Node ${catkin_LIBRARIES} ${OWN_LIB_SOURCES})
 add_executable(Calibration_Node src/calibration.node.cpp)
 target_link_libraries(Calibration_Node ${catkin_LIBRARIES} ${OWN_LIB_SOURCES})
 
+add_executable(OpenCV_Test src/opencv.test.cpp)
+target_link_libraries(OpenCV_Test ${catkin_LIBRARIES} ${OWN_LIB_SOURCES})
+
 install(TARGETS Detection_Node
   ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
   LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}

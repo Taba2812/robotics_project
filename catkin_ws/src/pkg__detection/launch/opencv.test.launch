@@ -1,0 +1,8 @@
+<launch>
+
+    <include file="src/launch/global.launch" />
+    <param name="FILE_PATH"  value="/root/code/catkin_ws/src/images_database/tests_results/point_polygon_test.png" />
+
+    <node pkg="pkg__detection" type="OpenCV_Test" name="OpenCV_Test" output="screen" />
+
+</launch>
