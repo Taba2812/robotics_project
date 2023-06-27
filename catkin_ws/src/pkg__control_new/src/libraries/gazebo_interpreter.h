@@ -21,8 +21,9 @@ namespace Gazebo {
             bool hasReachedDestination(ur5::JointAngles joints, float dt);
             ur5::JointAngles parseJointState(const sensor_msgs::JointState::ConstPtr &ja);
             ur5::JointAngles parseArray(const std_msgs::Float64MultiArray::ConstPtr &ja);
+            ur5::JointAngles sanitizeJoints(ur5::JointAngles joints);
             std_msgs::Float64MultiArray createJointMessage(const ur5::JointAngles &ja);
-            std_msgs::Float64MultiArray publishDestination() {return this->createJointMessage(this->destination);};
+            std_msgs::Float64MultiArray publishDestination() {return this->createJointMessage(this->sanitizeJoints(this->destination));};
 
             void correct(ur5::JointAngles &ja);
     };
