@@ -2,6 +2,7 @@
 #define GAZEBO_INT
 
 #include "robot.h"
+#include "std_msgs/Float32MultiArray.h"
 
 namespace Gazebo {
 
@@ -23,6 +24,7 @@ namespace Gazebo {
             ur5::JointAngles parseArray(const std_msgs::Float64MultiArray::ConstPtr &ja);
             ur5::JointAngles sanitizeJoints(ur5::JointAngles joints);
             std_msgs::Float64MultiArray createJointMessage(const ur5::JointAngles &ja);
+            std_msgs::Float32MultiArray createJointMessage32(const ur5::JointAngles &ja);
             std_msgs::Float64MultiArray publishDestination() {return this->createJointMessage(this->sanitizeJoints(this->destination));};
 
             void correct(ur5::JointAngles &ja);

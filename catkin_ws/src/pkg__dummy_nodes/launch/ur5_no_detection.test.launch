@@ -1,0 +1,14 @@
+<launch>
+
+    <include file="src/launch/global.launch" />
+    <include file="$(find pkg__control_new)/launch/ur5.launch" />
+    <include file="$(find pkg__control_new)/launch/gazebo.interface.launch" />
+    <include file="$(find pkg__motion_planning)/launch/motion_planning.launch" />
+
+    <param name="X" value="0" />
+    <param name="Y" value="0" />
+    <param name="Z" value="0.5" />
+
+    <node pkg="pkg__dummy_nodes" type="Detection-Core_Dummy" name="DetectionCore_Dummy" output="screen" />
+
+</launch>

@@ -1,12 +1,10 @@
 <launch>
 
     <include file="src/launch/global.launch" />
-    <include file="$(find pkg__control_new)/launch/settings.launch" />
-    <include file="$(find pkg__motion_planning)/launch/motion_planning.launch" />
-        
-    <node pkg="pkg__control_new" type="UR5_Node" name="UR5_Node" output="screen" />
-    <node pkg="pkg__dummy_nodes" type="JointStates_Dummy" name="JointStates_Dummy" output="screen" />
+    <include file="$(find pkg__control_new)/launch/settings.launch" />    
 
     <param name="STEPS" value="10" />
+
+    <node pkg="pkg__control_new" type="UR5_Node" name="UR5_Node" output="screen" />
     
 </launch>

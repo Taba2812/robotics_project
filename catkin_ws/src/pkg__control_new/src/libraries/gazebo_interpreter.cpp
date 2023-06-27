@@ -13,11 +13,7 @@ ur5::JointAngles Gazebo::Interpreter::parseJointState(const sensor_msgs::JointSt
         }
     }
 
-<<<<<<< Updated upstream
     correct(_ja); 
-=======
-    // correct(_ja); 
->>>>>>> Stashed changes
 
     return _ja;
 }
@@ -34,23 +30,23 @@ ur5::JointAngles Gazebo::Interpreter::parseArray(const std_msgs::Float64MultiArr
 
 ur5::JointAngles Gazebo::Interpreter::sanitizeJoints(ur5::JointAngles joints) {
 
-    if (joints[0] < ur5::joint0_min ) {joints[0] = ur5::joint0_min; std::cout << "Sanitized Destination" << std::endl;};
-    if (joints[0] > ur5::joint0_max ) {joints[0] = ur5::joint0_max; std::cout << "Sanitized Destination" << std::endl;};
+    if (joints[0] < ur5::joint0_min ) {joints[0] = ur5::joint0_min;};
+    if (joints[0] > ur5::joint0_max ) {joints[0] = ur5::joint0_max;};
 
-    if (joints[1] < ur5::joint1_min ) {joints[1] = ur5::joint1_min; std::cout << "Sanitized Destination" << std::endl;};
-    if (joints[1] > ur5::joint1_max ) {joints[1] = ur5::joint1_max; std::cout << "Sanitized Destination" << std::endl;};
+    if (joints[1] < ur5::joint1_min ) {joints[1] = ur5::joint1_min;};
+    if (joints[1] > ur5::joint1_max ) {joints[1] = ur5::joint1_max;};
 
-    if (joints[2] < ur5::joint2_min ) {joints[2] = ur5::joint2_min; std::cout << "Sanitized Destination" << std::endl;};
-    if (joints[2] > ur5::joint2_max ) {joints[2] = ur5::joint2_max; std::cout << "Sanitized Destination" << std::endl;};
+    if (joints[2] < ur5::joint2_min ) {joints[2] = ur5::joint2_min;};
+    if (joints[2] > ur5::joint2_max ) {joints[2] = ur5::joint2_max;};
 
-    if (joints[3] < ur5::joint3_min ) {joints[3] = ur5::joint3_min; std::cout << "Sanitized Destination" << std::endl;};
-    if (joints[3] > ur5::joint3_max ) {joints[3] = ur5::joint3_max; std::cout << "Sanitized Destination" << std::endl;};
+    if (joints[3] < ur5::joint3_min ) {joints[3] = ur5::joint3_min;};
+    if (joints[3] > ur5::joint3_max ) {joints[3] = ur5::joint3_max;};
 
-    if (joints[4] < ur5::joint4_min ) {joints[4] = ur5::joint4_min; std::cout << "Sanitized Destination" << std::endl;};
-    if (joints[4] > ur5::joint4_max ) {joints[4] = ur5::joint4_max; std::cout << "Sanitized Destination" << std::endl;};
+    if (joints[4] < ur5::joint4_min ) {joints[4] = ur5::joint4_min;};
+    if (joints[4] > ur5::joint4_max ) {joints[4] = ur5::joint4_max;};
 
-    if (joints[5] < ur5::joint5_min ) {joints[5] = ur5::joint5_min; std::cout << "Sanitized Destination" << std::endl;};
-    if (joints[5] > ur5::joint5_max ) {joints[5] = ur5::joint5_max; std::cout << "Sanitized Destination" << std::endl;};
+    if (joints[5] < ur5::joint5_min ) {joints[5] = ur5::joint5_min;};
+    if (joints[5] > ur5::joint5_max ) {joints[5] = ur5::joint5_max;};
 
     return joints;
 }
@@ -61,11 +57,19 @@ std_msgs::Float64MultiArray Gazebo::Interpreter::createJointMessage(const ur5::J
 
     ur5::JointAngles _ja = ja;
 
-<<<<<<< Updated upstream
-=======
-    correct(_ja);
+    for(int i=0; i<ur5::noJoints; i++) {
+        msg.data.at(i) = ja(i);
+    }
 
->>>>>>> Stashed changes
+    return msg;
+}
+
+std_msgs::Float32MultiArray Gazebo::Interpreter::createJointMessage32(const ur5::JointAngles &ja) {
+    std_msgs::Float32MultiArray msg;
+    msg.data.resize(ur5::noJoints);
+
+    ur5::JointAngles _ja = ja;
+
     for(int i=0; i<ur5::noJoints; i++) {
         msg.data.at(i) = ja(i);
     }

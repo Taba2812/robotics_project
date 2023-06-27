@@ -1,156 +1,90 @@
 #include "libraries/gazebo_interpreter.h"
+#include "libraries/robot.h"
 #include <ros/ros.h>
 #include "std_msgs/Bool.h"
+#include "std_msgs/Float32MultiArray.h"
+#include "std_msgs/Float64MultiArray.h"
 
 int main (int argc, char** argv) {
     ros::init(argc, argv, "UR5_Node");
     ros::NodeHandle nh;
 
-    int queue_size, noSteps;
-    std::string joint_in, joint_out, joint_req, motion_req, motion_data, motion_res;
-    nh.getParam("Q_Size", queue_size);
-    nh.getParam("Core2JS_Req", joint_req);
-    nh.getParam("Core2JS_Data", joint_out);
-    nh.getParam("JS2Core_Data", joint_in);
-    // nh.getParam("Docker_Joint_In", joint_in);
-    // nh.getParam("Docker_Joint_Out", joint_out);
-    nh.getParam("Core2MP_Req", motion_req);
-    nh.getParam("Core2MP_Data", motion_data);
-    nh.getParam("MP2Core_Data", motion_res);
+    Gazebo::Interpreter gi;
+
+    int queue, noSteps;
+    std::string to_gi, from_gi, to_detection, from_detection, to_motion_request, to_motion_data, from_motion;
+    nh.getParam("Q_Size", queue);
+    nh.getParam("UR52Gazebo", to_gi);
+    nh.getParam("UR52Gazebo", from_gi);
+    nh.getParam("Core2Det_Req", to_detection);
+    nh.getParam("Det2Core_Res", from_detection);
+    nh.getParam("Core2MP_Req", to_motion_request);
+    nh.getParam("Core2MP_Data", to_motion_data);
+    nh.getParam("MP2Core_Data", from_motion);
     nh.getParam("STEPS", noSteps);
 
-    Gazebo::Interpreter gi;
-    ur5::JointAngles angles;
+    ros::Publisher pub_gi = nh.advertise<std_msgs::Float64MultiArray>(to_gi, queue);
+    ros::Publisher pub_detection = nh.advertise<std_msgs::Bool>(to_detection, queue);
+    ros::Publisher pub_motion_next = nh.advertise<std_msgs::Bool>(to_motion_request, queue);
+    ros::Publisher pub_motion_data = nh.advertise<std_msgs::Float32MultiArray>(to_motion_data, queue);
 
-    ros::Publisher jointPub = nh.advertise<sensor_msgs::JointState>(joint_out, queue_size);
-    ros::Publisher jointReq = nh.advertise<std_msgs::Bool>(joint_req, queue_size);
-    ros::Publisher motionPub = nh.advertise<std_msgs::Bool>(motion_req, queue_size);
-    ros::Publisher dataPub = nh.advertise<std_msgs::Float32MultiArray>(motion_data, queue_size);
+    //CALLBACKS
 
-    bool jointStatus = false;
-    auto getJoint = [&] (const sensor_msgs::JointState::ConstPtr &js) {
-        if (jointStatus) { return; }
+    //Separare la classe Joint angles con una classe che sia un array a tre elementi per differenziarli
+    ur5::JointAngles block_buffer, dest_buffer;
+    bool block_buffer_empty = true;
+    bool dest_buffer_empty = true;
 
-        angles = gi.parseJointState(js);
+    auto l_gi = [&] (const std_msgs::Float64MultiArrayConstPtr &position) {
+        ur5::JointAngles received = gi.parseArray(position);
 
-        jointStatus = true;
-    };
-
-    ur5::Position curveSteps[noSteps];
-    std_msgs::Float32MultiArray msgMotion;
-    bool motionStatus = false;
-    int motionCounter = 0;
-    auto getMotion = [&] (const std_msgs::Float32MultiArrayConstPtr &next_position) {
-
-        if(motionStatus) { return; }
-
-        std::cout << "[" << motionCounter << "] ";    
-        for(int i=0; i<3; i++) std::cout << next_position->data.at(i) << " ";
-        std::cout << std::endl;
-
-        if (next_position->data.at(0) == 0 &&
-            next_position->data.at(1) == 0 &&
-            next_position->data.at(2) == 0) {
-
-            std::cout << "\n[Core] Destination reached sending RESET signal\n";
-            std_msgs::Float32MultiArray reset;
-            reset.data = {0,0,0,0};
-            dataPub.publish(reset);
-
+        if (block_buffer_empty && dest_buffer_empty) {
+            //Send request to Detection
+            std_msgs::Bool det_req;
+            det_req.data = true;
+            pub_detection.publish(det_req);
         } else {
-
-            for(int i=0; i<3; i++){
-                curveSteps[motionCounter](i) = next_position->data.at(i);
-            }
-
-            if(motionCounter < noSteps){
-                motionCounter++;
-                std_msgs::Bool next;
-                next.data = true;
-                motionPub.publish(next);
+            if (!block_buffer_empty) {
+                //Se position == blocco
+                    //block_buffer_empty = true;
+                    //Invia richiesta al planning per il pat alla destination
+                //Altrimenti
+                    //Richiedere il prossimo step del percorso
+                    //Inviarlo (fare inverse kinematic sul punto per inviare i joint);
             } else {
-                motionCounter = 0;
-                motionStatus = true;
+                //Se position == destination
+                    //dest_buffer_empty = true;
+                    //Continue... [Home, maybe in the future]
+                //Altrimenti
+                    //Richiede il prossimo step
+                    //Inviarlo
             }
         }
     };
 
-    ros::Subscriber jointSub = nh.subscribe<sensor_msgs::JointState>(joint_in, queue_size, getJoint);
-    ros::Subscriber motionSub = nh.subscribe<std_msgs::Float32MultiArray>(motion_res, queue_size, getMotion);
+    auto l_detection = [&] (const std_msgs::Float32MultiArrayConstPtr &position) {
+        block_buffer[0] = position->data[0];
+        block_buffer[1] = position->data[1];
+        block_buffer[2] = position->data[2];
 
-    // int index;
-    // double angle;
-    char c;
+        dest_buffer[0] = position->data[3];
+        dest_buffer[1] = position->data[4];
+        dest_buffer[2] = position->data[5];
 
-    ur5::Robot robot;
-    std_msgs::Bool jointMsg;
+        block_buffer_empty = false;
+        dest_buffer_empty = false;
 
-    // // end effector
-    // const double eeX = 0.151843;
-    // const double eeY = 0.190801;
-    // const double eeZ = -0.454981;
-    // const ur5::Position eePosition(eeX, eeY, eeZ);
+        pub_motion_data.publish(gi.createJointMessage32(block_buffer));
+    };
 
-    // const double eeRoll = 2.899031;
-    // const double eePitch = -0.087728;
-    // const double eeYaw = 1.553114;
-    // const ur5::EulerAngles eeRotation(eeRoll, eePitch, eeYaw);
-    // const ur5::Orientation eeOrientation = robot.computeOrientation(eeRotation);
+    auto l_motion = [&] (const std_msgs::Float32MultiArrayConstPtr &position) {
+        pub_gi.publish(position);
+    };
 
-    // ur5::JointAngles eeJointAngles;
+    ros::Subscriber sub_gi = nh.subscribe<std_msgs::Float64MultiArray>(from_gi, queue, l_gi);
+    ros::Subscriber sub_detection = nh.subscribe<std_msgs::Float32MultiArray>(from_detection, queue, l_detection);
+    ros::Subscriber sub_motion = nh.subscribe<std_msgs::Float32MultiArray>(from_motion, queue, l_motion);
 
-    // // block
-    // const double blockX = 0.64;
-    // const double blockY = 0.6;
-    // const double blockZ = -0.825;
-    // const ur5::Position blockPosition(blockX, blockY, blockZ);
+    ros::spin();
 
-    // const double blockRoll = 0;
-    // const double blockPitch = 0;
-    // const double blockYaw = 1;
-    // const ur5::EulerAngles blockRotation(blockRoll, blockPitch, blockYaw);
-    // const ur5::Orientation blockOrientation = robot.computeOrientation(blockRotation);
-
-    // ur5::JointAngles blockJointAngles;
-
-    // ur5::JointAngles interpolatedJointAngles[noSteps];
-
-    while(ros::ok()) {  
-        std::cout << "Continue: ";
-        std::cin >> c;
-
-        jointMsg.data = true;
-        jointReq.publish(jointMsg);
-
-        while(!jointStatus) ros::spinOnce();
-        jointStatus = false;
-
-        robot.computeDirect(angles);
-        std::cout << robot.getPose() << "\n\n";
-
-        ur5::JointAngles ja = robot.computeInverse(robot.getPose());
-        std::cout << "\nJoint angles: " << ja << "\n";
-        
-        // while(!jointStatus) ros::spinOnce();
-        // jointStatus = false;
-
-        // ur5::JointAngles ja = gi.getJointAngles();
-        // robot.computeDirect(ja);
-
-        // std::cout << "Position: " << robot.getPosition() << "\n\n";
-        // std::cout << "Orientation: " << robot.getOrientation() << "\n\n";
-
-        // std::cout << "Which joint do you want to move? ";
-        // std::cin >> index;
-
-        // std::cout << "How much? ";
-        // std::cin >> angle;
-
-        // ur5::JointAngles ja = angles;
-        // ja(index) += M_PI / angle;
-
-        // Gazebo::JointMessage jm = gi.createJointMessage(ja);
-
-        // jointPub.publish(jm);
-    }
 }

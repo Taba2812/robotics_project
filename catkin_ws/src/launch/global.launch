@@ -22,7 +22,7 @@
 
         <!--DETECTION-->
         <param name="Core2Det_Req" value="Detection_Request" /> <!--Bool-->
-        <param name="Det2Core_Res" value="Detection_Result" />  <!--Float32MultiArray-->
+        <param name="Det2Core_Res" value="Detection_Result" />  <!--Float32MultiArray [B_x,B_y,B_z,D_x,D_y,D_z] --> 
         <param name="Det2Zed_Req"  value="Camera_Request" />    <!--Bool-->
         <param name="Zed2Det_Data" value="Camera_Data" />       <!--PointCloud2-->
         <param name="Zed2Det_Img"  value="Camera_Image" />      <!--Image-->
