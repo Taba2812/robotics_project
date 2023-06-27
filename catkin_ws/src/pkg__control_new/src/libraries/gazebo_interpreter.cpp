@@ -13,7 +13,11 @@ ur5::JointAngles Gazebo::Interpreter::parseJointState(const sensor_msgs::JointSt
         }
     }
 
+<<<<<<< Updated upstream
     correct(_ja); 
+=======
+    // correct(_ja); 
+>>>>>>> Stashed changes
 
     return _ja;
 }
@@ -57,6 +61,11 @@ std_msgs::Float64MultiArray Gazebo::Interpreter::createJointMessage(const ur5::J
 
     ur5::JointAngles _ja = ja;
 
+<<<<<<< Updated upstream
+=======
+    correct(_ja);
+
+>>>>>>> Stashed changes
     for(int i=0; i<ur5::noJoints; i++) {
         msg.data.at(i) = ja(i);
     }

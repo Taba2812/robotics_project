@@ -13,7 +13,7 @@ int main(int argc, char** argv) {
 
   sensor_msgs::JointState jointStateMsg;
   jointStateMsg.name = {"shoulder_pan_joint", "shoulder_lift_joint", "elbow_joint", "wrist_1_joint", "wrist_2_joint", "wrist_3_joint"};
-  jointStateMsg.position = {-0.320003, -0.780023, -2.56006, -1.63004, -1.57004, 3.49009};
+  jointStateMsg.position = {-0.32, -0.78, -2.56, -1.63, -1.57, 3.49};
 
   std::string js_data, js_new, js_req;
   int queue_size;

@@ -33,32 +33,33 @@ namespace ur5 {
     typedef Eigen::Matrix<double, 4, 4> Pose;
     typedef Eigen::Matrix<double, 4, 1> Vector4d;
 
-    const float d1 = 0.089159;
-    const float a2 = -0.425;
-    const float a3 = -0.39225;
-    const float d4 = 0.10915;
-    const float d5 = 0.09465;
-    const float d6 = 0.0823;
+    const float a2 = -0.4250;
+    const float a3 = -0.3922;
+    const float d1 = 0.1625;
+    const float d4 = 0.1333;
+    const float d5 = 0.0997;
+    const float d6 = 0.0996;
 
     const float d[noJoints] = {d1, 0.0f, 0.0f, d4, d5, d6};
-    const float cn[noJoints] = {0.0f, a2, a3, 0.0f, 0.0f, 0.0f};
-    const float alpha[noJoints] = {M_PI_2, 0.0f, 0.0f, M_PI_2, -M_PI_2, 0.0f};
+    const float cn[noJoints] = {0.0f, 0.0f, a2, a3, 0.0f, 0.0f};
+    const float alpha[noJoints] = {0.0f, M_PI_2, 0.0f, 0.0f, M_PI_2, -M_PI_2};
 
     class Robot {
         private:
             JointAngles jointAngles;
             Position position;
             Orientation orientation;
-            Pose destination;
+            Pose pose;
         public:
             Robot();
 
             Position getPosition();
             Orientation getOrientation();
+            Pose getPose();
             JointAngles getJointAngles();
 
             Pose computeDirect(const JointAngles &ja);
-            JointAngles computeInverse(const Position &p, const Orientation &o);
+            JointAngles computeInverse(const Pose &pose);
             std_msgs::Float32MultiArray motionPlanningMessage(const Position &initial, const Position &final, const int &noSteps);
             ur5::Orientation computeOrientation(const EulerAngles &p);
     };
