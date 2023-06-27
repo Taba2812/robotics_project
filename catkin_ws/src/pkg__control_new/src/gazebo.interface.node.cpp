@@ -9,11 +9,21 @@ int main (int argc, char** argv) {
     ros::NodeHandle nh;
 
     Gazebo::Interpreter gi;
+    ur5::JointAngles current_position;
+    ur5::JointAngles home;
+        home[0] = 0;
+        home[1] = 0;
+        home[2] = -M_PI + (M_PI / 8);
+        home[3] = -M_PI_2 - (M_PI / 8);
+        home[4] = -M_PI_2;
+        home[5] = 0;
+    gi.setDestination(home);
+    bool atDestination;
+    bool waiting_ur5;
 
     int queue, frequency;
     float delta;
     std::string to_gazebo, from_gazebo, to_ur5, from_ur5;
-
     nh.getParam("Docker_Joint_Out", to_gazebo);
     nh.getParam("Docker_Joint_In", from_gazebo);
     nh.getParam("Gazebo2UR5", to_ur5);
@@ -23,50 +33,41 @@ int main (int argc, char** argv) {
     nh.getParam("DELTA", delta);
 
     ros::Rate rate(frequency);
-    std::cout << "Delta: " << delta << std::endl;
 
     ros::Publisher pub_gazebo = nh.advertise<std_msgs::Float64MultiArray>(to_gazebo, queue);
     ros::Publisher pub_ur5 = nh.advertise<sensor_msgs::JointState>(to_ur5, queue);
 
-    bool setJoint = false;
-    int message_counter = 0;
     //Stuff
     auto l_gazebo = [&] (const sensor_msgs::JointStateConstPtr &joint_states) {
         ur5::JointAngles joints = gi.parseJointState(joint_states);
-        if (gi.moving) {
-            if (gi.hasReachedDestination(joints, delta)) {
-                gi.moving = false;
-            } else {
-                std::cout << "Sent Message# " << message_counter << " --------------------------" << std::endl;
-                pub_gazebo.publish(gi.publishDestination());
-                rate.sleep();
-                message_counter++;
-            }
-
-        } else {
-            //Calculate destination;
-            if (!setJoint) {
-                joints[0] = M_PI_4;
-                joints[1] = 0;
-                joints[2] = 0;
-                joints[3] = 0;
-                joints[4] = 0;
-                joints[5] = 0;
-                setJoint = true;
-            }
-            gi.setDestination(joints);
-            gi.moving = true;
+        
+        current_position = joints;
+        if (atDestination && !waiting_ur5) {
+            pub_ur5.publish(gi.createJointMessage(joints));
+            waiting_ur5 = true;
+            std::cout << "[Gazebo-Interface][At Destination] Forwarded Joint Status to UR5 Controller" << std::endl;
         }
     };
 
     auto l_ur5 = [&] (const std_msgs::Float64MultiArrayConstPtr &joint_states) {
-        
+        ur5::JointAngles joints = gi.parseArray(joint_states);
+
+        waiting_ur5 = false;
+        gi.setDestination(joints);
     };
 
-    ros::Subscriber sub_gazebo = nh.subscribe<sensor_msgs::JointState>(from_gazebo, queue, l_gazebo);
+    ros::Subscriber sub_gazebo = nh.subscribe<sensor_msgs::JointState>(from_gazebo, 1, l_gazebo);
     ros::Subscriber sub_ur5 = nh.subscribe<std_msgs::Float64MultiArray>(from_ur5, queue, l_ur5);
 
-    ros::spin();
+    while (true) {
+        atDestination = gi.hasReachedDestination(current_position, delta);
+        ros::spinOnce();
+
+        if (!atDestination) 
+            pub_gazebo.publish(gi.publishDestination());
+
+        rate.sleep();
+    }
 
     return EXIT_SUCCESS;
 }

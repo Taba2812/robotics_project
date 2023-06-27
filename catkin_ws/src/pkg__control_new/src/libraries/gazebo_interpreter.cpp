@@ -18,6 +18,16 @@ ur5::JointAngles Gazebo::Interpreter::parseJointState(const sensor_msgs::JointSt
     return _ja;
 }
 
+ur5::JointAngles Gazebo::Interpreter::parseArray(const std_msgs::Float64MultiArray::ConstPtr &ja) {
+    ur5::JointAngles _ja;
+
+    for (int i = 0; i < ur5::noJoints; i++) {
+        _ja(i) = ja->data.at(i);
+    }
+
+    return _ja;
+}
+
 std_msgs::Float64MultiArray Gazebo::Interpreter::createJointMessage(const ur5::JointAngles &ja) {
     std_msgs::Float64MultiArray msg;
     msg.data.resize(ur5::noJoints);
@@ -38,10 +48,6 @@ void Gazebo::Interpreter::correct(ur5::JointAngles &ja) {
 bool Gazebo::Interpreter::hasReachedDestination(ur5::JointAngles joints, float dt) {
     bool reached = true;
     for (int i = 0; i < ur5::noJoints; i++) {
-        std::cout << "joint#" << i << ": " << joints[i] << std::endl;
-        std::cout << "dest#" << i << ": " << this->destination[i] << std::endl; 
-        std::cout << "Check#1: " << joints[i] << " < " << this->destination[i] + dt << " result: " << (joints[i] < (this->destination[i] + dt)) << std::endl;
-        std::cout << "Check#2: " << joints[i] << " > " << this->destination[i] - dt << " result: " << (joints[i] > (this->destination[i] - dt)) << std::endl << std::endl;
         if (!(joints[i] < (this->destination[i] + dt) && joints[i] > (this->destination[i] - dt)))
             reached = false;
     }
