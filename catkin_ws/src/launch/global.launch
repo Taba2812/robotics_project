@@ -11,8 +11,8 @@
         <param name="Q_Size" value="1000" />
 
         <!--JOINT STATES-->
-        <param name="JS2Core_Data" value="JointStates_Data" /> <!--JointState-->
-        <param name="Core2JS_Data" value="JointStates_New" /> <!--JointState-->
+        <param name="JS2Core_Data" value="JointStates_Data" />    <!--JointState-->
+        <param name="Core2JS_Data" value="JointStates_New" />     <!--JointState-->
         <param name="Core2JS_Req"  value="JointStates_Request" /> <!--Bool-->
 
         <!--MOTION PLANNING-->
@@ -33,6 +33,10 @@
         <param name="Docker_Image" value="/ur5/zed_node/left_raw/image_raw_color" />      <!--Image-->
         <param name="Docker_Joint_In" value="/ur5/joint_states" />                        <!--JointState-->
         <param name="Docker_Joint_Out" value="/ur5/joint_group_pos_controller/command" /> <!--Float64MultiArray-->
+
+        <!--UR5 CONTROLLER-->
+        <param name="Gazebo2UR5" value="Joints_Data" />   <!--JointState-->
+        <param name="UR52Gazebo" value="Joints_Result" /> <!--Float64MultiArray-->
 
 
 </launch>

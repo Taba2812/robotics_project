@@ -1,0 +1,11 @@
+<launch>
+
+    <include file="src/launch/global.launch" />
+    <include file="$(find pkg__control_new)/launch/settings.launch" />
+
+    <param name="FREQUENCY" value="1000" />
+    <param name="DELTA" value="0.1" />
+    
+    <node pkg="pkg__control_new" type="Gazebo_Interpreter_Node" name="Gazebo_Interpreter_Node" output="screen" />
+    
+</launch>

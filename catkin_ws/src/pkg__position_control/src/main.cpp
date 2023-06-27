@@ -138,6 +138,10 @@ int main(int argc, char **argv){
             }
         }
 
+        for (int i = 0; i < JOINTS; i++) {
+            std::cout << jointNames[i] << ": " << q[i] << std::endl;
+        }
+
         std::swap(q(0), q(2));
 
         for(int i=0; i<JOINTS; i++) {
