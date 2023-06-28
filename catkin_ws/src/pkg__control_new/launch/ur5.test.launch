@@ -1,0 +1,10 @@
+<launch>
+
+    <include file="src/launch/global.launch" />
+    <include file="$(find pkg__control_new)/launch/settings.launch" />    
+
+    <param name="STEPS" value="10" />
+
+    <node pkg="pkg__control_new" type="RobotTest_Node" name="RobotTest_Node" output="screen" />
+    
+</launch>

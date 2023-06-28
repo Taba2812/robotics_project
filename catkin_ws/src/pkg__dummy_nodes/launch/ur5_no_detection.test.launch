@@ -8,11 +8,11 @@
     <!--BLOCK POSITION-->
     <param name="X" value="0" />
     <param name="Y" value="0" />
-    <param name="Z" value="0.5" />
+    <param name="Z" value="-0.5" />
     <!--DESTINATION POSITION-->
     <param name="A" value="0" />
-    <param name="B" value="0.5" />
-    <param name="C" value="0.5" />
+    <param name="B" value="-0.5" />
+    <param name="C" value="-0.5" />
 
     <node pkg="pkg__dummy_nodes" type="Detection-Core_Dummy" name="DetectionCore_Dummy" output="screen" />
 
