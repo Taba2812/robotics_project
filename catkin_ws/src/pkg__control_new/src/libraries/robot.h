@@ -104,14 +104,6 @@ namespace ur5 {
             Pose(Eigen::Vector3d position, Eigen::Vector3d orientation);
             Pose(Eigen::Vector3d position, Eigen::Matrix3d orientation);
 
-            // Eigen::Matrix4d operator*(Eigen::Matrix4d m) {
-            //     return this->matrix * m;
-            // }
-
-            // Eigen::Matrix4d operator*(Pose p) {
-            //     return this->matrix * p.matrix;
-            // }
-
             Pose operator*(Eigen::Matrix4d m) {
                 return Pose(this->matrix * m);
             }
@@ -128,7 +120,10 @@ namespace ur5 {
             Ur5Coefficients coef;
             Pose world_displacement;
             Pose ee;
-            Pose eeWorld;
+            //Pose eeWorld;
+
+            JointAngles selectBestJoints(std::vector<JointAngles> joints);
+            bool respectsJointsRestrictions(const JointAngles joint); 
 
         public:
 
@@ -138,7 +133,6 @@ namespace ur5 {
 
             JointAngles getCurrentJoints() {return this->joints_current;}
             Eigen::Vector3d getEE_position() {return ee.getPosition();}
-            // Eigen::Vector3d getEE_orientation() {return ee.getOrientation();};
             Eigen::Matrix3d getEE_orientation_matrix() {return ee.getOrientationMatrix();}
             Pose getEE() {return ee;}
 

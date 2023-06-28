@@ -67,10 +67,10 @@ ur5::Pose ur5::Robot::computeDirect(const JointAngles ja) {
 
     TM =  T[0] * T[1] * T[2] * T[3] * T[4] * T[5];
 
-    this->eeWorld = this->world_displacement * TM;
+    //this->eeWorld = this->world_displacement * TM;
     this->ee = TM;
 
-    return this->world_displacement * TM;
+    return TM;
 }
 
 ur5::Pose ur5::Robot::computeDirect() {
@@ -96,16 +96,42 @@ ur5::Robot::Robot() {
     this->joints_current << -0.32, -0.78, -2.56, -1.63, -1.57, 3.49;
     //In the simulation the robot is rotated 180° on the x axis
     this->world_displacement = Pose(Eigen::Vector3d::Zero(), Eigen::Vector3d(M_PI,0,0));
-    this->eeWorld = this->computeDirect();
+    this->ee = this->computeDirect();
 }
 
 ur5::Pose ur5::Robot::translateEndEffector(Eigen::Vector3d tr) {
-    ur5::Pose tmp(this->eeWorld);
-    tmp.matrix(0,3) += tr(0);
-    tmp.matrix(1,3) += tr(1);
-    tmp.matrix(2,3) += tr(2);
+    //Eigen::Vector4d translation(tr(0), tr(1), tr(2), 1);
+    Eigen::Matrix3d id = Eigen::Matrix3d::Identity();
+    ur5::Pose translation(tr, id);
 
-    return tmp;
+    Eigen::Vector3d robot_space_tr = (this->world_displacement * translation).getPosition();
+    ur5::Pose robot_space_pose(robot_space_tr, id);
+
+    return robot_space_pose * this->getEE();
+}
+
+bool ur5::Robot::respectsJointsRestrictions(const ur5::JointAngles joint) {
+    bool result = true;
+    for (int i = 0; i < NO_JOINTS; i++) {
+        if (joint[i] > this->joints_limits.max[i] || joint[i] < this->joints_limits.min[i]) {
+            result = false;
+            break;
+        }
+    }
+
+    return result;
+}
+
+ur5::JointAngles ur5::Robot::selectBestJoints(std::vector<ur5::JointAngles> joints) {
+    ur5::JointAngles best;
+    for (int i = 0; i < joints.size(); i++) {
+        if (this->respectsJointsRestrictions(joints[i])) {
+            best = joints[i];
+            break;
+        }
+    }
+
+    return best;
 }
 
 ur5::JointAngles ur5::Robot::computeInverse(const Pose pose) { 
@@ -120,8 +146,8 @@ ur5::JointAngles ur5::Robot::computeInverse(const Pose pose) {
 
     T60 = pose.matrix;
 
-    std::cout << "T60" << std::endl;
-    std::cout << T60 << std::endl;
+    //std::cout << "T60" << std::endl;
+    //std::cout << T60 << std::endl;
 
     //theta1
     tmp << 0, 0, -(this->coef.d[5]),1;
@@ -132,7 +158,7 @@ ur5::JointAngles ur5::Robot::computeInverse(const Pose pose) {
     th1[0] = phi + psi + M_PI_2;
     th1[1] = phi - psi + M_PI_2;
 
-    std::cout << "\np50: " << P50 << "\nTH1: " << th1[0] << "\n" << th1[1] << "\n";
+    //std::cout << "TH1_1: " << th1[0] << "\nTH1_2: " << th1[1] << "\n\n";
 
     Eigen::Vector3d position = pose.getPosition();
 
@@ -141,6 +167,8 @@ ur5::JointAngles ur5::Robot::computeInverse(const Pose pose) {
     th5[1] = -acos( ( position(0)*sin(th1[0]) - position(1)*cos(th1[0]) - this->coef.d[3] ) / this->coef.d[5] );
     th5[2] =  acos( ( position(0)*sin(th1[1]) - position(1)*cos(th1[1]) - this->coef.d[3] ) / this->coef.d[5] );
     th5[3] = -acos( ( position(0)*sin(th1[1]) - position(1)*cos(th1[1]) - this->coef.d[3] ) / this->coef.d[5] );
+
+    //std::cout << "TH5_1: " << th5[0] << "\nTH5_2: " << th5[1] << "\nTH5_3: " << th5[2] << "\nTH5_4: " << th5[3] << "\n\n";
 
     //theta6
     T06.resize(4,4);
@@ -151,6 +179,8 @@ ur5::JointAngles ur5::Robot::computeInverse(const Pose pose) {
     th6[1] = atan2( (-X06(1)*sin(th1[0]) + Y06(1)*cos(th1[0])) / sin(th5[1]) , (X06(0)*sin(th1[0]) - Y06(0)*cos(th1[0])) / sin(th5[1]) );
     th6[2] = atan2( (-X06(1)*sin(th1[1]) + Y06(1)*cos(th1[1])) / sin(th5[2]) , (X06(0)*sin(th1[1]) - Y06(0)*cos(th1[1])) / sin(th5[2]) );
     th6[3] = atan2( (-X06(1)*sin(th1[1]) + Y06(1)*cos(th1[1])) / sin(th5[3]) , (X06(0)*sin(th1[1]) - Y06(0)*cos(th1[1])) / sin(th5[3]) );
+
+    //std::cout << "TH6_1: " << th6[0] << "\nTH6_2: " << th6[1] << "\nTH6_3: " << th6[2] << "\nTH6_4: " << th6[3] << "\n\n";
 
     //theta3
     ur5::Pose T41m_1(tMatrix(th1[0], this->coef.alpha[0], this->coef.d[0], this->coef.cn[0]).matrix.inverse() * T60* tMatrix(th6[0], this->coef.alpha[5], this->coef.d[5], this->coef.cn[5]).matrix.inverse() * tMatrix(th5[0], this->coef.alpha[4], this->coef.d[4], this->coef.cn[4]).matrix.inverse());
@@ -178,6 +208,9 @@ ur5::JointAngles ur5::Robot::computeInverse(const Pose pose) {
     th3[6] = -th3[2];
     th3[7] = -th3[3];
 
+    //std::cout << "TH3_1: " << th3[0] << "\nTH3_2: " << th3[1] << "\nTH3_3: " << th3[2] << "\nTH3_4: " << th3[3];
+    //std::cout << "\nTH3_5: " << th3[4] << "\nTH3_6: " << th3[5] << "\nTH3_7: " << th3[6] << "\nTH3_8: " << th3[7] << "\n\n";
+
     //theta2
     th2[0] = atan2(-p41_1(2), -p41_1(0)) - asin( (-(this->coef.cn[3]) * sin(th3[0])) / (p41xz_1) );
     th2[1] = atan2(-p41_2(2), -p41_2(0)) - asin( (-(this->coef.cn[3]) * sin(th3[1])) / (p41xz_2) );
@@ -187,6 +220,9 @@ ur5::JointAngles ur5::Robot::computeInverse(const Pose pose) {
     th2[5] = atan2(-p41_2(2), -p41_2(0)) - asin( ( (this->coef.cn[3]) * sin(th3[1])) / (p41xz_2) );
     th2[6] = atan2(-p41_3(2), -p41_3(0)) - asin( ( (this->coef.cn[3]) * sin(th3[2])) / (p41xz_3) );
     th2[7] = atan2(-p41_4(2), -p41_4(0)) - asin( ( (this->coef.cn[3]) * sin(th3[3])) / (p41xz_4) );
+
+    //std::cout << "TH2_1: " << th2[0] << "\nTH2_2: " << th2[1] << "\nTH2_3: " << th2[2] << "\nTH2_4: " << th2[3];
+    //std::cout << "\nTH2_5: " << th2[4] << "\nTH2_6: " << th2[5] << "\nTH2_7: " << th2[6] << "\nTH2_8: " << th2[7] << "\n\n";
 
     //th4
     T65 = tMatrix(th6[0], this->coef.alpha[5], this->coef.d[5], this->coef.cn[5]);
@@ -257,6 +293,9 @@ ur5::JointAngles ur5::Robot::computeInverse(const Pose pose) {
     Eigen::Vector3d v7(T43.matrix(0,0), T43.matrix(1,0), T43.matrix(2,0));
     th4[7] = atan2(v7(1), v7(0));
 
+    //std::cout << "TH4_1: " << th4[0] << "\nTH4_2: " << th4[1] << "\nTH4_3: " << th4[2] << "\nTH4_4: " << th4[3];
+    //std::cout << "\nTH4_5: " << th4[4] << "\nTH4_6: " << th4[5] << "\nTH4_7: " << th4[6] << "\nTH4_8: " << th4[7] << "\n\n";
+
     // jointStateMsg.position = {-0.32, -0.78, -2.56, -1.63, -1.57, 3.49};
 
     ur5::JointAngles allJoints[8];
@@ -269,151 +308,30 @@ ur5::JointAngles ur5::Robot::computeInverse(const Pose pose) {
     allJoints[6] << th1[1], th2[6], th3[6], th4[6], th5[2], th6[2];
     allJoints[7] << th1[1], th2[7], th3[7], th4[7], th5[3], th6[3];
 
-    for(int i=0; i<8; i++) {
-        ur5::Pose solution = this->computeDirect(allJoints[i]);
-        Eigen::Matrix4d difference = solution.matrix - T60;
-        std::cout << "[" << i << "] " << difference << "\n\n";
-    }
+    // for(int i=0; i<8; i++) {
+    //     //Check if this compute direct returns the absolute one or the one adjusted for the robot rotation
+    //     ur5::Pose solution = this->computeDirect(allJoints[i]);
+    //     Eigen::Matrix4d difference = solution.matrix - T60;
+    //     std::cout << "[" << i << "] " << difference << "\n\n";
+    // }
 
-    ja << allJoints[0];
-    this->joints_current = ja;
+    // std::cout << this->computeDirect(allJoints[0]).matrix << std::endl << std::endl;
+    // std::cout << this->computeDirect(allJoints[1]).matrix << std::endl << std::endl;
+    // std::cout << this->computeDirect(allJoints[2]).matrix << std::endl << std::endl;
+    // std::cout << this->computeDirect(allJoints[3]).matrix << std::endl << std::endl;
+    // std::cout << this->computeDirect(allJoints[4]).matrix << std::endl << std::endl;
+    // std::cout << this->computeDirect(allJoints[5]).matrix << std::endl << std::endl;
+    // std::cout << this->computeDirect(allJoints[6]).matrix << std::endl << std::endl;
+    // std::cout << this->computeDirect(allJoints[7]).matrix << std::endl << std::endl;
+
+    
+
+    ja << this->selectBestJoints({allJoints[0],allJoints[1],allJoints[2],allJoints[3],allJoints[4],allJoints[5],allJoints[6],allJoints[7]});
+    this->joints_current = allJoints[0];
 
     return ja;
 }
 
-// ur5::Position ur5::Robot::getPosition() {
-//     return this->position;
-// }
 
-// ur5::Orientation ur5::Robot::getOrientation() {
-//     return this->orientation;
-// }
 
-// ur5::Pose ur5::Robot::getPose() {
-//     return this->pose;
-// }
 
-// bool ur5::Robot::setJointAngles(ur5::JointAngles joints) {
-//     this->jointAngles = joints;
-
-//     return true;
-// }
-
-// ur5::JointAngles ur5::Robot::getJointAngles() {
-//     return this->jointAngles;
-// }
-
-// ur5::Pose ur5::Robot::computeDirect(const ur5::JointAngles &ja) {
-//     ur5::Pose TM, worldAdjust;
-//     ur5::Pose T[ur5::noJoints];
-
-//     float flipAngle = M_PI;
-//     worldAdjust << 1, 0, 0, 0,
-//                    0, -1, 0, 0,
-//                    0, 0, -1, 0,
-//                    0, 0, 0, 1;
-
-//     for(int i=0; i<ur5::noJoints; i++) {
-//         T[i] = tMatrix(ja(i), alpha[i], d[i], cn[i]);
-//     }
-
-//     TM = worldAdjust * T[0] * T[1] * T[2] * T[3] * T[4] * T[5];
-
-//     this->orientation = TM.block<3,3>(0,0);
-//     this->position = TM.block<3,1>(0,3);
-//     this->pose = TM;
-
-//     return TM;
-// }
-
-// ur5::Pose ur5::Robot::computeDirect() {
-//     return this->computeDirect(this->jointAngles);
-// }
-
-// ur5::JointAngles ur5::Robot::computeInverse(const Pose &pose) {
-//     ur5::JointAngles ja;
-//     ja << 0, 0, 0, 0, 0, 0;
-
-//     //𝜃1
-//     ur5::Vector4d z60(0, 0, -this->coef.d6, 1);
-//     ur5::Pose p50 = pose * z60;
-
-//     double psi = atan2(p50(1), p50(0));
-//     double phi = acos(this->coef.d4 / hypot(p50(0), p50(1)));
-//     double theta1 = psi + phi + M_PI_2;
-
-//     //𝜃5
-//     double p60x = pose(0,3);
-//     double p60y = pose(1,3);
-//     double theta5 = acos( (p60x * sin(theta1) - p60y * cos(theta1) - this->coef.d4) / this->coef.d6 );
-
-//     //𝜃6
-//     double xhat_y = pose(0,1);
-//     double yhat_y;
-//     double theta6 = atan2(0,0);
-
-//     //𝜃2
-
-//     //𝜃3
-
-//     //𝜃4
-
-//     // jointStateMsg.position = {-0.32, -0.78, -2.56, -1.63, -1.57, 3.49};
-
-//     return ja;
-// }
-
-// std_msgs::Float32MultiArray ur5::Robot::motionPlanningMessage(const Position &initial, const Position &final, const int &noSteps) {
-//     std_msgs::Float32MultiArray motionMsg;
-//     motionMsg.data.resize(7);
-
-//     motionMsg.data.at(0) = initial(0);
-//     motionMsg.data.at(1) = initial(1);
-//     motionMsg.data.at(2) = initial(2);
-//     motionMsg.data.at(3) = noSteps;
-//     motionMsg.data.at(4) = final(0);
-//     motionMsg.data.at(5) = final(1);
-//     motionMsg.data.at(6) = final(2);
-
-//     return motionMsg;
-// }
-
-// ur5::Orientation ur5::Robot::computeOrientation(const ur5::EulerAngles &p) {
-//     ur5::Orientation orientation;
-
-//     const double roll = p(0);
-//     const double pitch = p(1);
-//     const double yaw = p(2);
-
-//     orientation << cos(yaw) * cos(pitch),
-//                    cos(yaw) * sin(roll) * sin(pitch) - cos(roll) * sin(yaw),
-//                    cos(yaw) * cos(roll) * sin(pitch) + sin(yaw) * sin(roll),
-
-//                    sin(yaw) * cos(pitch),
-//                    sin(yaw) * sin(roll) * sin(pitch) + cos(roll) * cos(yaw),
-//                    sin(yaw) * cos(roll) * sin(pitch) - sin(roll) * cos(yaw),
-
-//                    -sin(pitch),
-//                    cos(pitch) * sin(roll),
-//                    cos(pitch) * cos(roll);
-
-//     return orientation;
-
-// }
-
-// ur5::Vector4d P(double th1, double th5, double th6, const Eigen::MatrixXd& T60){
-//     Eigen::Matrix4d T65, T54, T10;
-//     Eigen::MatrixXd T61, T41;
-//     Eigen::Vector4d tmp, P31;
-
-//     T65 = tMatrix(th6, this->coef.alpha[5], this->coef.d[5], this->coef.cn[5]);
-//     T54 = tMatrix(th5, this->coef.alpha[4], this->coef.d[4], this->coef.cn[4]);
-//     T10 = tMatrix(th1, this->coef.alpha[0], this->coef.d[0], this->coef.cn[0]);
-    
-//     T61 = T10.matrix.inverse() * T60;
-//     T41 = T61 * T54.matrix.inverse() * T65.matrix.inverse();
-//     tmp << 0, -this->coef.d[3], 0, 1;
-//     P31 = T41 * tmp;
-
-//     return P31;   
-// }
