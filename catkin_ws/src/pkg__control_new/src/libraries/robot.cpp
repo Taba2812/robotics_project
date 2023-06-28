@@ -65,11 +65,12 @@ ur5::Pose ur5::Robot::computeDirect(const JointAngles ja) {
         T[i] = tMatrix(ja(i), this->coef.alpha[i] , this->coef.d[i], this->coef.cn[i]);
     }
 
-    TM = this->world_displacement * T[0] * T[1] * T[2] * T[3] * T[4] * T[5];
+    TM =  T[0] * T[1] * T[2] * T[3] * T[4] * T[5];
 
+    this->eeWorld = this->world_displacement * TM;
     this->ee = TM;
 
-    return TM;
+    return this->world_displacement * TM;
 }
 
 ur5::Pose ur5::Robot::computeDirect() {
@@ -95,11 +96,11 @@ ur5::Robot::Robot() {
     this->joints_current << -0.32, -0.78, -2.56, -1.63, -1.57, 3.49;
     //In the simulation the robot is rotated 180° on the x axis
     this->world_displacement = Pose(Eigen::Vector3d::Zero(), Eigen::Vector3d(M_PI,0,0));
-    this->ee = this->computeDirect();
+    this->eeWorld = this->computeDirect();
 }
 
 ur5::Pose ur5::Robot::translateEndEffector(Eigen::Vector3d tr) {
-    ur5::Pose tmp(this->ee);
+    ur5::Pose tmp(this->eeWorld);
     tmp.matrix(0,3) += tr(0);
     tmp.matrix(1,3) += tr(1);
     tmp.matrix(2,3) += tr(2);
@@ -111,7 +112,7 @@ ur5::JointAngles ur5::Robot::computeInverse(const Pose pose) {
     ur5::JointAngles ja;
     Eigen::MatrixXd T60, T06;
     Eigen::Matrix3d ori;
-    ur5::Pose T65, T54, T43, T32, T21, T10, world_adjust;
+    ur5::Pose T65, T54, T43, T32, T21, T10;
     Eigen::Vector3d X06, Y06, pos;
     Vector4d cmp, tmp, P50, P31[4];
     double phi, psi, R, n;
@@ -130,6 +131,8 @@ ur5::JointAngles ur5::Robot::computeInverse(const Pose pose) {
     psi = acos( this->coef.d[3] / R );
     th1[0] = phi + psi + M_PI_2;
     th1[1] = phi - psi + M_PI_2;
+
+    std::cout << "\np50: " << P50 << "\nTH1: " << th1[0] << "\n" << th1[1] << "\n";
 
     Eigen::Vector3d position = pose.getPosition();
 
@@ -271,7 +274,6 @@ ur5::JointAngles ur5::Robot::computeInverse(const Pose pose) {
         Eigen::Matrix4d difference = solution.matrix - T60;
         std::cout << "[" << i << "] " << difference << "\n\n";
     }
-
 
     ja << allJoints[0];
     this->joints_current = ja;

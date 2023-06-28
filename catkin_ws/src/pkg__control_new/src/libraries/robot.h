@@ -127,7 +127,8 @@ namespace ur5 {
             JointLimits joints_limits;
             Ur5Coefficients coef;
             Pose world_displacement;
-            Pose ee; 
+            Pose ee;
+            Pose eeWorld;
 
         public:
 
