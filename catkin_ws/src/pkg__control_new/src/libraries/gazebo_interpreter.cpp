@@ -84,9 +84,11 @@ void Gazebo::Interpreter::correct(ur5::JointAngles &ja) {
 bool Gazebo::Interpreter::hasReachedDestination(ur5::JointAngles joints, float dt) {
     bool reached = true;
     for (int i = 0; i < ur5::noJoints; i++) {
+        //std::cout << "Joint#" << i << "=" << joints[i] << " | Dest#" << i << "=" << this->destination[i] << std::endl;
+        //std::cout << "Check#1=" << (joints[i] < (this->destination[i] + dt)) << " | Check#2=" << (joints[i] > (this->destination[i] - dt)) << std::endl;
         if (!(joints[i] < (this->destination[i] + dt) && joints[i] > (this->destination[i] - dt)))
             reached = false;
     }
-
+    //std::cout << "------------------------------------" << std::endl;
     return reached;
 }

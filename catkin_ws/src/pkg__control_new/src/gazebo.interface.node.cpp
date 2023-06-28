@@ -12,14 +12,14 @@ int main (int argc, char** argv) {
     ur5::JointAngles current_position;
     ur5::JointAngles home;
         home[0] = 0;
-        home[1] = 0;
-        home[2] = -M_PI + (M_PI / 8);
+        home[1] = -0.1;
+        home[2] = -2.617;
         home[3] = -M_PI_2 - (M_PI / 8);
         home[4] = -M_PI_2;
         home[5] = 0;
     gi.setDestination(home);
-    bool atDestination;
-    bool waiting_ur5;
+    bool atDestination = false;
+    bool waiting_ur5 = false;
 
     int queue, frequency;
     float delta;
@@ -35,7 +35,7 @@ int main (int argc, char** argv) {
     ros::Rate rate(frequency);
 
     ros::Publisher pub_gazebo = nh.advertise<std_msgs::Float64MultiArray>(to_gazebo, queue);
-    ros::Publisher pub_ur5 = nh.advertise<sensor_msgs::JointState>(to_ur5, queue);
+    ros::Publisher pub_ur5 = nh.advertise<std_msgs::Float64MultiArray>(to_ur5, queue);
 
     //Stuff
     auto l_gazebo = [&] (const sensor_msgs::JointStateConstPtr &joint_states) {
@@ -53,14 +53,19 @@ int main (int argc, char** argv) {
         ur5::JointAngles joints = gi.parseArray(joint_states);
 
         waiting_ur5 = false;
+        std::cout << "[Gazebo-Interface] Received new destination" << std::endl;
         gi.setDestination(joints);
     };
 
-    ros::Subscriber sub_gazebo = nh.subscribe<sensor_msgs::JointState>(from_gazebo, 1, l_gazebo);
+    ros::Subscriber sub_gazebo = nh.subscribe<sensor_msgs::JointState>(from_gazebo, queue, l_gazebo);
     ros::Subscriber sub_ur5 = nh.subscribe<std_msgs::Float64MultiArray>(from_ur5, queue, l_ur5);
 
+    sleep(2);
+
+    std::cout << "[Gazebo-Interface] Homing" << std::endl;
     while (true) {
         atDestination = gi.hasReachedDestination(current_position, delta);
+        //std::cout << "[Gazebo-Interface][Debug] atDestination=" << atDestination << std::endl;
         ros::spinOnce();
 
         if (!atDestination) 

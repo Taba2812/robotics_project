@@ -15,7 +15,7 @@ int main (int argc, char** argv) {
     std::string to_gi, from_gi, to_detection, from_detection, to_motion_request, to_motion_data, from_motion;
     nh.getParam("Q_Size", queue);
     nh.getParam("UR52Gazebo", to_gi);
-    nh.getParam("UR52Gazebo", from_gi);
+    nh.getParam("Gazebo2UR5", from_gi);
     nh.getParam("Core2Det_Req", to_detection);
     nh.getParam("Det2Core_Res", from_detection);
     nh.getParam("Core2MP_Req", to_motion_request);
@@ -36,6 +36,8 @@ int main (int argc, char** argv) {
     bool dest_buffer_empty = true;
 
     auto l_gi = [&] (const std_msgs::Float64MultiArrayConstPtr &position) {
+        std::cout << "[ur5-Core] Received new JointState from -Gazebo Interface-" << std::endl;
+
         ur5::JointAngles received = gi.parseArray(position);
 
         if (block_buffer_empty && dest_buffer_empty) {
@@ -63,6 +65,10 @@ int main (int argc, char** argv) {
     };
 
     auto l_detection = [&] (const std_msgs::Float32MultiArrayConstPtr &position) {
+        std::cout << "[ur5-Core] Received block and destination positions from -Detection-" << std::endl;
+        std::cout << "[ur5-Core] Received Block is: X:" << position->data[0] << " Y:"<< position->data[1] << " Z:" << position->data[2] << std::endl;
+        std::cout << "[ur5-Core] Received Dest  is: X:" << position->data[3] << " Y:"<< position->data[4] << " Z:" << position->data[5] << std::endl;
+        
         block_buffer[0] = position->data[0];
         block_buffer[1] = position->data[1];
         block_buffer[2] = position->data[2];
@@ -74,10 +80,12 @@ int main (int argc, char** argv) {
         block_buffer_empty = false;
         dest_buffer_empty = false;
 
+        std::cout << "[ur5-Core] Sending path request to -Motion Planning-" << std::endl;
         pub_motion_data.publish(gi.createJointMessage32(block_buffer));
     };
 
     auto l_motion = [&] (const std_msgs::Float32MultiArrayConstPtr &position) {
+        std::cout << "[ur5-Core][Forwarding] Forwarding result of -Motion Planning-" << std::endl;
         pub_gi.publish(position);
     };
 

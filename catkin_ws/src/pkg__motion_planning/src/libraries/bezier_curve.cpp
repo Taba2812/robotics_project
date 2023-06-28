@@ -38,7 +38,7 @@ Bezier::Curve::Curve(Bezier::Node dest, int seg) {
 
     //Takes the starting position as [0,0,0] and recive Delta Position based on the robot
     this->nodes.push_back({0,0,0});
-    this->nodes.push_back({0,0,-3});
+    this->nodes.push_back({0,0,-0.1});
     this->nodes.push_back({dest[0], dest[1], dest[2] + 3});
     this->nodes.push_back(dest);
 }

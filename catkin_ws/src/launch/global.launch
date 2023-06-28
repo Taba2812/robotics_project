@@ -35,8 +35,10 @@
         <param name="Docker_Joint_Out" value="/ur5/joint_group_pos_controller/command" /> <!--Float64MultiArray-->
 
         <!--UR5 CONTROLLER-->
-        <param name="Gazebo2UR5" value="Joints_Data" />   <!--JointState-->
+        <param name="Gazebo2UR5" value="Joints_Data" />   <!--Float64Multiarray-->
         <param name="UR52Gazebo" value="Joints_Result" /> <!--Float64MultiArray-->
 
+    <!--MOTION PLANNING-->
+        <param name="PATH_RESOLUTION" value="20" />
 
 </launch>

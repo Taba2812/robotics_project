@@ -17,10 +17,11 @@ int main (int argc, char **argv) {
 
     //Setup Params
     std::string pub_data, sub_data, sub_prog;
-    int queue;
+    int queue, resolution;
     handle.getParam("MP2Core_Data", pub_data);
     handle.getParam("Core2MP_Data", sub_data);
     handle.getParam("Core2MP_Req", sub_prog);
+    handle.getParam("PATH_RESOLUTION", resolution);
     handle.getParam("Q_Size", queue);
 
     ros::Publisher data_publisher = handle.advertise<std_msgs::Float32MultiArray>(pub_data, queue);
@@ -38,39 +39,35 @@ int main (int argc, char **argv) {
     };
 
     auto motion_planning_callback = [&] (const std_msgs::Float32MultiArrayConstPtr &destination) {
-        //First call, generate the curve
-        std::cout << "[Motion Planning] Destination received as: x-" << (float)destination->data[4] << " y-" << (float)destination->data[5] << " z-" << (float)destination->data[6] << std::endl;
-        Bezier::Node dest = {(float)destination->data[4],(float)destination->data[5],(float)destination->data[6]};
-        previous = {(float)destination->data[0], (float)destination->data[1], (float)destination->data[2]}; 
-        curve = Bezier::Curve(previous, dest, destination->data[3]);
+        std::cout << "[Motion Planning] Destination received as: x:" << (float)destination->data[0] << " y:" << (float)destination->data[1] << " z:" << (float)destination->data[2] << std::endl;
+        Bezier::Node dest = {(float)destination->data[0],(float)destination->data[1],(float)destination->data[2]};
+        previous = {0,0,0};
 
-        // std::cout << "Previous: " << previous.at(0) << " " << previous.at(1) << " " << previous.at(2) << "\n\n";
-        // std::cout << "Destination: " << dest.at(0) << " " << dest.at(1) << " " << dest.at(2) << "\n\n";
-        // std::cout << "Steps: " << destination->data[3] << "\n\n";
+        curve = Bezier::Curve(dest, resolution);
 
-        if (destination->data[4] == 0.0f && destination->data[5] == 0.0f && destination->data[6] == 0.0f) {
+        if (destination->data[0] == 0.0f && destination->data[1] == 0.0f && destination->data[2] == 0.0f) {
+            //Finished path, now reset curve waiting for new request
             curve = Bezier::Curve();
         } else {
             curve.getNext();
             Bezier::Node progress = curve.getNext();
-            std_msgs::Float32MultiArray reply;
 
+            std_msgs::Float32MultiArray reply;
             reply.data.resize(3);
 
+            std::cout << "[Motion Planning] Previous point -> x:" << previous.at(0) << " y:" << previous.at(1)<< " z:" << previous.at(2) << std::endl;
             std::cout << "[Motion Planning] Next point to reach -> x:" << progress.at(0) << " y:" << progress.at(1)<< " z:" << progress.at(2) << std::endl;
-            std::cout << "[Motion Planning] Previous point -> x:" << previous.at(0) << " y:" << previous.at(1)<< " z:" << previous.at(2) << std::endl << std::endl;
-            for(int i=0; i<3; i++){
-                reply.data.at(i) = progress.at(i) - previous.at(i);
-            }
+            
+            reply.data = progress;
             previous = progress;
+
+            std::cout << "[Motion Planning] Sending point -> x:" << progress.at(0) << " y:" << progress.at(1)<< " z:" << progress.at(2) << std::endl;
             data_publisher.publish(reply);
-        }
+        }   
     };
 
     ros::Subscriber data_subscriber = handle.subscribe<std_msgs::Float32MultiArray>(sub_data, queue, motion_planning_callback);
     ros::Subscriber progress_subscriber = handle.subscribe<std_msgs::Bool>(sub_prog, queue, next_callback);
-
-    std::cout << "Starting Spin" << std::endl;
 
     ros::spin();
 
