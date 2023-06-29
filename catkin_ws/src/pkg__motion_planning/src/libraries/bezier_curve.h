@@ -20,7 +20,7 @@ namespace Bezier {
         public:
             Curve();
             Curve(Bezier::Node init, Bezier::Node dest, int seg);
-            Curve(Node dest, int seg);
+            Curve(Node dest, int seg, int dir1, int dir2);
             Node getNext();
     };
 

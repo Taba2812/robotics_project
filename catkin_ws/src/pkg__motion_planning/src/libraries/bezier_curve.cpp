@@ -32,14 +32,14 @@ Bezier::Curve::Curve(Bezier::Node init, Bezier::Node dest, int seg) {
     this->nodes.push_back(dest);
 }
 
-Bezier::Curve::Curve(Bezier::Node dest, int seg) {
+Bezier::Curve::Curve(Bezier::Node dest, int seg, int dir1, int dir2) {
     this->segment_quantity = seg;
     this->step = 0;
 
     //Takes the starting position as [0,0,0] and recive Delta Position based on the robot
-    this->nodes.push_back({0,0,0});
-    this->nodes.push_back({0,0,-0.1});
-    this->nodes.push_back({dest[0], dest[1], dest[2] + 3});
+    this->nodes.push_back({0,       0,       0 });
+    this->nodes.push_back({0,       0,       ((float)0.1 * (float)dir1) });
+    this->nodes.push_back({dest[0], dest[1], dest[2] + ((float)0.1 * (float)dir2) });
     this->nodes.push_back(dest);
 }
 

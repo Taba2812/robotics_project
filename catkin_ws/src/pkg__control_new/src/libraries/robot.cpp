@@ -80,9 +80,9 @@ ur5::Pose ur5::Robot::computeDirect() {
 
 ur5::Robot::Robot() {
     JointLimits limits = {
-        //  0        1        2       3        4        5
-        { 2.9671, -0.1,    -2.617,  0.1,     2.094,  6.2832},
-        {-2.9671, -1.8326, -0.1,   -3.1416, -2.094, -6.2832}
+        //         0        1        2       3        4        5
+        /*MAX*/{ 2.9671, -0.1,    -0.1,      0.1,     2.094,  6.2832},
+        /*MIN*/{-2.9671, -1.8326, -2.617,   -3.1416, -2.094, -6.2832}
     };
     Ur5Coefficients coef = {
         //  0        1        2       3        4        5
@@ -94,6 +94,7 @@ ur5::Robot::Robot() {
     this->joints_limits = limits;
     this->coef = coef;
     this->joints_current << -0.32, -0.78, -2.56, -1.63, -1.57, 3.49;
+    this->home << 0, -0.1, -2.617, -M_PI_2 - (M_PI / 8), -M_PI_2, 0;
     //In the simulation the robot is rotated 180° on the x axis
     this->world_displacement = Pose(Eigen::Vector3d::Zero(), Eigen::Vector3d(M_PI,0,0));
     this->ee = this->computeDirect();
@@ -113,6 +114,7 @@ ur5::Pose ur5::Robot::translateEndEffector(Eigen::Vector3d tr) {
 bool ur5::Robot::respectsJointsRestrictions(const ur5::JointAngles joint) {
     bool result = true;
     for (int i = 0; i < NO_JOINTS; i++) {
+        //std::cout << "joint#" << i << " is " << (joint[i] > this->joints_limits.max[i] || joint[i] < this->joints_limits.min[i]) << std::endl;
         if (joint[i] > this->joints_limits.max[i] || joint[i] < this->joints_limits.min[i]) {
             result = false;
             break;
@@ -122,16 +124,39 @@ bool ur5::Robot::respectsJointsRestrictions(const ur5::JointAngles joint) {
     return result;
 }
 
+float ur5::Robot::calculateDistance(ur5::JointAngles newAngles, ur5::JointAngles current) {
+    float dist = 0.0f;
+    for (int i = 0; i < NO_JOINTS; i++) {
+        dist += abs(newAngles[i] - current[i]);
+    }
+
+    return dist;
+}
+
 ur5::JointAngles ur5::Robot::selectBestJoints(std::vector<ur5::JointAngles> joints) {
-    ur5::JointAngles best;
+    std::vector<ur5::JointAngles> best;
+    std::vector<float> distances;
     for (int i = 0; i < joints.size(); i++) {
+        //std::cout << "forJoints#"<< i << ": " << joints[i] << std::endl;
         if (this->respectsJointsRestrictions(joints[i])) {
-            best = joints[i];
-            break;
+            best.push_back(joints[i]);
+            distances.push_back(this->calculateDistance(joints[i], this->getCurrentJoints()));
         }
     }
 
-    return best;
+    int best_index = 0;
+
+    for (int i = 0; i < (distances.size() - 1); i++) {
+        if (distances[i+1] < distances[i])
+            best_index = i+1;
+    }
+
+    if (best.empty()) {
+        std::cout << "[Robot-Class] Inverse kinematic could not find a joints setup within the limits that the robot can endure, sending to home" << std::endl;
+        return this->home;
+    }
+
+    return best[best_index];
 }
 
 ur5::JointAngles ur5::Robot::computeInverse(const Pose pose) { 
@@ -327,7 +352,17 @@ ur5::JointAngles ur5::Robot::computeInverse(const Pose pose) {
     
 
     ja << this->selectBestJoints({allJoints[0],allJoints[1],allJoints[2],allJoints[3],allJoints[4],allJoints[5],allJoints[6],allJoints[7]});
-    this->joints_current = allJoints[0];
+    // std::cout << "Ja: " << ja << std::endl;
+    // std::cout << "allJoints#0: " << allJoints[0] << std::endl;
+    // std::cout << "allJoints#0: " << allJoints[1] << std::endl;
+    // std::cout << "allJoints#0: " << allJoints[2] << std::endl;
+    // std::cout << "allJoints#0: " << allJoints[3] << std::endl;
+    // std::cout << "allJoints#0: " << allJoints[4] << std::endl;
+    // std::cout << "allJoints#0: " << allJoints[5] << std::endl;
+    // std::cout << "allJoints#0: " << allJoints[6] << std::endl;
+    // std::cout << "allJoints#0: " << allJoints[7] << std::endl;
+
+    this->joints_current = ja;
 
     return ja;
 }

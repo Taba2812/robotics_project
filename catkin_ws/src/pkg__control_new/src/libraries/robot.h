@@ -116,6 +116,7 @@ namespace ur5 {
     class Robot {
         private:
             JointAngles joints_current;
+            JointAngles home;
             JointLimits joints_limits;
             Ur5Coefficients coef;
             Pose world_displacement;
@@ -124,6 +125,7 @@ namespace ur5 {
 
             JointAngles selectBestJoints(std::vector<JointAngles> joints);
             bool respectsJointsRestrictions(const JointAngles joint); 
+            float calculateDistance(JointAngles neAngles, JointAngles current);
 
         public:
 
@@ -133,6 +135,7 @@ namespace ur5 {
 
             JointAngles getCurrentJoints() {return this->joints_current;}
             Eigen::Vector3d getEE_position() {return ee.getPosition();}
+            Eigen::Vector3d getHomePosition() {return (this->computeDirect(this->home)).getPosition();}
             Eigen::Matrix3d getEE_orientation_matrix() {return ee.getOrientationMatrix();}
             Pose getEE() {return ee;}
 

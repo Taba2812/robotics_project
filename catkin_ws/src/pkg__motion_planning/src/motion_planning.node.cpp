@@ -43,7 +43,7 @@ int main (int argc, char **argv) {
         Bezier::Node dest = {(float)destination->data[0],(float)destination->data[1],(float)destination->data[2]};
         previous = {0,0,0};
 
-        curve = Bezier::Curve(dest, resolution);
+        curve = Bezier::Curve(dest, resolution, (int)destination->data[3], (int)destination->data[4]);
 
         if (destination->data[0] == 0.0f && destination->data[1] == 0.0f && destination->data[2] == 0.0f) {
             //Finished path, now reset curve waiting for new request

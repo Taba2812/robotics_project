@@ -1,94 +1,71 @@
 #include "gazebo_interpreter.h"
 
-// Gazebo::Interpreter::Interpreter() {}
+Gazebo::Interpreter::Interpreter() {}
 
-// ur5::JointAngles Gazebo::Interpreter::parseJointState(const sensor_msgs::JointState::ConstPtr &ja) {
-//     ur5::JointAngles _ja;
+ur5::JointAngles Gazebo::Interpreter::parseJointState(const sensor_msgs::JointState::ConstPtr &ja) {
+    ur5::JointAngles _ja;
 
-//     for(int i=0; i<ur5::noJoints; i++){
-//         for(int j=0; j<ur5::noJoints; j++){
-//             if(ur5::jointNames[j] == ja->name.at(i)){
-//                 _ja(i) = ja->position[i];
-//             }
-//         }
-//     }
+    for(int i=0; i < NO_JOINTS; i++){
+        for(int j=0; j< NO_JOINTS; j++){
+            if(ur5::jointNames[j] == ja->name.at(i)){
+                _ja(i) = ja->position[i];
+            }
+        }
+    }
 
-//     correct(_ja); 
+    correct(_ja); 
 
-//     return _ja;
-// }
+    return _ja;
+}
 
-// ur5::JointAngles Gazebo::Interpreter::parseArray(const std_msgs::Float64MultiArray::ConstPtr &ja) {
-//     ur5::JointAngles _ja;
+ur5::JointAngles Gazebo::Interpreter::parseArray(const std_msgs::Float64MultiArray::ConstPtr &ja) {
+    ur5::JointAngles _ja;
 
-//     for (int i = 0; i < ur5::noJoints; i++) {
-//         _ja(i) = ja->data.at(i);
-//     }
+    for (int i = 0; i < NO_JOINTS; i++) {
+        _ja(i) = ja->data.at(i);
+    }
 
-//     return _ja;
-// }
+    return _ja;
+}
 
-// ur5::JointAngles Gazebo::Interpreter::sanitizeJoints(ur5::JointAngles joints) {
+std_msgs::Float64MultiArray Gazebo::Interpreter::createJointMessage(const ur5::JointAngles &ja) {
+    std_msgs::Float64MultiArray msg;
+    msg.data.resize(NO_JOINTS);
 
-//     if (joints[0] < ur5::joint0_min ) {joints[0] = ur5::joint0_min;};
-//     if (joints[0] > ur5::joint0_max ) {joints[0] = ur5::joint0_max;};
+    ur5::JointAngles _ja = ja;
 
-//     if (joints[1] < ur5::joint1_min ) {joints[1] = ur5::joint1_min;};
-//     if (joints[1] > ur5::joint1_max ) {joints[1] = ur5::joint1_max;};
+    for(int i=0; i< NO_JOINTS; i++) {
+        msg.data.at(i) = ja(i);
+    }
 
-//     if (joints[2] < ur5::joint2_min ) {joints[2] = ur5::joint2_min;};
-//     if (joints[2] > ur5::joint2_max ) {joints[2] = ur5::joint2_max;};
+    return msg;
+}
 
-//     if (joints[3] < ur5::joint3_min ) {joints[3] = ur5::joint3_min;};
-//     if (joints[3] > ur5::joint3_max ) {joints[3] = ur5::joint3_max;};
+std_msgs::Float32MultiArray Gazebo::Interpreter::createJointMessage32(const ur5::JointAngles &ja) {
+    std_msgs::Float32MultiArray msg;
+    msg.data.resize(NO_JOINTS);
 
-//     if (joints[4] < ur5::joint4_min ) {joints[4] = ur5::joint4_min;};
-//     if (joints[4] > ur5::joint4_max ) {joints[4] = ur5::joint4_max;};
+    ur5::JointAngles _ja = ja;
 
-//     if (joints[5] < ur5::joint5_min ) {joints[5] = ur5::joint5_min;};
-//     if (joints[5] > ur5::joint5_max ) {joints[5] = ur5::joint5_max;};
+    for(int i=0; i< NO_JOINTS; i++) {
+        msg.data.at(i) = ja(i);
+    }
 
-//     return joints;
-// }
+    return msg;
+}
 
-// std_msgs::Float64MultiArray Gazebo::Interpreter::createJointMessage(const ur5::JointAngles &ja) {
-//     std_msgs::Float64MultiArray msg;
-//     msg.data.resize(ur5::noJoints);
+void Gazebo::Interpreter::correct(ur5::JointAngles &ja) {
+    std::swap(ja(0), ja(2));
+}
 
-//     ur5::JointAngles _ja = ja;
-
-//     for(int i=0; i<ur5::noJoints; i++) {
-//         msg.data.at(i) = ja(i);
-//     }
-
-//     return msg;
-// }
-
-// std_msgs::Float32MultiArray Gazebo::Interpreter::createJointMessage32(const ur5::JointAngles &ja) {
-//     std_msgs::Float32MultiArray msg;
-//     msg.data.resize(ur5::noJoints);
-
-//     ur5::JointAngles _ja = ja;
-
-//     for(int i=0; i<ur5::noJoints; i++) {
-//         msg.data.at(i) = ja(i);
-//     }
-
-//     return msg;
-// }
-
-// void Gazebo::Interpreter::correct(ur5::JointAngles &ja) {
-//     std::swap(ja(0), ja(2));
-// }
-
-// bool Gazebo::Interpreter::hasReachedDestination(ur5::JointAngles joints, float dt) {
-//     bool reached = true;
-//     for (int i = 0; i < ur5::noJoints; i++) {
-//         //std::cout << "Joint#" << i << "=" << joints[i] << " | Dest#" << i << "=" << this->destination[i] << std::endl;
-//         //std::cout << "Check#1=" << (joints[i] < (this->destination[i] + dt)) << " | Check#2=" << (joints[i] > (this->destination[i] - dt)) << std::endl;
-//         if (!(joints[i] < (this->destination[i] + dt) && joints[i] > (this->destination[i] - dt)))
-//             reached = false;
-//     }
-//     //std::cout << "------------------------------------" << std::endl;
-//     return reached;
-// }
+bool Gazebo::Interpreter::hasReachedDestination(ur5::JointAngles joints, float dt) {
+    bool reached = true;
+    for (int i = 0; i < NO_JOINTS; i++) {
+        //std::cout << "Joint#" << i << "=" << joints[i] << " | Dest#" << i << "=" << this->destination[i] << std::endl;
+        //std::cout << "Check#1=" << (joints[i] < (this->destination[i] + dt)) << " | Check#2=" << (joints[i] > (this->destination[i] - dt)) << std::endl;
+        if (!(joints[i] < (this->destination[i] + dt) && joints[i] > (this->destination[i] - dt)))
+            reached = false;
+    }
+    //std::cout << "------------------------------------" << std::endl;
+    return reached;
+}

@@ -8,7 +8,7 @@ int main (int argc, char **argv) {
     Bezier::Node destination = {6,6,6};
     int segments = 20;
 
-    Bezier::Curve test_curve(destination, segments);
+    Bezier::Curve test_curve(destination, segments, -1, 1);
 
     std::cout << "Starting Bezier Points:" << std::endl;
     for (int i = 0; i <= segments; i++) {

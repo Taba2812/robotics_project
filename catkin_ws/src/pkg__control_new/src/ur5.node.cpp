@@ -6,109 +6,144 @@
 #include "std_msgs/Float64MultiArray.h"
 
 int main (int argc, char** argv) {
-    // ros::init(argc, argv, "UR5_Node");
-    // ros::NodeHandle nh;
+    ros::init(argc, argv, "UR5_Node");
+    ros::NodeHandle nh;
 
-    // Gazebo::Interpreter gi;
-    // ur5::Robot robot;
+    Gazebo::Interpreter gi;
+    ur5::Robot robot;
 
-    // int queue, noSteps;
-    // std::string to_gi, from_gi, to_detection, from_detection, to_motion_request, to_motion_data, from_motion;
-    // nh.getParam("Q_Size", queue);
-    // nh.getParam("UR52Gazebo", to_gi);
-    // nh.getParam("Gazebo2UR5", from_gi);
-    // nh.getParam("Core2Det_Req", to_detection);
-    // nh.getParam("Det2Core_Res", from_detection);
-    // nh.getParam("Core2MP_Req", to_motion_request);
-    // nh.getParam("Core2MP_Data", to_motion_data);
-    // nh.getParam("MP2Core_Data", from_motion);
-    // nh.getParam("STEPS", noSteps);
+    int queue, noSteps, frequency;
+    std::string to_gi, from_gi, to_detection, from_detection, to_motion_request, to_motion_data, from_motion;
+    nh.getParam("Q_Size", queue);
+    nh.getParam("UR52Gazebo", to_gi);
+    nh.getParam("Gazebo2UR5", from_gi);
+    nh.getParam("Core2Det_Req", to_detection);
+    nh.getParam("Det2Core_Res", from_detection);
+    nh.getParam("Core2MP_Req", to_motion_request);
+    nh.getParam("Core2MP_Data", to_motion_data);
+    nh.getParam("MP2Core_Data", from_motion);
+    nh.getParam("STEPS", noSteps);
+    nh.getParam("FREQUENCY", frequency);
 
-    // ros::Publisher pub_gi = nh.advertise<std_msgs::Float64MultiArray>(to_gi, queue);
-    // ros::Publisher pub_detection = nh.advertise<std_msgs::Bool>(to_detection, queue);
-    // ros::Publisher pub_motion_next = nh.advertise<std_msgs::Bool>(to_motion_request, queue);
-    // ros::Publisher pub_motion_data = nh.advertise<std_msgs::Float32MultiArray>(to_motion_data, queue);
+    ros::Rate rate(frequency);
 
-    // //CALLBACKS
+    ros::Publisher pub_gi = nh.advertise<std_msgs::Float64MultiArray>(to_gi, queue);
+    ros::Publisher pub_detection = nh.advertise<std_msgs::Bool>(to_detection, queue);
+    ros::Publisher pub_motion_next = nh.advertise<std_msgs::Bool>(to_motion_request, queue);
+    ros::Publisher pub_motion_data = nh.advertise<std_msgs::Float32MultiArray>(to_motion_data, queue);
 
-    // //Separare la classe Joint angles con una classe che sia un array a tre elementi per differenziarli
-    // ur5::JointAngles block_buffer, dest_buffer;
-    // bool block_buffer_empty = true;
-    // bool dest_buffer_empty = true;
+    //CALLBACKS
 
-    // auto l_gi = [&] (const std_msgs::Float64MultiArrayConstPtr &position) {
-    //     std::cout << "[ur5-Core] Received new JointState from -Gazebo Interface-" << std::endl;
+    //Separare la classe Joint angles con una classe che sia un array a tre elementi per differenziarli
+    Eigen::Vector3d block_buffer, dest_buffer;
+    bool block_buffer_empty = true;
+    bool dest_buffer_empty = true;
 
-    //     ur5::JointAngles received = gi.parseArray(position);
-    //     robot.setJointAngles(received);
+    auto l_gi = [&] (const std_msgs::Float64MultiArrayConstPtr &position) {
+        std::cout << "[ur5-Core] Received new JointState from -Gazebo Interface-" << std::endl;
 
-    //     if (block_buffer_empty && dest_buffer_empty) {
-    //         //Send request to Detection
-    //         std_msgs::Bool det_req;
-    //         det_req.data = true;
-    //         pub_detection.publish(det_req);
-    //     } else {
-    //         if (!block_buffer_empty) {
-    //             //Se position == blocco
-    //                 //block_buffer_empty = true;
-    //                 //Invia richiesta al planning per il pat alla destination
-    //             //Altrimenti
-    //                 //Richiedere il prossimo step del percorso
-    //                 //Inviarlo (fare inverse kinematic sul punto per inviare i joint);
-    //         } else {
-    //             //Se position == destination
-    //                 //dest_buffer_empty = true;
-    //                 //Continue... [Home, maybe in the future]
-    //             //Altrimenti
-    //                 //Richiede il prossimo step
-    //                 //Inviarlo
-    //         }
-    //     }
-    // };
+        ur5::JointAngles received = gi.parseArray(position);
+        robot.computeDirect(received);
 
-    // auto l_detection = [&] (const std_msgs::Float32MultiArrayConstPtr &position) {
-    //     std::cout << "[ur5-Core] Received block and destination positions from -Detection-" << std::endl;
-    //     std::cout << "[ur5-Core] Received Block is: X:" << position->data[0] << " Y:"<< position->data[1] << " Z:" << position->data[2] << std::endl;
-    //     std::cout << "[ur5-Core] Received Dest  is: X:" << position->data[3] << " Y:"<< position->data[4] << " Z:" << position->data[5] << std::endl;
+        if (block_buffer_empty && dest_buffer_empty) {
+            //Send request to Detection
+            std_msgs::Bool det_req;
+            det_req.data = true;
+            pub_detection.publish(det_req);
+        } else {
+            std_msgs::Bool request_next_path_step;
+            request_next_path_step.data = true;
+            pub_motion_next.publish(request_next_path_step);
+
+        }
+    };
+
+    auto l_detection = [&] (const std_msgs::Float32MultiArrayConstPtr &position) {
+        std::cout << "[ur5-Core] Received block and destination positions from -Detection-" << std::endl;
+        std::cout << "[ur5-Core] Received Block is: X:" << position->data[0] << " Y:"<< position->data[1] << " Z:" << position->data[2] << std::endl;
+        std::cout << "[ur5-Core] Received Dest  is: X:" << position->data[3] << " Y:"<< position->data[4] << " Z:" << position->data[5] << std::endl;
         
-    //     block_buffer[0] = position->data[0];
-    //     block_buffer[1] = position->data[1];
-    //     block_buffer[2] = position->data[2];
+        block_buffer(0) = position->data[0];
+        block_buffer(1) = position->data[1];
+        block_buffer(2) = position->data[2];
 
-    //     dest_buffer[0] = position->data[3];
-    //     dest_buffer[1] = position->data[4];
-    //     dest_buffer[2] = position->data[5];
+        dest_buffer(0) = position->data[3] - position->data[0];
+        dest_buffer(1) = position->data[4] - position->data[1];
+        dest_buffer(2) = position->data[5] - position->data[2];
 
-    //     block_buffer_empty = false;
-    //     dest_buffer_empty = false;
+        block_buffer_empty = false;
+        dest_buffer_empty = false;
 
-    //     std::cout << "[ur5-Core] Sending path request to -Motion Planning-" << std::endl;
-    //     pub_motion_data.publish(gi.createJointMessage32(block_buffer));
-    // };
+        std::cout << "[ur5-Core] Sending path request to -Motion Planning-" << std::endl;
+        std_msgs::Float32MultiArray block_coordinate;
+        block_coordinate.data.resize(5);
+        block_coordinate.data[0] = position->data[0];
+        block_coordinate.data[1] = position->data[1];
+        block_coordinate.data[2] = position->data[2];
+        block_coordinate.data[3] = -1;
+        block_coordinate.data[4] =  1;
 
-    // auto l_motion = [&] (const std_msgs::Float32MultiArrayConstPtr &step_coordinate) {
-    //     std::cout << "[ur5-Core][Forwarding] Forwarding result of -Motion Planning-" << std::endl;
+        pub_motion_data.publish(block_coordinate);
+    };
+
+    auto l_motion = [&] (const std_msgs::Float32MultiArrayConstPtr &step_coordinate) {
         
-    //     //Calculate kinematics
-    //     ur5::Pose ee_pose = robot.computeDirect();
+        Eigen::Vector3d translation(step_coordinate->data.at(0), step_coordinate->data.at(1), step_coordinate->data.at(2));
+        if (translation != Eigen::Vector3d::Zero()) {
+            ur5::Pose new_destination = robot.translateEndEffector(translation);
 
-    //     std::cout << ee_pose << std::endl << std::endl;
+            ur5::Pose oriented(new_destination.getPosition(), Eigen::Vector3d(0,0,M_PI_2 + 1));
 
-    //     for (int i = 0; i < 3; i++) {
-    //         ee_pose(i,3) -= step_coordinate->data.at(i); 
-    //     }
+            ur5::JointAngles updated_joints = robot.computeInverse(oriented);
 
-    //     std::cout << ee_pose << std::endl << std::endl;
+            std::cout << "[ur5-Core][Forwarding] Forwarding result of -Motion Planning-" << std::endl;
+            pub_gi.publish(gi.createJointMessage(updated_joints));
+            // rate.sleep();
+        } else {
+            std::cout << "[ur5-Core] Arrived at destination" << std::endl;
+            if (!block_buffer_empty && !dest_buffer_empty) {
+                block_buffer_empty = true;
 
-    //     ur5::JointAngles updated_joints = robot.computeInverse(ee_pose);
+                std::cout << "[ur5Core] Dest Buffer: " << dest_buffer << "\n\n"; 
 
-    //     pub_gi.publish(gi.createJointMessage(updated_joints));
-    // };
+                std_msgs::Float32MultiArray dest_coordinate;
+                dest_coordinate.data.resize(5);
+                dest_coordinate.data[0] = dest_buffer[0];
+                dest_coordinate.data[1] = dest_buffer[1];
+                dest_coordinate.data[2] = dest_buffer[2];
+                dest_coordinate.data[3] = 1; 
+                dest_coordinate.data[4] = -1;
 
-    // ros::Subscriber sub_gi = nh.subscribe<std_msgs::Float64MultiArray>(from_gi, queue, l_gi);
-    // ros::Subscriber sub_detection = nh.subscribe<std_msgs::Float32MultiArray>(from_detection, queue, l_detection);
-    // ros::Subscriber sub_motion = nh.subscribe<std_msgs::Float32MultiArray>(from_motion, queue, l_motion);
+                for(int i=0; i<dest_coordinate.data.size(); i++) {
+                    std::cout << "\nDest Coordinates: " << dest_coordinate.data.at(i) << "\n\n";
+                }
 
-    // ros::spin();
+                std::cout << "[ur5-Core][Forwarding][2] Forwarding result of -Motion Planning-" << std::endl;
+                pub_motion_data.publish(dest_coordinate);
+                // rate.sleep();
+            } else if (block_buffer_empty) {
+                dest_buffer_empty = true;
+
+                std_msgs::Float32MultiArray home_coordinate;
+                home_coordinate.data.resize(5);
+                Eigen::Vector3d home_pos = robot.getHomePosition();
+                home_coordinate.data[0] = home_pos[0];
+                home_coordinate.data[1] = home_pos[1];
+                home_coordinate.data[2] = home_pos[2];
+                home_coordinate.data[3] =  1; 
+                home_coordinate.data[4] = -1;
+
+                std::cout << "[ur5-Core][Forwarding][3] Forwarding result of -Motion Planning-" << std::endl;
+                pub_motion_data.publish(home_coordinate);
+                // rate.sleep();
+            } 
+        }
+    };
+
+    ros::Subscriber sub_gi = nh.subscribe<std_msgs::Float64MultiArray>(from_gi, queue, l_gi);
+    ros::Subscriber sub_detection = nh.subscribe<std_msgs::Float32MultiArray>(from_detection, queue, l_detection);
+    ros::Subscriber sub_motion = nh.subscribe<std_msgs::Float32MultiArray>(from_motion, queue, l_motion);
+
+    ros::spin();
 
 }
