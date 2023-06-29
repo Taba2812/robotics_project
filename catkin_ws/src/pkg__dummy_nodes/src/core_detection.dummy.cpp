@@ -25,7 +25,10 @@ int main (int argc, char **argv) {
     
     ros::Publisher pub = handle.advertise<std_msgs::Float32MultiArray>(det_res, queue);
 
+    bool done = false;
     auto detection_callback = [&] (const std_msgs::BoolConstPtr &result) {
+        if (done) {return;}
+        
         std::cout <<  "[Detection][Dummy] Received Request for Detection" << std::endl;
 
         std_msgs::Float32MultiArray payload;
@@ -33,6 +36,7 @@ int main (int argc, char **argv) {
         std::cout <<  "[Detection][Dummy] Sending Detection Position" << std::endl;
         std::cout <<  "[Detection][Dummy] Sent Block Position: X:" << x << " Y:" << y << "Z:" << z << std::endl;
         std::cout <<  "[Detection][Dummy] Sent Dest  Position: X:" << a << " Y:" << b << "Z:" << c << std::endl;
+        done = true;
         pub.publish(payload);
     };
 

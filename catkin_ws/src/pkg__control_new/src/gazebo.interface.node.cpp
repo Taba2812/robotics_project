@@ -63,12 +63,14 @@ int main (int argc, char** argv) {
     sleep(2);
 
     std::cout << "[Gazebo-Interface] Homing" << std::endl;
-    while (true) {
+    while (ros::ok()) {
         atDestination = gi.hasReachedDestination(current_position, delta);
         //std::cout << "[Gazebo-Interface][Debug] atDestination=" << atDestination << std::endl;
         ros::spinOnce();
 
         if (!atDestination) 
+            //std::cout << "[Gazebo-Interface] NOT AT DESTINATION" << std::endl;
+            rate.sleep();
             pub_gazebo.publish(gi.publishDestination());
 
         rate.sleep();

@@ -39,6 +39,24 @@ int main (int argc, char** argv) {
     bool block_buffer_empty = true;
     bool dest_buffer_empty = true;
 
+    auto l_send_to_gazebo_interface = [&] (ur5::JointAngles to_publish) {
+        pub_gi.publish(gi.createJointMessage(to_publish));
+    };
+
+    auto l_send_to_motion_planning = [&] (const Eigen::Vector3d pos, const Eigen::Vector2d dir) {
+        std::cout << "[ur5-Core] Sending path request to -Motion Planning-" << std::endl;
+        std_msgs::Float32MultiArray block_coordinate;
+        block_coordinate.data.resize(5);
+        block_coordinate.data[0] = pos(0);
+        block_coordinate.data[1] = pos(1);
+        block_coordinate.data[2] = pos(2);
+        block_coordinate.data[3] = dir(0);
+        block_coordinate.data[4] = dir(1);
+
+        sleep(1);
+        pub_motion_data.publish(block_coordinate);
+    };
+
     auto l_gi = [&] (const std_msgs::Float64MultiArrayConstPtr &position) {
         std::cout << "[ur5-Core] Received new JointState from -Gazebo Interface-" << std::endl;
 
@@ -60,8 +78,6 @@ int main (int argc, char** argv) {
 
     auto l_detection = [&] (const std_msgs::Float32MultiArrayConstPtr &position) {
         std::cout << "[ur5-Core] Received block and destination positions from -Detection-" << std::endl;
-        std::cout << "[ur5-Core] Received Block is: X:" << position->data[0] << " Y:"<< position->data[1] << " Z:" << position->data[2] << std::endl;
-        std::cout << "[ur5-Core] Received Dest  is: X:" << position->data[3] << " Y:"<< position->data[4] << " Z:" << position->data[5] << std::endl;
         
         block_buffer(0) = position->data[0];
         block_buffer(1) = position->data[1];
@@ -74,16 +90,7 @@ int main (int argc, char** argv) {
         block_buffer_empty = false;
         dest_buffer_empty = false;
 
-        std::cout << "[ur5-Core] Sending path request to -Motion Planning-" << std::endl;
-        std_msgs::Float32MultiArray block_coordinate;
-        block_coordinate.data.resize(5);
-        block_coordinate.data[0] = position->data[0];
-        block_coordinate.data[1] = position->data[1];
-        block_coordinate.data[2] = position->data[2];
-        block_coordinate.data[3] = -1;
-        block_coordinate.data[4] =  1;
-
-        pub_motion_data.publish(block_coordinate);
+        l_send_to_motion_planning(block_buffer, Eigen::Vector2d(-1,1));
     };
 
     auto l_motion = [&] (const std_msgs::Float32MultiArrayConstPtr &step_coordinate) {
@@ -97,44 +104,26 @@ int main (int argc, char** argv) {
             ur5::JointAngles updated_joints = robot.computeInverse(oriented);
 
             std::cout << "[ur5-Core][Forwarding] Forwarding result of -Motion Planning-" << std::endl;
-            pub_gi.publish(gi.createJointMessage(updated_joints));
+            
+            //pub_gi.publish(gi.createJointMessage(updated_joints));
+            l_send_to_gazebo_interface(updated_joints);
             // rate.sleep();
+
         } else {
             std::cout << "[ur5-Core] Arrived at destination" << std::endl;
             if (!block_buffer_empty && !dest_buffer_empty) {
                 block_buffer_empty = true;
 
-                std::cout << "[ur5Core] Dest Buffer: " << dest_buffer << "\n\n"; 
-
-                std_msgs::Float32MultiArray dest_coordinate;
-                dest_coordinate.data.resize(5);
-                dest_coordinate.data[0] = dest_buffer[0];
-                dest_coordinate.data[1] = dest_buffer[1];
-                dest_coordinate.data[2] = dest_buffer[2];
-                dest_coordinate.data[3] = 1; 
-                dest_coordinate.data[4] = -1;
-
-                for(int i=0; i<dest_coordinate.data.size(); i++) {
-                    std::cout << "\nDest Coordinates: " << dest_coordinate.data.at(i) << "\n\n";
-                }
-
-                std::cout << "[ur5-Core][Forwarding][2] Forwarding result of -Motion Planning-" << std::endl;
-                pub_motion_data.publish(dest_coordinate);
+                l_send_to_motion_planning(dest_buffer, Eigen::Vector2d(1,-1));
                 // rate.sleep();
+
             } else if (block_buffer_empty) {
                 dest_buffer_empty = true;
-
-                std_msgs::Float32MultiArray home_coordinate;
-                home_coordinate.data.resize(5);
-                Eigen::Vector3d home_pos = robot.getHomePosition();
-                home_coordinate.data[0] = home_pos[0];
-                home_coordinate.data[1] = home_pos[1];
-                home_coordinate.data[2] = home_pos[2];
-                home_coordinate.data[3] =  1; 
-                home_coordinate.data[4] = -1;
-
                 std::cout << "[ur5-Core][Forwarding][3] Forwarding result of -Motion Planning-" << std::endl;
-                pub_motion_data.publish(home_coordinate);
+
+                //pub_gi.publish(gi.createJointMessage(robot.getHomeJoints()));
+                sleep(2);
+                l_send_to_gazebo_interface(robot.getHomeJoints());
                 // rate.sleep();
             } 
         }
