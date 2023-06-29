@@ -114,7 +114,7 @@ int main (int argc, char** argv) {
             if (!block_buffer_empty && !dest_buffer_empty) {
                 block_buffer_empty = true;
 
-                l_send_to_motion_planning(dest_buffer, Eigen::Vector2d(1,-1));
+                l_send_to_motion_planning(dest_buffer, Eigen::Vector2d(1,1));
                 // rate.sleep();
 
             } else if (block_buffer_empty) {
