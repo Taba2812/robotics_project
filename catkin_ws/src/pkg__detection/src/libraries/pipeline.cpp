@@ -15,12 +15,6 @@ void pipeline::generateMask(cv::Mat src, cv::Mat *mask) {
 
     //Mask for all colors that we are looking for then mix them
     for (setting::Boundry bound : setting::access.lookup_colors()) {
-        std::cout << "LH: " << bound.lower.hue \
-                    << " LS:" << bound.lower.saturation \
-                    << " LB:" << bound.lower.brightness \
-                    << " UH:" << bound.upper.hue \
-                    << " US:" << bound.upper.saturation \
-                    << " UB:" << bound.upper.brightness << std::endl;
         cv::inRange(HSVCamera, cv::Scalar(bound.lower.hue, bound.lower.saturation, bound.lower.brightness), 
                                cv::Scalar(bound.upper.hue, bound.upper.saturation, bound.upper.brightness), HSVRange);
 

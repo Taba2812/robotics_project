@@ -3,21 +3,21 @@
     <!-- <param name="" value="" /> -->
 
     <!-- TABLE CROPPING -->
-    <param name="LEFT_CROP"  value="673" />
-    <param name="RIGHT_CROP" value="874" />
-    <param name="TOP_CROP"   value="95" />
-    <param name="BOT_CROP"   value="817" />
+    <param name="LEFT_CROP"  value="679" />
+    <param name="RIGHT_CROP" value="881" />
+    <param name="TOP_CROP"   value="160" />
+    <param name="BOT_CROP"   value="759" />
 
     <!-- PIPELINE -->
     <param name="EROSION_SIZE"  value="2" />
     <param name="DILATION_SIZE" value="4" />
 
-    <param name="LOWER_HUE"         value="110" />
-    <param name="LOWER_SATURATION"  value="20" />
-    <param name="LOWER_BRIGHTNESS"  value="50" />
-    <param name="HIGHER_HUE"        value="194" />
-    <param name="HIGHER_SATURATION" value="192" />
-    <param name="HIGHER_BRIGHTNESS" value="206" />
+    <param name="LOWER_HUE"         value="113" />
+    <param name="LOWER_SATURATION"  value="34" />
+    <param name="LOWER_BRIGHTNESS"  value="26" />
+    <param name="HIGHER_HUE"        value="124" />
+    <param name="HIGHER_SATURATION" value="163" />
+    <param name="HIGHER_BRIGHTNESS" value="227" />
 
     <!--<param name="LOWER_HUE"         value="103" />
     <param name="LOWER_SATURATION"  value="80" />
@@ -55,17 +55,17 @@
     <param name="RED"    value="0" />
     <param name="VIOLET" value="0" />
 
-    <param name="X1_Y1_Z2"            value="0" />
-    <param name="X1_Y2_Z1"            value="0" />
+    <param name="X1_Y1_Z2"            value="1" />
+    <param name="X1_Y2_Z1"            value="1" />
     <param name="X1_Y2_Z2"            value="1" />
-    <param name="X1_Y2_Z2_CHAMFER"    value="0" />
-    <param name="X1_Y2_Z2_TWINFILLET" value="0" />
-    <param name="X1_Y3_Z2"            value="0" />
-    <param name="X1_Y3_Z2_FILLET"     value="0" />
-    <param name="X1_Y4_Z1"            value="0" />
-    <param name="X1_Y4_Z2"            value="0" />
-    <param name="X2_Y2_Z2"            value="0" />
-    <param name="X2_Y2_Z2_FILLET"     value="0" />
+    <param name="X1_Y2_Z2_CHAMFER"    value="1" />
+    <param name="X1_Y2_Z2_TWINFILLET" value="1" />
+    <param name="X1_Y3_Z2"            value="1" />
+    <param name="X1_Y3_Z2_FILLET"     value="1" />
+    <param name="X1_Y4_Z1"            value="1" />
+    <param name="X1_Y4_Z2"            value="1" />
+    <param name="X2_Y2_Z2"            value="1" />
+    <param name="X2_Y2_Z2_FILLET"     value="1" />
 
     <param name="BLOCK_DATASET_PATH"  value="/root/code/catkin_ws/src/images_database/block_dataset_simulation" />
 

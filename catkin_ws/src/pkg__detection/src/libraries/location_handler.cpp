@@ -36,11 +36,6 @@ std::vector<cv::Point2i> LocationHandler::RRect2Contour(Types::RecognitionResult
                                             cv::Size2f(selected.template_size.width * selected.detection_rect[2], selected.template_size.height * selected.detection_rect[2]), 
                                             selected.detection_rect[3]);
 
-    for (int i = 0; i < 4; i++) {
-        std::cout << "Vector#" << i << " " << selected.detection_rect[i] << std::endl;
-    }
-    std::cout << "TWidth: " << selected.template_size.width << " THeight: " << selected.template_size.height << std::endl;
-
     cv::Point2f vertices[4];
     rect.points(vertices);
 
@@ -56,9 +51,6 @@ cv::Vec3f LocationHandler::extrapolateDetectionPosition(cv::Mat img, Types::Reco
 
     
     std::vector<cv::Point2i> contour = LocationHandler::RRect2Contour(selected); 
-    for (int i = 0; i < contour.size(); i++) {
-        std::cout << "ContPt#" << i << " [" << contour[i].x << "," << contour[i].y << "]" << std::endl;
-    }
 
     //MIDPOINT STUFF
     cv::Vec4f midpoint = point_cloud_array.at<cv::Vec4f>(selected.detection_rect[0], selected.detection_rect[1]);
@@ -71,7 +63,6 @@ cv::Vec3f LocationHandler::extrapolateDetectionPosition(cv::Mat img, Types::Reco
     float value_z_tot = 0;
 
     if (point_cloud_array.rows != img.rows || point_cloud_array.cols != img.cols) {return cv::Vec3f(0, 0, 0);}
-    std::cout << "Rows: " << img.rows << " Cols: " << img.cols << std::endl;
 
     int i = 0;
     auto pcl_lambda = [&] (f32_Pixel &pixel, const int *position) {
@@ -98,19 +89,17 @@ cv::Vec3f LocationHandler::extrapolateDetectionPosition(cv::Mat img, Types::Reco
         int col = position[1];
         if (cv::pointPolygonTest( contour, cv::Point2f((float)col, (float)row), false ) != 1) {return;}
         
-        pixel.x = 150;
-        pixel.y = 150;
-        pixel.z = 150;
+        pixel.x += 10;
+        pixel.y += 10;
+        pixel.z += 10;
     };
 
     point_cloud_array.forEach<f32_Pixel>(pcl_lambda);
-    img.forEach<ui8_Pixel>(img_lambda);
+    //img.forEach<ui8_Pixel>(img_lambda);
 
     float final_x = value_x_tot / weight_tot;
     float final_y = value_y_tot / weight_tot;
     float final_z = value_z_tot / weight_tot;
-    
-    std::cout << "Total Pixels: " << img.rows * img.cols << " Eligible pixels: " << i << std::endl;
 
     return cv::Vec3f(final_x, final_y, final_z);
 }

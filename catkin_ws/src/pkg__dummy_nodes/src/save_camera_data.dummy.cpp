@@ -194,22 +194,20 @@ int main (int argc, char **argv) {
     auto pointcloud_callback = [&] (const sensor_msgs::PointCloud2ConstPtr &point_cloud) {
         if (i_pcl) {return;}
 
+        std::cout << "[CAMERA][Dummy] Received Point Cloud" << std::endl;
+
         //Convert from sensor_msgs::PointCloud2 to cv::Mat
         pcl::PCLPointCloud2 pcl_pc2;
         pcl_conversions::toPCL(*point_cloud,pcl_pc2);
         PTL_PointCloudPtr temp_cloud(new pcl::PointCloud<pcl::PointXYZ>);
         pcl::fromPCLPointCloud2(pcl_pc2,*temp_cloud);
 
-        if (0 < (0 + 0.1f)) {
-            std::cout << "Funziona" << std::endl;
-        }
-
         matrice = pcl_to_Mat(temp_cloud);
         matrice = adjust_raw_matrix(matrice);
 
         save_raw_matrix_to_txt(matrice, RAW_PATH);
 
-        std::cout << "Over" << std::endl;
+        std::cout << "[CAMERA][Dummy] Saved Point Cloud" << std::endl;
         i_pcl++;
     };
 
@@ -235,8 +233,9 @@ int main (int argc, char **argv) {
     ros::Subscriber pcl_sub = handle.subscribe<sensor_msgs::PointCloud2>(in_pcl, queue, pointcloud_callback);
     ros::Subscriber img_sub = handle.subscribe<sensor_msgs::Image>(in_img, queue, image_callback);
 
-    std::cout << "[CAMERA][Dummy] Type any character to take an instance of the data sent by simulated zed:" << std::endl;
+    std::cout << "[CAMERA][Dummy] Type any character to take an instance of the data sent by simulated zed:";
     std::cin.get();
+    std::cout << std::endl;
 
     ros::spin();
 

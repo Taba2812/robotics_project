@@ -41,22 +41,20 @@ Detection::DetectionResults Detection::detectBlocks(cv::Mat pcl, cv::Mat png) {
     //OBJECT RECOGNITION -------------------------------------------
         std::vector<Types::RecognitionResult> detections;
         detections = recognition::runRecognition(result);
-        std::cout << "TMP: Passed detection" << std::endl;
 
     //CALCULATION OBJECT POSITION
         Types::RecognitionResult selected_block;
         selected_block = LocationHandler::selectDetection(detections, result.cols, result.rows);
 
         //recognition::drawSelected(result, selected_block);
-        recognition::drawSelected(result, detections[2]);
+        recognition::drawSelected(result, selected_block);
 
         cv::Vec3f detection_position;
-        detection_position = LocationHandler::extrapolateDetectionPosition(result, detections[2], pcd);
+        detection_position = LocationHandler::extrapolateDetectionPosition(result, selected_block, pcd);
         
     Detection::DetectionResults extrapolate;
     extrapolate.position = detection_position;
     extrapolate.image = result;
 
-    std::cout << "exited" << std::endl;
     return extrapolate;
 }

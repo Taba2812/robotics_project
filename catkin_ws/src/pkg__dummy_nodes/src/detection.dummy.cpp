@@ -34,7 +34,6 @@ int main (int argc, char **argv) {
         float tot = a + b + c;
         float dist = sqrt(tot);
         std::cout <<  "[Core][Dummy] Block Detected at position: [" << result->data[0] << "," << result->data[1] << "," << result->data[2] << "] Distance: " << dist << std::endl;
-        std::cout <<  "[Core][Dummy] Block Expected at position: [" << difference[0] << "," << difference[1] << "," << difference[2] << "] Distance: " << ex_dist << std::endl;
     };
 
     ros::Subscriber sub = handle.subscribe<std_msgs::Float32MultiArray>(det_res, queue, detection_callback);
@@ -42,7 +41,7 @@ int main (int argc, char **argv) {
     std::cout << "[Core][Dummy] Press any key to send a detection request: ";
     std::cin.get();
 
-    std::cout << "[Core][Dummy] Sending Detection Request" << std::endl;
+    std::cout << std::endl << "[Core][Dummy] Sending Detection Request" << std::endl;
     std_msgs::Bool reply;
     reply.data = true;
     pub.publish(reply);

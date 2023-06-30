@@ -8,7 +8,7 @@ std::vector<Types::RecognitionResult> recognition::runRecognition(cv::InputOutpu
     recognition::setParameters(guil); 
 
     recognition::setDataset(guil, &buffer);
-    std::cout << "Number of images used as templates: " << buffer.size() << std::endl;
+    std::cout << "[Detection][Recognition] Number of images used as templates: " << buffer.size() << std::endl;
 
     return recognition::detection(guil, &buffer, img, guilPosition);
 }
@@ -120,15 +120,13 @@ std::vector<Types::RecognitionResult> recognition::detection(cv::Ptr<cv::General
         partial_detections.clear();
     }
 
-    std::cout << "Total detections across all images: " << std::to_string(position.size()) << std::endl;
+    std::cout << "[Detection][Recognition] Total detections across all images: " << std::to_string(position.size()) << std::endl;
 
     recognition::scrapOvelappingDetections(&position, &pTemplate);
 
-    std::cout << "Total detections after scrapping: " << std::to_string(position.size()) << std::endl;
+    std::cout << "[Detection][Recognition] Total detections after scrapping: " << std::to_string(position.size()) << std::endl;
 
     recognition::drawResults(img, position, buffer, pTemplate);
-
-    std::cout << "pos_0: " << position[0][0] << " pos_1: " << position[0][1] << std::endl;
 
     std::vector<Types::RecognitionResult> results;
 
@@ -186,9 +184,6 @@ void recognition::scrapOvelappingDetections(std::vector<cv::Vec4f> *detections, 
     if (detections->empty() || pTemplate->empty()) {return;}
     if (detections->size()  != pTemplate->size())  {return;}
 
-    std::cout << "[Detection][ScrapOverlyingDetections] Function Barrier Checks Passed!" << std::endl;
-    std::cout << "[Detection][ScrapOverlyingDetections] inter_tresh=" << setting::access.intersection_threshold << std::endl;
-
     std::vector<cv::Vec4f>::iterator outer_pos_iter = detections->begin();
     std::vector<cv::Mat>::iterator outer_temp_iter = pTemplate->begin();
     bool need_to_increment = true;
@@ -197,7 +192,6 @@ void recognition::scrapOvelappingDetections(std::vector<cv::Vec4f> *detections, 
     int outer_counter = 0;
     while (outer_pos_iter != std::prev(detections->end()) and outer_pos_iter != detections->end()) {
         
-        //std::cout << "[Detection][ScrapOverlyingDetections][Outer Loop #" << outer_counter << "]" <<std::endl;
         need_to_increment = true;
 
         cv::Vec4f element = *outer_pos_iter;
@@ -216,7 +210,6 @@ void recognition::scrapOvelappingDetections(std::vector<cv::Vec4f> *detections, 
 
         while (inner_pos_iter != detections->end() and inner_temp_iter != pTemplate->end()) {
 
-            //std::cout << "[Detection][ScrapOverlyingDetections] [Inner Loop #" << inner_counter << "]" <<std::endl;
             if (outer_pos_iter == detections->end() and outer_temp_iter == pTemplate->end()) {
                 need_to_increment = false;
                 break;

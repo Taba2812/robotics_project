@@ -32,6 +32,7 @@ int main (int argc, char **argv) {
 
         #if DISPLAY
         while (true) {
+            std::cout << "[Debug][Detection] Showing final result of detection image processing on screen..." << std::endl;
             cv::imshow("Detection Output", ImgPtr->image);
             int c = cv::waitKey(10);
             if (c == 'k') {   
@@ -39,13 +40,13 @@ int main (int argc, char **argv) {
             }
         } 
         #else
-        cv::imwrite(file_path, ImgPtr->image);
+            std::cout << "[Debug][Detection] Saving final result of detection image processing in .png file..." << std::endl;
+            cv::imwrite(file_path, ImgPtr->image);
         #endif   
         
     };
 
     ros::Subscriber sub_img = handle.subscribe<sensor_msgs::Image>(topic, RATIO, image_callback);
 
-    std::cout << "Spinning ..." << std::endl;
     ros::spin();
 }

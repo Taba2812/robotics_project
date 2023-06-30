@@ -46,7 +46,7 @@ int main (int argc, char **argv) {
     ros::Publisher debug_pub = nh.advertise<sensor_msgs::Image>(img_debug, queue);
 
     auto detection = [&] () {
-        std::cout << "[Detection] Running Detection..." << std::endl;
+        std::cout << "[Detection] Running Recognition..." << std::endl;
         Detection::DetectionResults det = Detection::Detect(pcl_mat, img_mat);
         
         debug_pub.publish(DataTypeHandler::Mat2Image(det.image));
@@ -54,7 +54,7 @@ int main (int argc, char **argv) {
     };
     
     auto pcl_callback = [&] (const sensor_msgs::PointCloud2ConstPtr &point_cloud) {
-        std::cout << "[Detection] Recieved Point Cloud..." << std::endl;
+        std::cout << "[Detection] Received Point Cloud..." << std::endl;
         
         pcl_mat = DataTypeHandler::PointCloud2Mat(point_cloud);
         pcl_available = true;
@@ -73,7 +73,7 @@ int main (int argc, char **argv) {
         std::cout << "[Detection] Received Image..." << std::endl;
 
         img_mat = DataTypeHandler::Image2Mat(image);
-        std::cout << "Mat -> rows:" << img_mat.rows << " cols:" << img_mat.cols << std::endl;
+        std::cout << "[Detection] Image data | Mat -> rows:" << img_mat.rows << " cols:" << img_mat.cols << std::endl;
         img_available = true;
 
         if (pcl_available && img_available) {

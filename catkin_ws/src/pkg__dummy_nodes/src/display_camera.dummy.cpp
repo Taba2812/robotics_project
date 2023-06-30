@@ -118,7 +118,6 @@ int main (int argc, char **argv) {
     std_msgs::Bool reply;
     reply.data = true;
     pub.publish(reply);
-
-    std::cout << "Spinning ..." << std::endl;
+    
     ros::spin();
 }
